@@ -4,73 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IEJB</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="estilo/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <div class="box-logo">
-            <img class="logo-iejb" src="images/logo-iejb.png" alt="logo-iejb">
-            <h1>UMA IGREJA FAMÍLIA</h1>
-        </div>
-        <nav>
-            <ul class="menu-principal">
-                <li><a href="">Sobre Nós</a></li>
-                <li><a href="">Cultos</a></li>
-                <li><a href="">Localização</a></li>
-                <li><a href="">Contato</a></li>
-            </ul>
-        </nav>
-    </header>
-
     <main>
-        <section class="secao-principal">
-            <div class="box-bemvindo">
-                <h2 class="bemvindo">Bem-vindo à IEJB</h2>
-                <h3 class="bemvindo">Uma Igreja Família</h3>
-            </div>
-        </section>
-
-        <section class="sobre">
-            <div class="sobre">
-                <h2>Sobre Nós</h2>
-                <p>Desde 2013, a Igreja Evangélica do Jardim Brasil tem sido um lugar de encontro com Deus e comunhão em Araçariguama - SP. Mais do que uma instituição, somos uma família de fé. Acreditamos que a igreja funciona como um corpo, onde cada pessoa é importante e tem uma função especial dada por Deus. Nossa missão é viver o evangelho através do discipulado, acolhendo a comunidade e transformando vidas através de Cristo.</p>
-            </div>
-            <img class="imagem-sobre" src="images/iejb-sobre.jpg" alt="">
-        </section>
-
-        <div class="barra-div">
-        </div>
-
-        <section class="horario-cultos">
-            <div class="titulo-horarios">
-                <h2>Horário dos Cultos</h2>
-                <p class="venha-nos-visitar">Venha nos visitar!</p>
+        <header>
+            <img class="logo" src="images/logo-iejb.png" alt="logo-iejb">
+            <nav>
+                <ul>
+                    <li><a href="#">Sobre</a></li>
+                    <li><a href="#">Programação</a></li>
+                    <li><a href="#">Ministérios</a></li>
+                    <li><a href="#">Localização</a></li>
+                    <li><a href="#">Contato</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <article>
+            <div class="banner">
+                <h1>IEJB</h1>
+                <p>Uma igreja familia</p>
             </div>
 
-            <div class="all-box-horarios">
-                <div class="box-horarios">
-                    <h3 class="dia">Domingo</h3>
-                    <h4 class="hora">09:00</h4>
-                    <p class="evento">Escola Bíblica Dominical</p>
-
-                    <h4 class="hora">18:00</h4>
-                    <p class="evento">Culto da Família</p>
+            <section id="sobre" class="sobre">
+                <div class="texto-container">
+                    <h2>Sobre nós</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer in neque at eros pellentesque laoreet. Proin leo ante, volutpat eu volutpat eu, gravida pretium nibh. Cras tempor lorem sed augue rutrum sodales. In ullamcorper vestibulum diam. Sed non erat eu urna cursus elementum quis id arcu. In bibendum luctus tortor, eget ultricies lorem semper in. Nam sed est vel elit lacinia egestas. Nunc congue tempor arcu, id semper tellus sagittis in. Donec sed auctor eros. Sed malesuada neque est, eget faucibus velit semper vel. Suspendisse cursus rhoncus nibh et lobortis.</p>
                 </div>
-                <div class="box-horarios">
-                    <h3 class="dia">Terça</h3>
-                    <h4 class="hora">19:30</h4>
-                    <p class="evento">Culto de Terças</p>
-                </div>
-                <div class="box-horarios">
-                    <h3 class="dia">Sabádo</h3>
-                    <h4 class="hora">19:00</h4>
-                    <p class="evento">Santa Ceia</p>
+                <img class="fachada-iejb" src="images/fachada-iejb.png" alt="fachada-iejb">
+            </section>
 
-                    <h4 class="hora">19:30</h4>
-                    <p class="evento">Culto de Jovens</p>
+            <section class="programacao" id="programacao">
+                <h1>Programação</h1>
+                <div class="programacao-container">
+                    <div class="programacao-grid">
+                        <h2>Domingo</h2>
+                        <h3>Oração</h3>
+                        <p>08:00</p>
+                        <h3>Escola Bíblica</h3>
+                        <p>09:00</p>
+                        <h3>Culto da Família</h3>
+                        <p>18:00</p>
+                    </div>
+                    <div class="programacao-grid">
+                        <h2>Terça-feira</h2>
+                        <h3>Culto de Terça</h3>
+                        <p>19:30</p>
+                    </div>
+                    <div class="programacao-grid">
+                        <h2>Sábado</h2>
+                        <h3>Culto de Jovens</h3>
+                        <p>19:30</p>
+                        <p class="observacao">*todo 3º sábado</p>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </article>
     </main>
 </body>
 </html>
