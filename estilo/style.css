@@ -411,11 +411,11 @@ footer {
     .sobre {
         margin: auto;
         padding: 18px;
-
     }
 
     .sobre .texto-container {
         font-size: 16px;
+        margin: auto;
     }
 
     .sobre img {
@@ -493,6 +493,9 @@ footer {
 
     .map-container {
         width: 100%;
+        align-items: center;
+        justify-content: center;
+        margin: auto;
     }
 
     .map-container iframe {
