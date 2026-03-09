@@ -515,6 +515,7 @@ footer {
 
     .contato-container .icons-container .icons {
         font-size: 40px;
+        transform: none;
     }
 
     footer p {
