@@ -90,6 +90,12 @@ article {
     font-weight: 200;
 }
 
+.banner .versiculo {
+    font-size: 18px;
+    color: #cfcfcf;
+    margin: 30px;
+}
+
 .sobre {
     display: flex;
     align-items: center;
@@ -256,6 +262,7 @@ article {
     max-width: 500px;
     font-size: 20px;
     text-align: justify;
+    margin-right: 30px;
 }
 
 .localizacao .textos h2 {
@@ -272,9 +279,6 @@ article {
     margin: auto;
     align-items: center;
     justify-content: center;
-}
-
-.localizacao-container .map-container {
 }
 
 .map-container iframe {
@@ -352,6 +356,27 @@ footer {
 }
 
 @media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        justify-content: space-between;
+        height: 120px;
+        padding: 20px;
+    }
+
+    header img {
+        width: 5%;
+    }
+
+    header nav {
+        position: static;
+        transform: none;
+        margin-top: 15px;
+    }
+
+    header nav ul li a {
+        font-size: 14px;
+    }
+    
     .sobre {
         flex-direction: column;
         align-items: center;
@@ -533,7 +558,11 @@ footer {
     }
 }
 
-@media (max-width: 1050px) {
+@media (max-width: 1050px) {    
+    .banner .versiculo {
+        max-width: 600px;
+    }
+
     .sobre {
         flex-direction: column;
     }
