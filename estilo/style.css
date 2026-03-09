@@ -6,6 +6,10 @@
     --cor-secundaria: #EBDEDD;
 }
 
+.html {
+    scroll-behavior: smooth;
+}
+
 body { 
     margin: 0;
     font-family: Montserrat;
@@ -141,6 +145,11 @@ article {
     font-weight: 500;
 }
 
+.fa-regular {
+    margin-right: 15px;
+    font-size: 22px;
+}
+
 .programacao .programacao-grid h3 {
     margin-bottom: 0;
     font-weight: 500;
@@ -149,6 +158,11 @@ article {
 .programacao .programacao-grid p {
     margin-top: 0;
     color: #4E4E4E;
+}
+
+.fa-regular.fa-clock {
+    margin-right: 10px;
+    font-size: 18px;
 }
 
 .banner-igreja-container {
@@ -213,4 +227,30 @@ article {
 .imagem-container img {
     width: 100%;
     border-radius: 20px;
+}
+
+.localizacao {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px;
+}
+
+.localizacao .textos {
+    display: flex;
+    gap: 40px;
+    max-width: 500px;
+}
+
+.localizacao .localizacao-container {
+    display: flex;
+    margin: auto;
+}
+
+.localizacao-container .map-container {
+    max-width: 500px;
+    margin-left: 40px;
+}
+
+.map-container iframe {
 }
