@@ -255,6 +255,7 @@ article {
     gap: 40px;
     max-width: 500px;
     font-size: 20px;
+    text-align: justify;
 }
 
 .localizacao .textos h2 {
@@ -346,4 +347,174 @@ footer {
     padding: 10px;
     color: white;
     text-align: center;
+}
+
+@media (max-width: 768px) {
+    .sobre {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sobre .texto-container {
+        margin-bottom: 30px;
+    }
+
+    .sobre img {
+        max-width: 600px;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .ministerios .ministerios-container {
+        flex-direction: column;
+        align-items: center;
+        border-bottom: 2px solid lightgray;
+    }
+
+    .ministerios-container .imagem-grid {
+        max-width: 600px;
+    }
+
+    .localizacao .localizacao-container{
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .localizacao-container .textos {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        flex-direction: column;
+        justify-content: space-between;
+        height: 120px;
+        padding: 20px;
+    }
+
+    header img {
+        width: 10%;
+    }
+
+    header nav {
+        position: static;
+        transform: none;
+        margin-top: 15px;
+    }
+
+    .banner {
+        height: 500px;
+    }
+
+    .sobre {
+        margin: auto;
+        padding: 18px;
+
+    }
+
+    .sobre .texto-container {
+        font-size: 16px;
+    }
+
+    .sobre img {
+        height: 250px;
+        object-fit: cover;
+    }
+
+    .programacao h1,
+    .ministerios h1,
+    .localizacao h1,
+    .contato h1 {
+    padding-left:5px;
+    font-size: 24px;
+}
+
+    .programacao h1 {
+        margin-bottom: 0;
+        font-size: 26px;
+    }
+
+    .programacao .programacao-container{
+        flex-direction: column;
+    }
+
+    .programacao-container .programacao-grid {
+        margin: 0;
+        margin-left: 5px;
+        font-size: 16px;
+    }
+
+    .programacao-grid h2 {
+        margin-top: 50px;
+    }
+
+    .programacao-grid .tit-domingo {
+        margin-top: 0;
+    }
+
+    .programacao-grid p {
+        margin-bottom: 0;
+    }
+
+    .banner-igreja-container img {
+        height: 350px;
+    }
+
+    .ministerios h1 {
+        margin-left: 20px;
+        font-size: 26px;
+    }
+
+    .ministerios-container {
+        padding: 18px;
+    }
+
+    .ministerios-container .texto h2 {
+        font-size: 26px;
+    }
+
+    .ministerios-container .texto p {
+        font-size: 16px;
+    }
+
+    .localizacao {
+        padding: 18px;
+    }
+
+    .localizacao h1 {
+        margin-bottom: 0;
+    }
+
+    .localizacao .localizacao-container .textos .textos-container p {
+        font-size: 16px;
+    }
+
+    .map-container {
+        width: 100%;
+    }
+
+    .map-container iframe {
+        max-width: 300px;
+        max-height: 300px;
+        width: 100%;
+        margin-bottom: 30px;
+    }
+
+    .contato h1 {
+        margin-bottom: 40px;
+    }
+
+    .contato .contato-container {
+        flex-direction: column;
+    }
+
+    .contato-container .icons-container .icons {
+        font-size: 40px;
+    }
+
+    footer p {
+        font-size: 14px;
+    }
 }
