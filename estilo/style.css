@@ -404,6 +404,10 @@ footer {
         margin-top: 15px;
     }
 
+    header nav ul li a {
+        font-size: 11px;
+    }
+
     .banner {
         height: 500px;
     }
