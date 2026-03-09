@@ -496,14 +496,14 @@ footer {
     }
 
     .map-container {
-        width: 100%;
+        width: 90%;
         align-items: center;
         justify-content: center;
         margin: auto;
     }
 
     .map-container iframe {
-        max-width: 300px;
+        max-width: 200px;
         max-height: 300px;
         width: 100%;
         margin-bottom: 30px;
