@@ -270,14 +270,16 @@ article {
 .localizacao .localizacao-container {
     display: flex;
     margin: auto;
+    align-items: center;
+    justify-content: center;
 }
 
 .localizacao-container .map-container {
-    max-width: 1000px;
-    margin-left: 40px;
 }
 
 .map-container iframe {
+    width: 500px;
+    height: 350px;
     border-radius: 20px;
     box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.199);
 }
@@ -309,7 +311,7 @@ article {
 }
 
 .contato-container .icons-container .icons {
-    font-size: 80px;
+    font-size: 60px;
 }
 
 .contato-container .icons-container .icons i {
@@ -364,6 +366,10 @@ footer {
         max-width: 600px;
         justify-content: center;
         width: 100%;
+    }
+
+    .programacao-container {
+        flex-direction: column;
     }
 
     .ministerios .ministerios-container {
@@ -496,14 +502,14 @@ footer {
     }
 
     .map-container {
-        width: 90%;
+        width: 100%;
+        max-width: 100%;
         align-items: center;
         justify-content: center;
-        margin: auto;
     }
 
     .map-container iframe {
-        max-width: 200px;
+        max-width: 300px;
         max-height: 300px;
         width: 100%;
         margin-bottom: 30px;
@@ -524,5 +530,49 @@ footer {
 
     footer p {
         font-size: 14px;
+    }
+}
+
+@media (max-width: 1050px) {
+    .sobre {
+        flex-direction: column;
+    }
+
+    .sobre img {
+        max-width: 600px;
+    }
+
+    .ministerios-container {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    }
+
+    .ministerios-container .texto {
+        max-width: 800px;
+    }
+
+    .ministerios-container .imagem-container .imagem-grid {
+        max-width: 700px;
+    }
+
+    .localizacao .localizacao-container {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .localizacao-container .textos .textos-container p{
+        max-width: 800px;
+    }
+
+    .localizacao-container .map-container {
+        max-width: 100%;
+    }
+
+    .localizacao-container .map-container iframe {
+        max-width: 500px;
+        height: 400px;
+
     }
 }
