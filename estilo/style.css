@@ -355,6 +355,40 @@ footer {
     text-align: center;
 }
 
+.botao-whatsapp {
+    position: fixed;
+    display: flex;
+    width: 40px;
+    height: 40px;
+    text-decoration: none;
+    bottom: 30px;
+    right: 30px;
+    font-size: 40px;
+    background-color: #25D366;
+    padding: 12px;
+    border-radius: 100%;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 4px 4px 5px rgba(0, 0, 0, 0.217);
+    transition: all 0.2s ease;
+}
+
+.botao-whatsapp i {
+    color: white !important;
+}
+
+.botao-whatsapp:hover {
+    transform: scale(1.1);
+    color: white;
+}
+
+.botao-whatsapp,
+.botao-whatsapp:visited,
+.botao-whatsapp:hover,
+.botao-whatsapp:active {
+    color: white;
+}
+
 @media (max-width: 768px) {
     header {
         flex-direction: column;
