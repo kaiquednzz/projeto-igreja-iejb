@@ -20,16 +20,15 @@ header {
     color: var(--cor-secundaria);
     padding: 25px 40px;
     text-align: center;
-    height: 80px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     font-family: Montserrat;
-
 }
 
 header img{
-    width: 50px;
+    width: 40px;
 }
 
 header nav {
