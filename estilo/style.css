@@ -525,50 +525,11 @@ footer {
     color: white;
 }
 
-/* ===== PÁGINA ESCALAS ===== */
-
-.pagina-escalas .escalas-container{
-    display: flex;
-    flex-direction: column;
-    font-family: Montserrat;
-    font-size: 20px;
-    padding: 40px;
-    justify-content: center;
-}
-
-.pagina-escalas .escalas-container h1 {
-    font-weight: 500;
-    color: var(--cor-principal);
-    margin-bottom: 0;
-    margin-top: 0;
-}
-
-.pagina-escalas .escalas-container p {
-    margin-bottom: 40px;
-}
-
-.pagina-escalas .escalas-container .imagens-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.pagina-escalas .escalas-container .imagens-container .imagens-grid img {
-    margin-left: 20px;
-    margin-right: 20px;
-    max-width: 500px;
-}
-
 
 @media (max-width: 1080px) {
 
     .sobre img {
         margin-top: 30px;
-    }
-
-    .pagina-escalas .escalas-container .imagens-container {
-        display: flex;
-        flex-direction: column;
     }
 }
 
@@ -632,10 +593,6 @@ footer {
 
     .localizacao-container .textos {
         margin-bottom: 20px;
-    }
-
-    .pagina-escalas .escalas-container .imagens-container .imagens-grid img {
-    max-width: 400px;
     }
 }
 
@@ -785,15 +742,6 @@ footer {
 
     footer p {
         font-size: 14px;
-    }
-
-    .pagina-escalas .escalas-container {
-        font-size: 16px;
-        padding: 18px;
-    }
-
-    .pagina-escalas .escalas-container .imagens-container .imagens-grid img {
-        max-width: 300px;
     }
 }
 
