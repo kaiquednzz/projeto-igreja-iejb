@@ -51,11 +51,11 @@ header ul li a {
     text-decoration: none;
     font-size: 16px;
     transition: all 0.3s ease;
+    padding: 10px;
 }
 
 header ul li a:hover {
     background-color: #af3937;
-    padding: 10px;
     border-radius: 10px;
 }
 
@@ -111,7 +111,7 @@ article {
 }
 
 .sobre .texto-container p {
-    margin-bottom: 30px;
+    margin-bottom: 50px;
 }
 
 .sobre .texto-container h2 {
@@ -131,19 +131,19 @@ article {
 
 .sobre .botao-saiba-mais {
     font-size: 24px;
-    color: var(--cor-principal);
+    color: white;
     text-decoration: none;
     margin-top: 50px;
+    padding: 10px;
     border-radius: 10px;
-    transition: all 0.2s ease;
-    font-weight: bold;
+    outline: 2px solid black;
+    box-shadow: 5px 5px 0px black;
+    background-color: var(--cor-principal);
 }
 
 .sobre .botao-saiba-mais:hover {
-    background-color: var(--cor-principal);
-    color: white;
-    padding: 10px;
     font-weight: normal;
+    box-shadow: 7px 7px 0px black;
 }
 
 .fa-solid.fa-circle-info {
