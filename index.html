@@ -1,137 +1,113 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IEJB</title>
     <link rel="stylesheet" href="estilo/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="script/script.js" defer></script>
 </head>
+
 <body>
     <header>
-            <a href="index.html"><img class="logo" src="images/logo-iejb.png" alt="logo-iejb"></a>
-            <nav>
-                <ul>
-                    <li><a href="#sobre">Sobre</a></li>
-                    <li><a href="#programacao">Programação</a></li>
-                    <li><a href="pages/eventos.html">Eventos</a></li>
-                    <li><a href="#localizacao">Localização</a></li>
-                    <li><a href="#contato">Contato</a></li>
-                </ul>
-            </nav>
-        </header>
-    <main>       
-        <article>
-            <div class="banner">
-                <h1>Bem vindo à IEJB</h1>
-                <p>Uma igreja família</p>
-                <p class="versiculo">"Porque onde estiverem dois ou três reunidos em meu nome, ali estou no meio deles." Mateus 18:20</p>
+        <div class="logo"><img src="./images/logo-iejb.png" alt="IEJB Logo">
+            <h1>UMA <br> IGREJA <br> FAMILIA</h1>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="#">SOBRE</a></li>
+                <li><a href="#">CULTOS</a></li>
+                <li><a href="#">GRUPOS</a></li>
+                <li><a href="#">SOU NOVO</a></li>
+            </ul>
+        </nav>
+        <p><a href="#">VISITAR →</a></p>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="textos">
+                <h2>Bem-vindo à IEJB</h2>
+                <h3>Uma família
+                    que te <strong>recebe</strong>
+                    de braços abertos
+                </h3>
+                <h4>Aqui você não é visitante — você é parte. Venha como você é.</h4>
             </div>
+            <div class="buttons">
+                <a class="btn-sou-novo" href="#">Sou Novo Aqui →</a>
+                <a class="btn-ver-cultos" href="#">Ver os cultos ↓</a>
+            </div>
+        </section>
 
-            <section id="sobre" class="sobre">
-                <div class="texto-container">
-                    <h2>Sobre nós</h2>
-                    <p>A IEJB foi fundada em 2013 pelo Pastor Luiz, enviado pela igreja sede em Osasco, a IEJA. Desde o início, a visão da igreja tem sido formar uma comunidade cristã comprometida com o evangelho e com o cuidado mútuo entre as pessoas. Nossos princípios são baseados no discipulado, caminhando no modelo de vida na vida, onde crescemos espiritualmente através do relacionamento, do ensino da Palavra e do acompanhamento uns dos outros. Também valorizamos a família, entendendo que ela é um dos pilares para a formação de uma fé sólida e de uma comunidade saudável. Nosso desejo é que cada pessoa que chegue aqui encontre um lugar de acolhimento, crescimento espiritual e comunhão, onde possa desenvolver sua fé, servir a Deus e viver o propósito que Ele tem para sua vida.</p>
-                    <i class="fa-solid fa-circle-info"></i> <a class="botao-saiba-mais" href="pages/sobre.html" target="_blank">Nossa História</a>
+        <section id="brand" class="brand">
+            <h2>"Não negligencie reunir-se, como é costume de alguns, mas encoraje uns aos outros."</h2>
+            <p>Hebreus 10:25</p>
+        </section>
+
+        <article>
+            <section id="quem-somos" class="quem-somos">
+                <div class="imagem">
+                    <img src="./images/iejb-sobre.jpg" alt="Imagem de uma reunião da igreja">
                 </div>
-                <div class="fachada-container"><img class="fachada-iejb" src="images/fachada-iejb.png" alt="fachada-iejb"></div>
+                <div class="textos">
+                    <h3>QUEM SOMOS</h3>
+                    <h2>Uma <strong>comunidade</strong> que <br> cresce junta</h2>
+                    <p>Somos uma família de fé que acredita que relacionamentos transformam vidas. Desde 2001, temos
+                        sido um espaço de acolhida, cura e crescimento espiritual para centenas de famílias na nossa
+                        região.
+
+                        Não importa onde você esteja na sua jornada de fé — se está dando os primeiros passos ou
+                        buscando aprofundar seu relacionamento com Deus, você tem lugar aqui.</p>
+                    <ul>
+                        <li>
+                            <h4>Graça que transforma</h4>
+                            <p>Acreditamos que toda pessoa merece uma nova chance.</p>
+                        </li>
+                        <li>
+                            <h4>Comunidade real</h4>
+                            <p>Relacionamentos autênticos que vão além do domingo.</p>
+                        </li>
+                        <li>
+                            <h4>Palavra que fala</h4>
+                            <p>Ensinamentos práticos para o dia a dia.</p>
+                        </li>
+                    </ul>
+                </div>
             </section>
 
-            <section class="programacao" id="programacao">
-                <h1>Programação</h1>
-                <div class="programacao-container">
-                    <div class="programacao-grid">
-                        <h2 class="tit-domingo"><i class="fa-regular fa-calendar"></i>Domingo</h2>
-                        <h3>Oração</h3>
-                        <p><i class="fa-regular fa-clock"></i>08:00</p>
-                        <h3>Escola Bíblica</h3>
-                        <p><i class="fa-regular fa-clock"></i>09:00</p>
-                        <h3>Culto da Família</h3>
-                        <p><i class="fa-regular fa-clock"></i   >18:00</p>
-                    </div>
-                    <div class="programacao-grid">
-                        <h2><i class="fa-regular fa-calendar"></i>Terça-feira</h2>
-                        <h3>Culto de Terça</h3>
-                        <p><i class="fa-regular fa-clock"></i>19:30</p>
-                    </div>
-                    <div class="programacao-grid">
-                        <h2><i class="fa-regular fa-calendar"></i>Sábado</h2>
-                        <h3>Culto de Jovens</h3>
-                        <p><i class="fa-regular fa-clock"></i>19:30</p>
-                        <p class="observacao">*todo 3º sábado</p>
-                    </div>
-                </div>
-                <div class="banner-igreja-container">
-                    <img src="images/iejb-sobre.jpg" alt="Igreja IEJB">
-                </div>
-            </section>
-
-            <section id="ministerios" class="ministerios">
-                <h1>Ministérios</h1>
-                <div class="ministerios-container">
-                    <div class="texto">
-                        <h2>Louvor</h2>
-                        <p>Nosso ministério de louvor é formado por três grupos que servem juntos com o propósito de conduzir a igreja em momentos de adoração a Deus. Nosso desejo é que cada louvor cantado aponte para Cristo e para a verdade do evangelho, mantendo sempre uma mensagem cristocêntrica. Entendemos o louvor como uma forma de expressar nossa gratidão e amor a Deus. Ajudamos a igreja a entrar em um ambiente de adoração, onde cada pessoa possa se conectar com Deus. Nosso compromisso é servir com dedicação, sensibilidade espiritual e fidelidade à Palavra, para que a adoração seja sempre verdadeira e glorifique somente a Cristo.</p>
-                    </div>
-                    <div class="imagem-container">
-                        <div class="imagem-grid"><img src="images/louvor.png" alt="Louvor"></div>
-                    </div>
-                </div>
-                <div class="ministerios-container">
-                    <div class="imagem-container">
-                        <div class="imagem-grid"><img src="images/infantil.png" alt="Infantil"></div>
-                    </div>
-                    <div class="texto">
-                        <h2>Infantil</h2>
-                        <p>Nosso ministério infantil tem como propósito ensinar as crianças desde cedo sobre o amor de Deus e os princípios da Palavra. Acreditamos que a infância é um tempo fundamental para a formação da fé, por isso buscamos apresentar o evangelho de forma clara, acessível e cheia de significado para cada criança. Por meio de atividades, ensino bíblico e momentos de comunhão, procuramos ajudar os pequenos a conhecerem a Deus, desenvolverem valores cristãos e crescerem em um ambiente saudável e acolhedor. Nosso desejo é que cada criança se sinta amada, cuidada e encorajada a caminhar com Cristo desde os primeiros anos de sua vida.</p>
-                    </div>
-                </div>
-                <div class="ministerios-container">
-                    <div class="texto">
-                        <h2>Jovens</h2>
-                        <p>Nosso ministério de jovens é um espaço dedicado ao crescimento espiritual, comunhão e ao fortalecimento da fé entre os jovens da igreja. Nosso objetivo é caminhar juntos na Palavra de Deus, incentivando cada jovem a desenvolver um relacionamento verdadeiro com Cristo e a viver os princípios do evangelho no dia a dia. Buscamos criar um ambiente onde os jovens possam aprender, compartilhar experiências e crescer em maturidade espiritual. Mais do que um grupo, queremos ser uma comunidade onde cada jovem se sinta acolhido, encorajado e preparado para viver o propósito de Deus em sua geração.</p>
-                    </div>
-                    <div class="imagem-container">
-                        <div class="imagem-grid"><img src="images/jovens.png" alt="Jovens"></div>
-                    </div>
-                </div> 
-            </section>
-
-            <section id="localizacao" class="localizacao">
-                <h1>Chegue até nós</h1>
-                <div class="localizacao-container">
-                    <div class="textos">
-                        <div class="textos-container">
-                            <h2><i class="fa-regular fa-map"></i>Localização</h2>
-                            <p>Estamos localizados na Rua Ceará, 128, em Araçariguama - SP. O espaço foi preparado para receber pessoas e famílias que desejam conhecer mais sobre Deus e participar da comunhão da igreja. Se você está procurando um lugar para congregar, aprender mais sobre o evangelho e caminhar em fé junto com outras pessoas, será uma alegria receber sua visita. Venha nos conhecer e fazer parte dessa família que cresce unida no propósito de servir a Deus e amar pessoas.</p>
-                            <p>Rua Ceará, 128, Jardim Brasil, Araçariguama - SP</p>
+            <section id="programacao" class="programacao">
+                <h2>PROGRAMAÇÃO</h2>
+                <h3>Nossos <strong>Cultos</strong></h3>
+                    <div class="cultos">
+                        <div class="cultos-grid">
+                            <h4>DOMINGO</h4>
+                            <h5>EBD</h5>
+                            <h6>09:00h</h6>
+                            <p>Louvor, pregação e um momento especial para as crianças no Culto Kids.</p>
+                        </div>
+                        <div class="cultos-grid">
+                            <h4>DOMINGO</h4>
+                            <h5>Culto da Família</h5>
+                            <h6>18:00h</h6>
+                            <p>Um culto mais descontraído, ideal para trazer aquele amigo que está longe de Deus.</p>
+                        </div>
+                        <div class="cultos-grid">
+                            <h4>Terça-feira</h4>
+                            <h5>Culto de Oração</h5>
+                            <h6>19:30h</h6>
+                            <p>Intercessão, estudo bíblico e comunhão durante a semana.</p>
                         </div>
                     </div>
-                    <div class="map-container">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m17!1m11!1m3!1d110.4269966787808!2d-47.06598709701326!3d-23.42883752695691!2m2!1f0!2f3.1539404301523937!3m2!1i1024!2i768!4f53.92469346882895!3m3!1m2!1s0x94cf13f8794efdbf%3A0xcd2dc1be3b5dbea4!2sR.%20Cear%C3%A1%2C%20120%2C%20Ara%C3%A7ariguama%20-%20SP%2C%2018147-000!5e1!3m2!1spt-BR!2sbr!4v1773076046808!5m2!1spt-BR!2sbr"  style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    </div>
-                </div>
             </section>
 
-            <section id="contato" class="contato">
-                <h1>Fale Conosco</h1>
-                <div class="contato-container">
-                    <div class="icons-container">
-                        <div class="icons">
-                            <a href="https://wa.me/5511997942695" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
-                            <a href="https://www.instagram.com/iejbrasil/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-                            <a href=""><i class="fa-brands fa-youtube"></i></a>
-                        </div>
-                    </div>
-                </div>
+            <section>
+                
             </section>
-
-            <footer>
-                <p>© 2026 IEJB. Todos os direitos reservados.</p>
-            </footer>
         </article>
     </main>
-
-    <a class="botao-whatsapp" href="https://wa.me/5511997942695" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
 </body>
+
 </html>
