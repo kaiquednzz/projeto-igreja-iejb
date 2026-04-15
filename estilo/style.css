@@ -12,9 +12,17 @@
     --background: #FDFAF5;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 * {
     margin: 0;
     padding: 0;
+}
+
+i {
+    margin-right: 8px;
 }
 
 header {
@@ -577,6 +585,7 @@ strong {
 }
 
 #localizacao {
+    margin: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -600,6 +609,7 @@ strong {
 }
 
 .localizacao .localizacao-container {
+    margin: auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -618,10 +628,14 @@ strong {
 }
 
 .localizacao .textos {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .localizacao .textos h4 {
@@ -637,7 +651,7 @@ strong {
     font-weight: 300;
 }
 
-.localizacao .textos a {
+.localizacao a {
     width: fit-content;
     text-align: center;
     margin: auto;
@@ -650,16 +664,17 @@ strong {
     font-size: 16px;
     font-weight: 300;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-.localizacao .textos a:hover {
+.localizacao a:hover {
     background-color: #b1252a;
     transform: translateY(-4px);
 }
 
 footer {
     background-color: #500403;
-    padding: 40px 80px 40px 20px;
+    padding: 20px 80px 20px 20px;
     display: flex;
     flex-direction: column;
 }
@@ -695,6 +710,12 @@ footer .footer-social .media-icons a:hover {
 footer .footer-social img {
     width: 50px;
     margin-bottom: 30px;
+}
+
+footer .footer-colunas {
+    justify-content: center;
+    align-items: center;
+    display: flex;
 }
 
 footer .footer-colunas ul li {
@@ -735,4 +756,42 @@ footer .footer-copyright {
 .reveal.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+@media (max-width: 870px) {
+    .hero h2 {
+        font-size: 36px;
+    }
+
+    .hero h3 {
+        font-size: 24px;
+    }
+
+    .brand {
+        padding: 30px 20px;
+        font-size: 16px;
+    }
+
+    .quem-somos .imagem {
+        min-width: 30%;
+        min-height: 1000px;
+    }
+
+    .programacao .cultos {
+        max-width: 800px;
+    }
+
+    .programacao .cultos .cultos-grid {
+        width: 100%;
+        height: 260px;
+    }
+
+    .ministerios-container {
+        grid-template-columns: 1fr;
+    }
+
+    .depoimentos .depoimentos-container {
+        flex-direction: column;
+        gap: 20px;
+    }
 }
