@@ -115,7 +115,7 @@ header p:hover {
 }
 
 .hero .textos {
-    max-width: 500px;
+    max-width: 550px;
 }
 
 .hero h2 {
@@ -207,14 +207,16 @@ strong {
 }
 
 .quem-somos .imagem {
-    width: 50vw;
-    height: 813px;
+    width: 50%;
+    min-height: 100%;
+    flex-shrink: 0;
 }
 
 .quem-somos .imagem img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
 }
 
 .quem-somos .textos {
@@ -785,11 +787,6 @@ footer .footer-copyright {
         font-size: 16px;
     }
 
-    .quem-somos .imagem {
-        min-width: 30%;
-        min-height: 1000px;
-    }
-
     .programacao .cultos {
         max-width: 800px;
     }
@@ -871,7 +868,7 @@ footer .footer-copyright {
     }
 
     .quem-somos .textos h2 {
-        font-size: 28px;
+        font-size: 32px;
     }
 
     .programacao .cultos {
@@ -897,6 +894,11 @@ footer .footer-copyright {
     .depoimentos .depoimentos-container .depoimentos-grid {
         width: 80vw;
         height: auto;
+    }
+
+    .cta h3 {
+        margin-top: 20px;
+        line-height: 36px;
     }
 
     .cta .cta-container {
