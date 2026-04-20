@@ -762,6 +762,208 @@ footer .footer-copyright {
     width: 100%;
 }
 
+/* ===== PÁGINAS LEGAIS (termos / privacidade) ===== */
+
+.pagina-legal {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px 40px 80px 40px;
+    background-color: var(--background);
+}
+
+.pagina-legal .breadcrumb {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--principal);
+    margin-bottom: 40px;
+}
+
+.pagina-legal .breadcrumb a {
+    color: var(--principal);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.pagina-legal .breadcrumb a:hover {
+    opacity: 0.7;
+}
+
+.pagina-legal .breadcrumb span {
+    margin: 0 8px;
+    opacity: 0.4;
+}
+
+.pagina-legal .label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--principal);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.pagina-legal h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    color: var(--principal);
+    margin-bottom: 12px;
+    line-height: 1.1;
+}
+
+.pagina-legal .data-atualizacao {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    color: #999;
+    margin-bottom: 48px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid #e8e0de;
+}
+
+.pagina-legal h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--principal);
+    margin-top: 48px;
+    margin-bottom: 16px;
+}
+
+.pagina-legal p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: #444;
+    margin-bottom: 16px;
+}
+
+.pagina-legal a {
+    color: var(--principal-brighter);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.pagina-legal a:hover {
+    border-bottom-color: var(--principal-brighter);
+}
+
+.pagina-legal .destaque {
+    background-color: var(--secondary);
+    border-left: 4px solid var(--principal-brighter);
+    padding: 20px 24px;
+    border-radius: 0 8px 8px 0;
+    margin: 32px 0;
+}
+
+.pagina-legal .destaque p {
+    margin-bottom: 0;
+    font-style: italic;
+}
+
+@media (max-width: 480px) {
+    .pagina-legal {
+        padding: 40px 20px 60px 20px;
+    }
+
+    .pagina-legal h1 {
+        font-size: 32px;
+    }
+}
+
+.pagina-legal .label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--principal);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.pagina-legal h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    color: var(--principal);
+    margin-bottom: 12px;
+    line-height: 1.1;
+}
+
+.pagina-legal .data-atualizacao {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    color: #999;
+    margin-bottom: 48px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid #e8e0de;
+}
+
+.pagina-legal h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--principal);
+    margin-top: 48px;
+    margin-bottom: 16px;
+}
+
+.pagina-legal p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: #444;
+    margin-bottom: 16px;
+}
+
+.pagina-legal a {
+    color: var(--principal-brighter);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.pagina-legal a:hover {
+    border-bottom-color: var(--principal-brighter);
+}
+
+.pagina-legal .destaque {
+    background-color: var(--secondary);
+    border-left: 4px solid var(--principal-brighter);
+    padding: 20px 24px;
+    border-radius: 0 8px 8px 0;
+    margin: 32px 0;
+}
+
+.pagina-legal .destaque p {
+    margin-bottom: 0;
+    font-style: italic;
+}
+
+.pagina-legal .tag-simples {
+    display: inline-block;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 32px;
+}
+
+@media (max-width: 480px) {
+    .pagina-legal {
+        padding: 40px 20px 60px 20px;
+    }
+
+    .pagina-legal h1 {
+        font-size: 32px;
+    }
+}
+
 .reveal {
     opacity: 0;
     transform: translateY(40px);
