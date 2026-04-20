@@ -628,9 +628,10 @@ strong {
 }
 
 .localizacao .textos {
+    width: fit-content;
     align-items: center;
     justify-content: center;
-    text-align: center;
+    text-align: left;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
@@ -639,6 +640,7 @@ strong {
 }
 
 .localizacao .textos h4 {
+    width: fit-content;
     font-size: 18px;
     color: var(--principal);
     font-family: 'Montserrat';
@@ -646,6 +648,7 @@ strong {
 }
 
 .localizacao .textos p {
+    width: fit-content;
     font-size: 16px;
     font-family: 'Montserrat';
     font-weight: 300;
