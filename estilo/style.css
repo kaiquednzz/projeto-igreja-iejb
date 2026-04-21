@@ -21,6 +21,10 @@ html {
     padding: 0;
 }
 
+main {
+    background-color: var(--background);
+}
+
 i {
     margin-right: 8px;
 }
@@ -234,6 +238,8 @@ strong {
     font-size: 20px;
     font-family: 'Montserrat';
     font-weight: 300;
+    color: var(--principal);
+    margin-bottom: 10px;
 }
 
 .quem-somos .textos h2 {
@@ -358,6 +364,7 @@ strong {
     flex-direction: column;
     align-items: center;
     padding: 50px 20px;
+    background-color: var(--background);
 }
 
 .ministerios h2 {
@@ -372,6 +379,7 @@ strong {
     color: var(--principal);
     font-family: 'Playfair Display';
     margin-bottom: 20px;
+    line-height: 40px;
 }
 
 .ministerios-container {
@@ -450,6 +458,7 @@ strong {
     color: var(--background);
     font-family: 'Playfair Display';
     margin-bottom: 20px;
+    line-height: 40px;
 }
 
 .depoimentos .depoimentos-container .depoimentos-grid {
@@ -789,6 +798,43 @@ footer .footer-copyright {
     width: 100%;
 }
 
+.botao-instagram {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.botao-instagram a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle at 30% 107%,
+            #fdf497 0%,
+            #fdf497 5%,
+            #fd5949 45%,
+            #d6249f 60%,
+            #285AEB 90%);
+    color: white;
+    border-radius: 14px;
+    /* quadradinho com borda arredondada, igual a logo */
+    text-decoration: none;
+    font-size: 36px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(214, 36, 159, 0.4);
+}
+
+.botao-instagram a:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(214, 36, 159, 0.6);
+}
+
+.botao-instagram a i {
+    margin: 0px;
+}
+
 /* ===== PÁGINAS LEGAIS (termos / privacidade) ===== */
 
 .pagina-legal {
@@ -1002,7 +1048,29 @@ footer .footer-copyright {
     transform: translateY(0);
 }
 
+@media (max-width: 1100px) {
+    .ministerios .ministerios-container .ministerios-grid {
+        width: 400px;
+        height: auto;
+    }
+
+    .ministerios .ministerios-container .ministerios-grid .imagem {
+        width: 380px;
+    }
+}
+
+@media (max-width: 1080px) {
+    .depoimentos .depoimentos-container .depoimentos-grid {
+        width: 200px;
+        height: 180px;
+    }
+}
+
 @media (max-width: 870px) {
+    .hero {
+        padding: 20px;
+    }
+
     .hero h2 {
         font-size: 36px;
     }
@@ -1014,6 +1082,10 @@ footer .footer-copyright {
     .brand {
         padding: 30px 20px;
         font-size: 16px;
+    }
+
+    .quem-somos .textos {
+        padding: 20px;
     }
 
     .programacao .cultos {
@@ -1053,6 +1125,51 @@ footer .footer-copyright {
 
     footer .footer-social img {
         margin-bottom: 0;
+    }
+}
+
+@media (max-width: 775px) {
+    .localizacao .localizacao-container {
+        width: 90vw;
+    }
+}
+
+@media (max-width: 645px) {
+    header nav ul li a {
+        font-size: 8px;
+    }
+
+    header p a {
+        font-size: 8px;
+    }
+
+    .quem-somos .imagem {
+        display: none;
+    }
+
+    .programacao .cultos {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .programacao .cultos .cultos-grid {
+        width: 70vw;
+        height: auto;
+    }
+
+    .cta .cta-container {
+        flex-direction: column;
+        margin: auto;
+    }
+
+    .localizacao .localizacao-container {
+        width: 80vw;
+        margin-right: 20px;
+    }
+
+    .localizacao .localizacao-container iframe {
+        width: 80vw;
+        height: 50vh;
     }
 }
 
