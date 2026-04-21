@@ -48,6 +48,12 @@ header .logo h1 {
     font-weight: 500;
 }
 
+header .logo a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
 header img {
     width: 34px;
 }
@@ -583,6 +589,27 @@ strong {
 
 .cta a:hover {
     background-color: #b1252a;
+    transform: translateY(-6px);
+}
+
+.cta .botao-email {
+    width: fit-content;
+    background-color: transparent;
+    text-decoration: none;
+    font-family: 'Montserrat';
+    font-size: 18px;
+    color: black;
+    font-weight: 300;
+    border: 2px solid var(--principal-brighter);
+    padding: 12px 20px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    margin-top: 0px;
+}
+
+.cta .botao-email:hover {
+    background-color: #8F0D0B;
+    color: white;
     transform: translateY(-6px);
 }
 
