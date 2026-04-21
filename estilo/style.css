@@ -1064,6 +1064,17 @@ footer .footer-copyright {
         width: 200px;
         height: 180px;
     }
+
+    .programacao .cultos .cultos-grid {
+        width: 250px;
+    }
+}
+
+@media (max-width: 940px) {
+    .programacao .cultos .cultos-grid {
+        width: 200px;
+        height: auto;
+    }
 }
 
 @media (max-width: 870px) {
@@ -1101,9 +1112,24 @@ footer .footer-copyright {
         grid-template-columns: 1fr;
     }
 
+    .ministerios .ministerios-container .ministerios-grid {
+        width: 500px;
+        height: auto;
+    }
+
+    .ministerios .ministerios-container .ministerios-grid .imagem {
+        width: 100%;
+        height: auto;
+    }
+
     .depoimentos .depoimentos-container {
         flex-direction: column;
         gap: 20px;
+    }
+
+    .depoimentos .depoimentos-container .depoimentos-grid {
+        width: 400px;
+        height: auto;
     }
 
     footer {
@@ -1136,7 +1162,7 @@ footer .footer-copyright {
 
 @media (max-width: 645px) {
     header nav ul li a {
-        font-size: 8px;
+        font-size: 10px;
     }
 
     header p a {
@@ -1170,6 +1196,13 @@ footer .footer-copyright {
     .localizacao .localizacao-container iframe {
         width: 80vw;
         height: 50vh;
+    }
+}
+
+@media (max-width: 550px) {
+    .ministerios .ministerios-container .ministerios-grid {
+        width: 80vw;
+        height: auto;
     }
 }
 
