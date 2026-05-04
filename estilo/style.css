@@ -46,7 +46,7 @@ header .logo {
 header .logo h1 {
     color: white;
     font-family: 'Oswald';
-    font-size: 16px;
+    font-size: 14px;
     line-height: 20px;
     margin-left: 10px;
     font-weight: 500;
@@ -59,7 +59,7 @@ header .logo a {
 }
 
 header img {
-    width: 34px;
+    width: 30px;
 }
 
 header nav ul {
@@ -489,6 +489,161 @@ strong {
     font-weight: 300;
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+.eventos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 20px;
+    background-color: var(--secondary);
+}
+
+.eventos h2 {
+    font-size: 20px;
+    color: var(--principal);
+    font-family: 'Montserrat';
+    font-weight: 400;
+}
+
+.eventos h3 {
+    font-size: 42px;
+    color: var(--principal);
+    font-family: 'Playfair Display';
+    margin-bottom: 40px;
+    line-height: 40px;
+}
+
+.eventos-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.eventos .eventos-container .eventos-grid {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 0 10px;
+    max-width: 450px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--principal-brighter);
+    background-color: var(--background);
+}
+
+.eventos .eventos-container .eventos-grid .data {
+    display: flex;
+    align-items: center;
+    background-color: var(--principal);
+    color: var(--background);
+    margin: -20px;
+    padding: 10px;
+    height: 50px;
+    border-radius: 10px 10px 0 0;
+}
+
+.eventos .eventos-container .eventos-grid .data h4 {
+    font-size: 36px;
+    font-family: 'Montserrat';
+    font-weight: 400;
+}
+
+.eventos .eventos-container .eventos-grid .textos {
+    font-size: 18px;
+    color: var(--principal);
+    font-family: 'Montserrat';
+    font-weight: 400;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+.eventos .eventos-container .eventos-grid .textos h4 {
+    font-size: 16px;
+    color: var(--principal);
+    font-family: 'Montserrat';
+    font-weight: 400;
+}
+
+.eventos .eventos-container .eventos-grid .textos h3 {
+    font-size: 32px;
+    color: var(--principal);
+    font-family: 'Playfair Display';
+    margin-bottom: 10px;
+}
+
+.eventos .eventos-container .eventos-grid .textos p {
+    font-size: 18px;
+    color: black;
+    font-family: 'Montserrat';
+    font-weight: 300;
+    text-align: justify;
+}
+
+.eventos .eventos-container .eventos-grid .textos hr {
+    margin-top: 10px;
+    border: 1px solid var(--principal);
+}
+
+.eventos .eventos-container .eventos-grid .data .dia {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+}
+
+.eventos .eventos-container .eventos-grid .data .dia h5 {
+    font-size: 16px;
+    font-family: 'Montserrat';
+    font-weight: 500;
+    color: var(--background);
+}
+
+.eventos .eventos-container .eventos-grid .data .dia h6 {
+    font-size: 14px;
+    font-family: 'Montserrat';
+    font-weight: 400;
+    color: var(--background);
+}
+
+.eventos .eventos-container .eventos-grid .horario-localizacao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-family: 'Montserrat';
+    font-weight: 400;
+    color: #666666;
+}
+
+.eventos .eventos-container .eventos-grid .horario-localizacao .horario {
+    display: flex;
+    flex-direction: column;
+}
+
+.eventos .eventos-container .eventos-grid .horario-localizacao i {
+    margin-right: 10px;
+}
+
+.eventos .eventos-container .eventos-grid .horario-localizacao .botao a {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: var(--principal-brighter);
+    color: var(--background);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.eventos .eventos-container .eventos-grid .horario-localizacao .botao a:hover {
+    background-color: var(--principal);
+    transform: translateY(-3px);
+}
+
+.eventos .eventos-container .eventos-grid:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
 }
 
 #cta {
