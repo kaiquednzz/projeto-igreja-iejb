@@ -622,6 +622,7 @@ strong {
 
 .eventos .eventos-container .eventos-grid .horario-localizacao i {
     margin-right: 10px;
+    font-size: 14px;
 }
 
 .eventos .eventos-container .eventos-grid .horario-localizacao .botao a {
@@ -1315,6 +1316,11 @@ footer .footer-copyright {
     .localizacao .localizacao-container {
         width: 90vw;
     }
+
+    .eventos-container {
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 @media (max-width: 645px) {
@@ -1430,6 +1436,29 @@ footer .footer-copyright {
     .depoimentos .depoimentos-container .depoimentos-grid {
         width: 80vw;
         height: auto;
+    }
+
+    .eventos h3 {
+        font-size: 32px;
+    }
+
+    .eventos-container .eventos-grid.reveal .textos p {
+        font-size: 16px;
+    }
+
+    .eventos .eventos-container .eventos-grid .textos h4 {
+        font-size: 12px;
+    }
+
+    .eventos .eventos-container .eventos-grid .horario {
+        max-width: 200px;
+        font-size: 12px;
+        gap: 2px;
+    }
+
+    .eventos .eventos-container .eventos-grid a {
+        font-size: 14px;
+        min-width: 90px;
     }
 
     .cta h3 {
