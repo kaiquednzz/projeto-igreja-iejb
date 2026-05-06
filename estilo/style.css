@@ -19,6 +19,7 @@ html {
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 main {
@@ -1200,6 +1201,279 @@ footer .footer-copyright {
 .botao-instagram a i {
     margin: 0px;
 }
+
+/* ===== LINHA DO TEMPO ===== */
+.timeline-hero {
+    background: #500403;
+    padding: 80px 40px 60px;
+    text-align: center;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient( rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(../images/igreja-cantata-22.jpg);
+    background-size: cover;
+    background-position: center;
+}
+
+.timeline-hero span {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .45);
+}
+
+.timeline-hero h1 {
+    font-family: 'Playfair Display';
+    font-size: 64px;
+    font-weight: 500;
+    color: white;
+    margin-top: 10px;
+}
+
+.timeline-hero h1 strong {
+    color: #BF262B;
+    font-style: italic;
+}
+
+.timeline-hero p {
+    font-size: 15px;
+    font-weight: 300;
+    color: rgba(255, 255, 255, .55);
+    margin-top: 16px;
+    line-height: 1.7;
+}
+
+.timeline {
+    position: relative;
+    max-width: 860px;
+    margin: 80px auto 100px;
+    padding: 0 24px;
+}
+
+/* linha central */
+.timeline::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    background: #EBDEDD;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 0;
+}
+
+/* ===== EVENTO ===== */
+.event {
+    position: relative;
+    width: 50%;
+    padding: 10px 0 48px 0; /* Removemos o padding lateral fixo daqui */
+}
+
+/* card */
+.event .content {
+    background: white;
+    padding: 28px 28px 24px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, .06);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .07);
+    transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+}
+
+.event .content:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, .12);
+    border-color: rgba(191, 38, 43, .25);
+}
+
+/* tag categoria */
+.event .tag {
+    font-family: 'Montserrat';
+    font-size: 14px;
+    color: #BF262B;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* ano */
+.event h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: #8F0D0B;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+/* título do evento */
+.event h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+/* texto */
+.event p {
+    font-size: 14px;
+    font-weight: 300;
+    color: #777;
+    line-height: 1.8;
+}
+
+/* detalhe rodapé do card */
+.event .detail {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #f0ebe8;
+    font-size: 12px;
+    color: #aaa;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.event .detail i {
+    color: #BF262B;
+    font-size: 11px;
+}
+
+/* card marco (vermelho) */
+.event .content.marco {
+    background: #8F0D0B;
+    border-color: transparent;
+}
+
+.marco .tag {
+    color: rgba(255, 255, 255, .5);
+}
+
+.marco h3 {
+    color: white;
+}
+
+.marco h4 {
+    color: white;
+}
+
+.marco p {
+    color: rgba(255, 255, 255, .7);
+}
+
+.marco .detail {
+    border-color: rgba(255, 255, 255, .15);
+    color: rgba(255, 255, 255, .45);
+}
+
+.marco .detail i {
+    color: rgba(255, 255, 255, .6);
+}
+
+/* ===== BOLINHA ===== */
+.event::before {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: #FDFAF5;
+    border: 2px solid #8F0D0B;
+    border-radius: 50%;
+    top: 20px;
+    z-index: 2;
+    transition: background .3s ease, transform .3s ease;
+}
+
+.event:hover::before {
+    background: #BF262B;
+    transform: scale(1.4);
+    box-shadow: 0 0 0 5px rgba(191, 38, 43, .15);
+}
+
+/* ===== ESQUERDA ===== */
+.left {
+    left: 0;
+    padding-right: 45px;
+    text-align: right;
+}
+
+.left::before {
+    right: -7px;
+}
+
+.left .detail {
+    justify-content: flex-end;
+}
+
+/* ===== DIREITA ===== */
+.right {
+    left: 50%;
+    padding-left: 45px;
+    text-align: left;
+}
+
+.right::before {
+    left: -7px;
+}
+
+/* ===== TIMELINE RESPONSIVA ===== */
+@media (max-width: 680px) {
+    .timeline::after {
+        left: 18px;
+    }
+
+    .event {
+        width: 100%;
+        padding-left: 45px; /* Espaço para a linha que foi pra esquerda */
+        padding-right: 0;
+        text-align: left;
+    }
+
+    .event::before {
+        left: 11px;
+        right: auto;
+    }
+
+    .left,
+    .right {
+        left: 0;
+        text-align: left;
+    }
+
+    .left .detail {
+        justify-content: flex-start;
+    }
+}
+
+/* responsivo */
+@media (max-width: 768px) {
+    .timeline::after {
+        left: 10px;
+    }
+
+    .event {
+        width: 100%;
+        padding-left: 40px;
+        padding-right: 20px;
+        margin-bottom: 30px;
+    }
+
+    .event::before {
+        left: 2px;
+    }
+
+    .left,
+    .right {
+        left: 0;
+        text-align: left;
+    }
+}
+
+
+
 
 /* ===== PÁGINAS LEGAIS (termos / privacidade) ===== */
 
