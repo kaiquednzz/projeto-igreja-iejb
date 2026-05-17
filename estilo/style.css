@@ -435,6 +435,132 @@ strong {
     transform: translateY(-6px);
 }
 
+.pag-galeria-hero {
+    background: #500403;
+    padding: 60px 40px 60px;
+    text-align: center;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(../images/cantata22-wide.jpg);
+    background-size: cover;
+    background-position: center;
+}
+
+.pag-galeria-hero span {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: white;
+}
+
+.pag-galeria-hero h1 {
+    font-family: 'Playfair Display';
+    font-size: 64px;
+    font-weight: 500;
+    color: white;
+    margin-top: 10px;
+}
+
+.pag-galeria-hero h1 strong {
+    color: #BF262B;
+    font-style: italic;
+}
+
+.pag-galeria-hero p {
+    font-size: 15px;
+    font-weight: 300;
+    color: white;
+    margin-top: 16px;
+    line-height: 1.7;
+}
+
+.pag-galeria-container {
+    margin: auto;
+    justify-content: center;
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background-color: var(--background);
+}
+
+.pag-galeria-container .pag-galeria-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.pag-galeria-container .pag-galeria-grid .imagem-grande {
+    width: 400px;
+    height: 500px;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+.pag-galeria-container .pag-galeria-grid .imagem-pequena {
+    width: 400px;
+    height: 400px;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+.pag-galeria-container .pag-galeria-grid img {
+    transition: all 0.2s ease;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.216);
+}
+
+.pag-galeria-container .pag-galeria-grid img:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pag-galeria-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    margin-top: 40px;
+    max-width: 700px;
+    text-align: center;
+}
+
+.pag-galeria-cta h2 {
+    font-size: 20px;
+    color: var(--principal);
+    font-family: 'Montserrat';
+    font-weight: 400;
+}
+
+.pag-galeria-cta h3 {
+    font-size: 42px;
+    color: var(--principal);
+    font-family: 'Playfair Display';
+    margin-bottom: 40px;
+    line-height: 40px;
+}
+
+.pag-galeria-cta a {
+    width: fit-content;
+    text-decoration: none;
+    font-family: 'Montserrat';
+    font-size: 22px;
+    color: white;
+    font-weight: 300;
+    background-color: var(--principal-brighter);
+    padding: 12px 20px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    margin-bottom: 50px;
+}
+
+.pag-galeria-cta a:hover {
+    background-color: #b1252a;
+    transform: translateY(-6px);
+}
+
 .ministerios {
     display: flex;
     flex-direction: column;
@@ -1326,9 +1452,11 @@ footer .footer-copyright {
     }
 }
 
-@media (max-width: 1199px) {
-    .galeria-item {
-        height: 250px;
+@media (max-width: 1250px) {
+
+    .pag-galeria-container .pag-galeria-grid .imagem-pequena,
+    .pag-galeria-container .pag-galeria-grid .imagem-grande {
+        width: 350px;
     }
 }
 
@@ -1337,6 +1465,12 @@ footer .footer-copyright {
     .ministerios .ministerios-container .ministerios-grid {
         width: 400px;
         height: auto;
+    }
+
+    .pag-galeria-container .pag-galeria-grid .imagem-pequena,
+    .pag-galeria-container .pag-galeria-grid .imagem-grande {
+        width: 300px;
+        height: 350px;
     }
 }
 
@@ -1351,9 +1485,25 @@ footer .footer-copyright {
     }
 }
 
-@media (max-width: 940px) {
+@media (max-width: 952px) {
     .programacao .cultos .cultos-grid {
         width: 200px;
+        height: auto;
+    }
+
+    .pag-galeria-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .pag-galeria-container .pag-galeria-grid {
+        grid-column: auto;
+    }
+
+    .pag-galeria-container .pag-galeria-grid .imagem-pequena,
+    .pag-galeria-container .pag-galeria-grid .imagem-grande {
+        width: 100%;
         height: auto;
     }
 }
@@ -1436,6 +1586,40 @@ footer .footer-copyright {
 }
 
 @media (max-width: 775px) {
+    header {
+        padding: 8px 12px;
+        gap: 12px;
+    }
+
+    header .logo {
+        margin-left: 10px;
+    }
+
+    header .logo img {
+        width: 25px;
+    }
+
+    header .logo h1 {
+        font-size: 11px;
+        line-height: 16px;
+        margin-left: 6px;
+    }
+
+    header nav ul li {
+        margin-left: 12px;
+    }
+
+    header nav ul li a {
+        font-size: 11px;
+    }
+
+    header p a {
+        font-size: 10px;
+        padding: 8px 14px;
+        margin-right: 12px;
+        border-radius: 20px;
+    }
+
     .localizacao .localizacao-container {
         width: 90vw;
     }
@@ -1449,6 +1633,37 @@ footer .footer-copyright {
         grid-template-columns: repeat(3, 1fr);
         gap: 24px;
     }
+
+    .pag-galeria-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .pag-galeria-container .pag-galeria-grid .imagem-grande {
+        width: 100%;
+        max-width: 350px;
+        height: 400px;
+    }
+
+    .pag-galeria-container .pag-galeria-grid .imagem-pequena {
+        width: 100%;
+        max-width: 350px;
+        height: 300px;
+    }
+
+    .pag-galeria-cta h2 {
+        font-size: 18px;
+    }
+
+    .pag-galeria-cta h3 {
+        font-size: 28px;
+        margin-bottom: 30px;
+    }
+
+    .pag-galeria-cta a {
+        font-size: 14px;
+        padding: 10px 16px;
+    }
 }
 
 @media (max-width: 645px) {
@@ -1457,7 +1672,8 @@ footer .footer-copyright {
     }
 
     header p a {
-        font-size: 8px;
+        font-size: 9px;
+        padding: 6px 12px;
     }
 
     .quem-somos .imagem {
@@ -1499,24 +1715,51 @@ footer .footer-copyright {
 
 @media (max-width: 480px) {
     header {
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
+        padding: 6px 8px;
+        justify-content: space-between;
+    }
+
+    header .logo {
+        margin-left: 6px;
+        min-width: fit-content;
+    }
+
+    header .logo img {
+        width: 22px;
     }
 
     header .logo h1 {
-        font-size: 14px;
+        font-size: 9px;
+        line-height: 12px;
+        margin-left: 4px;
+    }
+
+    header nav ul {
+        gap: 0;
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
     header nav ul li {
-        margin-left: 10px;
+        margin-left: 6px;
+        margin-right: 6px;
     }
 
     header nav ul li a {
-        font-size: 12px;
+        font-size: 9px;
+    }
+
+    header p {
+        margin: 0;
     }
 
     header p a {
-        display: none;
+        font-size: 8px;
+        padding: 6px 10px;
+        margin-right: 6px;
+        white-space: nowrap;
     }
 
     .hero {
@@ -1571,6 +1814,81 @@ footer .footer-copyright {
         font-size: 13px;
     }
 
+    .pag-galeria-hero {
+        height: 250px;
+        padding: 40px 20px 40px;
+    }
+
+    .pag-galeria-hero h1 {
+        font-size: 36px;
+    }
+
+    .pag-galeria-hero span {
+        font-size: 11px;
+    }
+
+    .pag-galeria-hero p {
+        font-size: 14px;
+    }
+
+    .pag-galeria-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 12px 0;
+        gap: 0;
+        background-color: var(--background);
+        margin: 0 auto;
+    }
+
+    .pag-galeria-container .pag-galeria-grid {
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0;
+        padding: 0;
+    }
+
+    .pag-galeria-container .pag-galeria-grid .imagem-pequena,
+    .pag-galeria-container .pag-galeria-grid .imagem-grande {
+        width: 90vw;
+        height: auto;
+        max-width: 90vw;
+        margin-bottom: 16px;
+        margin-left: auto;
+        margin-right: auto;
+        object-fit: cover;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.216);
+    }
+
+
+    .pag-galeria-cta {
+        margin: auto;
+        margin-top: 30px;
+        padding: 0 16px;
+    }
+
+    .pag-galeria-cta h2 {
+        font-size: 16px;
+    }
+
+    .pag-galeria-cta h3 {
+        font-size: 24px;
+        margin-bottom: 25px;
+        line-height: 32px;
+    }
+
+    .pag-galeria-cta a {
+        font-size: 12px;
+        padding: 10px 16px;
+        margin-bottom: 30px;
+    }
 
     .ministerios .ministerios-container .ministerios-grid {
         width: 80vw;
