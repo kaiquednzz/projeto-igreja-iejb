@@ -323,6 +323,7 @@ strong {
     flex-direction: column;
     align-items: center;
     background-color: var(--background);
+    border: var(--principal) 1px solid;
     padding: 20px;
     border-radius: 10px;
     margin: 0 10px;
