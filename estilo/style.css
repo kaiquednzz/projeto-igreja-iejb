@@ -465,7 +465,6 @@ strong {
 .pag-galeria-hero h1 {
     font-family: 'Playfair Display';
     font-size: 64px;
-    font-weight: 500;
     color: white;
     margin-top: 10px;
 }
@@ -1796,7 +1795,7 @@ footer .footer-copyright {
 
     .btn-galeria {
         padding: 12px 28px;
-        font-size: 13px;
+        font-size: 20px;
     }
 
     .pag-galeria-hero {
