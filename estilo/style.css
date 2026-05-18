@@ -236,7 +236,7 @@ strong {
 }
 
 .quem-somos .textos {
-    width: 500px;
+    width: 550px;
     padding: 50px 60px;
 }
 
@@ -259,12 +259,35 @@ strong {
     font-family: 'Montserrat';
     font-weight: 300;
     margin-top: 20px;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     text-align: justify;
+}
+
+.quem-somos .textos a {
+    width: fit-content;
+    text-align: center;
+    text-decoration: none;
+    font-family: 'Montserrat';
+    font-size: 20px;
+    color: white;
+    font-weight: 300;
+    background-color: var(--principal-brighter);
+    padding: 12px 20px;
+    border-radius: 30px;
+    transition: all 0.2s ease;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+}
+
+.quem-somos .textos a:hover {
+    background-color: #b1252a;
+    transform: translateY(-6px);
 }
 
 .quem-somos .textos ul {
     list-style-type: none;
+    margin-top: 40px;
 }
 
 .quem-somos .textos ul li {
@@ -1265,19 +1288,17 @@ footer .footer-copyright {
     z-index: 0;
 }
 
-/* ===== EVENTO ===== */
 .event {
     position: relative;
     width: 50%;
-    padding: 10px 0 48px 0; /* Removemos o padding lateral fixo daqui */
+    padding: 10px 0 48px 0;
 }
 
-/* card */
 .event .content {
     background: white;
     padding: 28px 28px 24px;
     border-radius: 14px;
-    border: 1px solid rgba(0, 0, 0, .06);
+    border: 1px solid var(--principal);
     box-shadow: 0 4px 20px rgba(0, 0, 0, .07);
     transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
 }
@@ -1288,7 +1309,6 @@ footer .footer-copyright {
     border-color: rgba(191, 38, 43, .25);
 }
 
-/* tag categoria */
 .event .tag {
     font-family: 'Montserrat';
     font-size: 14px;
@@ -1297,7 +1317,6 @@ footer .footer-copyright {
     margin-bottom: 6px;
 }
 
-/* ano */
 .event h3 {
     font-family: 'Cormorant Garamond', serif;
     font-size: 36px;
@@ -1307,25 +1326,23 @@ footer .footer-copyright {
     margin-bottom: 10px;
 }
 
-/* título do evento */
 .event h4 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
+    font-family: 'montserrat';
+    font-size: 14px;
     font-weight: 600;
     color: #1a1a1a;
     margin-bottom: 10px;
     line-height: 1.2;
 }
 
-/* texto */
 .event p {
+    font-family: 'montserrat';
     font-size: 14px;
     font-weight: 300;
-    color: #777;
+    color: #4a4a4a;
     line-height: 1.8;
 }
 
-/* detalhe rodapé do card */
 .event .detail {
     margin-top: 16px;
     padding-top: 14px;
@@ -1342,7 +1359,6 @@ footer .footer-copyright {
     font-size: 11px;
 }
 
-/* card marco (vermelho) */
 .event .content.marco {
     background: #8F0D0B;
     border-color: transparent;
