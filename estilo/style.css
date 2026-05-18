@@ -1702,6 +1702,7 @@ footer .footer-copyright {
         flex-direction: row;
         align-items: center;
         padding: 6px 8px;
+        height: 70px;
         justify-content: space-between;
     }
 
@@ -1732,7 +1733,7 @@ footer .footer-copyright {
     }
 
     header nav ul li a {
-        font-size: 9px;
+        font-size: 10px;
     }
 
     header p {
