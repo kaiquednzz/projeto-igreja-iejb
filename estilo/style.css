@@ -112,6 +112,11 @@ header p:hover {
     transform: translateY(-4px);
 }
 
+header .mobile-menu {
+    display: none;
+    cursor: pointer;
+}
+
 .hero {
     display: flex;
     flex-direction: column;
@@ -1700,6 +1705,68 @@ footer .footer-copyright {
     }
 }
 
+@media (max-width: 600px) {
+    header nav {
+        display: none;
+    }
+
+    header p {
+        display: none;
+    }
+
+    header .mobile-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-right: 10px;
+        transition: all 0.2s ease;
+    }
+
+    header .mobile-menu span {
+        width: 20px;
+        height: 2px;
+        background-color: var(--background);
+    }
+
+    header .mobile-menu:hover {
+        gap: 6px;
+    }
+
+    header {
+        position: relative;
+    }
+
+    header nav {
+        display: none;
+        transform: translateY(-100%);
+    }
+
+    header nav.ativo {
+        display: flex;
+        position: absolute;
+        align-items: end;
+        text-align: end;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: var(--principal);
+        flex-direction: column;
+        padding: 20px 0;
+        z-index: 999;
+        transform: translateY(0);
+    }
+
+    header nav.ativo ul {
+        flex-direction: column;
+        gap: 12px;
+        margin-right: 10px;
+    }
+
+    header nav.ativo ul li a {
+        font-size: 16px;
+    }
+}
+
 @media (max-width: 550px) {
     .ministerios .ministerios-container .ministerios-grid {
         width: 80vw;
@@ -1712,7 +1779,7 @@ footer .footer-copyright {
         flex-direction: row;
         align-items: center;
         padding: 6px 8px;
-        height: 70px;
+        height: 80px;
         justify-content: space-between;
     }
 
@@ -1722,11 +1789,11 @@ footer .footer-copyright {
     }
 
     header .logo img {
-        width: 22px;
+        width: 28px;
     }
 
     header .logo h1 {
-        font-size: 9px;
+        font-size: 12px;
         line-height: 12px;
         margin-left: 4px;
     }
@@ -1760,6 +1827,33 @@ footer .footer-copyright {
     .hero {
         padding: 30px 20px;
         height: 500px;
+    }
+
+    .hero .textos {
+        max-width: 300px;
+    }
+
+    .hero h2 {
+        font-size: 28px;
+    }
+
+    .hero h3 {
+        font-size: 16px;
+    }
+
+    .hero .buttons {
+        flex-direction: column;
+        gap: 0px;
+    }
+
+    .hero .buttons .btn-sou-novo {
+        font-size: 14px;
+        width: fit-content;
+    }
+
+    .hero .buttons .btn-ver-cultos {
+        font-size: 14px;
+        width: fit-content;
     }
 
     .brand h2 {
