@@ -352,6 +352,7 @@ strong {
 .programacao .cultos .cultos-grid h5 {
     font-size: 32px;
     font-family: 'Playfair Display';
+    font-style: italic;
     font-weight: 500;
     margin-top: 10px;
 }
@@ -448,7 +449,6 @@ strong {
 }
 
 .pag-galeria-hero {
-    background: #500403;
     padding: 60px 40px 60px;
     text-align: center;
     height: 400px;
@@ -456,9 +456,25 @@ strong {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.pag-galeria-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
     background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(../images/cantata22-wide.webp);
     background-size: cover;
     background-position: center;
+    filter: blur(3px);
+    scale: 1.1;
+    z-index: 0;
+}
+
+.pag-galeria-hero > * {
+    position: relative;
+    z-index: 1;
 }
 
 .pag-galeria-hero span {
@@ -486,6 +502,36 @@ strong {
     color: white;
     margin-top: 16px;
     line-height: 1.7;
+}
+
+.fundacao-hero {
+    display: flex;
+    flex-direction: column;
+    padding: 50px 80px;
+    align-items: center;
+    justify-content: center;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url(../images/fachada-iejb.webp);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    height: 200px;
+}
+
+.fundacao-hero h2 {
+    font-size: 22px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    color: var(--background);
+    font-family: 'Montserrat';
+    font-weight: 400;
+}
+
+.fundacao-hero h3 {
+    font-size: 56px;
+    color: var(--background);
+    font-family: 'Playfair Display';
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 40px;
+    line-height: 60px;
 }
 
 .pag-galeria-container {
