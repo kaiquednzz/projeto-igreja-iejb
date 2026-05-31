@@ -1819,13 +1819,23 @@ footer .footer-copyright {
         height: auto;
     }
 
+    .fundacao-hero {
+        padding: 40px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
+        margin-bottom: 20px;
+        height: 250px;
+    }
+
     .fundacao-hero h2 {
         font-size: 16px;
+
     }
 
     .fundacao-hero h3 {
         font-size: 36px;
         line-height: 40px;
+        max-width: 100%;
     }
 }
 
