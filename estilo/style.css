@@ -472,7 +472,7 @@ strong {
     z-index: 0;
 }
 
-.pag-galeria-hero > * {
+.pag-galeria-hero>* {
     position: relative;
     z-index: 1;
 }
@@ -748,6 +748,32 @@ strong {
     font-weight: 300;
     margin-top: 10px;
     margin-bottom: 10px;
+    text-align: justify;
+}
+
+/* Efeito do cursor piscando no final do texto */
+.depoimentos .depoimentos-container .depoimentos-grid p::after {
+    content: '|';
+    margin-left: 2px;
+    animation: piscaCursor 0.7s infinite;
+    color: var(--principal);
+}
+
+@keyframes piscaCursor {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Classe que o JS vai usar para esconder o cursor quando a digitação terminar */
+.depoimentos .depoimentos-container .depoimentos-grid p.digitado::after {
+    display: none;
 }
 
 .eventos {
@@ -2064,6 +2090,7 @@ footer .footer-copyright {
 
     .eventos-container .eventos-grid.reveal .textos p {
         font-size: 16px;
+        text-align: justify;
     }
 
     .eventos .eventos-container .eventos-grid .textos h4 {
