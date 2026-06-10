@@ -1224,6 +1224,7 @@ footer .footer-social .logo h1 {
     line-height: 20px;
     margin-left: 10px;
     font-weight: 500;
+    text-align: start;
 }
 
 footer .footer-social .logo a {
@@ -1947,7 +1948,7 @@ footer .footer-copyright {
     }
 
     .hero h2 {
-        font-size: 28px;
+        font-size: 36px;
     }
 
     .hero h3 {
@@ -1960,12 +1961,12 @@ footer .footer-copyright {
     }
 
     .hero .buttons .btn-sou-novo {
-        font-size: 14px;
+        font-size: 18px;
         width: fit-content;
     }
 
     .hero .buttons .btn-ver-cultos {
-        font-size: 14px;
+        font-size: 18px;
         width: fit-content;
     }
 
