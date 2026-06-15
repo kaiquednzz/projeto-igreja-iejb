@@ -329,7 +329,7 @@ strong {
     align-items: center;
     background-color: var(--background);
     border: 1px solid var(--principal);
-    border-bottom: 4px solid var(--principal);
+    border-bottom: 6px solid var(--principal);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
     padding: 28px;
     border-radius: 18px;
@@ -381,16 +381,20 @@ strong {
 }
 
 .programacao .cultos .cultos-grid h6 {
-    font-size: 24px;
+    background-color: #f6e4e1;
+    padding: 6px 14px;
+    border-radius: 20px;
+    color: var(--principal-brighter);
+    font-size: 20px;
     font-style: italic;
     font-family: 'Montserrat';
-    font-weight: 300;
+    font-weight: 400;
     margin-top: 10px;
 }
 
 .programacao .cultos .cultos-grid hr {
     width: 90%;
-    border: 1px solid var(--principal);
+    border: 1px solid #8f0d0b60;
     margin-top: 10px;
 }
 
