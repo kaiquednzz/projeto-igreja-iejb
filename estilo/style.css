@@ -328,18 +328,41 @@ strong {
     flex-direction: column;
     align-items: center;
     background-color: var(--background);
-    border: var(--principal) 1px solid;
-    padding: 20px;
-    border-radius: 10px;
+    border: 1px solid var(--principal);
+    border-bottom: 4px solid var(--principal);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    padding: 28px;
+    border-radius: 18px;
     margin: 0 10px;
     width: 300px;
-    height: 200px;
+    min-height: 320px;
     transition: all 0.3s ease;
 }
 
 .programacao .cultos .cultos-grid:hover {
     transform: translateY(-4px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+}
+
+.programacao .cultos .cultos-grid .culto-icone {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #f6e4e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    position: relative;
+}
+
+.programacao .cultos .cultos-grid .culto-icone i {
+    font-size: 22px;
+    color: var(--principal);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .programacao .cultos .cultos-grid h4 {
@@ -365,8 +388,15 @@ strong {
     margin-top: 10px;
 }
 
+.programacao .cultos .cultos-grid hr {
+    width: 90%;
+    border: 1px solid var(--principal);
+    margin-top: 10px;
+}
+
 .programacao .cultos .cultos-grid p {
-    font-size: 16px;
+    color: rgb(48, 48, 48);
+    font-size: 15px;
     font-family: 'Montserrat';
     font-weight: 300;
     margin-top: 10px;
