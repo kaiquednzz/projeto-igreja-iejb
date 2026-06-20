@@ -1344,6 +1344,10 @@ footer .footer-copyright {
     margin: 0px;
 }
 
+@view-transition {
+    navigation: auto;
+}
+
 /* ===== PÁGINAS LEGAIS (termos / privacidade) ===== */
 
 .pagina-legal {
