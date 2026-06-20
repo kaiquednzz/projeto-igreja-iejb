@@ -1344,8 +1344,45 @@ footer .footer-copyright {
     margin: 0px;
 }
 
+/* Ativa a transição nativa entre páginas */
 @view-transition {
     navigation: auto;
+}
+
+/* Customização da animação */
+::view-transition-old(root) {
+    /* Animação da página que está SAINDO */
+    animation: slide-out 0.5s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+::view-transition-new(root) {
+    /* Animação da página que está ENTRANDO */
+    animation: slide-in 0.5s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+/* Definição dos movimentos (Keyframes) */
+@keyframes slide-out {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(-30%);
+        opacity: 0;
+    }
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 /* ===== PÁGINAS LEGAIS (termos / privacidade) ===== */
