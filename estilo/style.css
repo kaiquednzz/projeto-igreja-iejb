@@ -3434,3 +3434,105 @@ body.lightbox-aberto {
 .evento-acoes {
     flex-basis: 100%;
 }
+
+/* Correções de rolagem lateral / responsividade no mobile */
+html,
+body {
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+img,
+video,
+iframe {
+    max-width: 100%;
+}
+
+.versiculo-card,
+#localizacao,
+.localizacao .localizacao-container,
+.depoimentos .depoimentos-container .depoimentos-grid {
+    box-sizing: border-box;
+}
+
+@media (max-width: 775px) {
+    .depoimentos .depoimentos-container,
+    .depoimentos .depoimentos-container .depoimentos-grid {
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .depoimentos .depoimentos-container .depoimentos-grid {
+        width: min(400px, 100%);
+    }
+
+    #localizacao,
+    .localizacao {
+        width: 100%;
+    }
+
+    .localizacao .localizacao-container {
+        width: 100%;
+        margin-right: auto;
+    }
+
+    .localizacao .localizacao-container iframe {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .cta .cta-container {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+/* Cards dinâmicos: largura 100% + padding não pode estourar a seção */
+.planeje-card,
+.quiz-card,
+.versiculo-card {
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.planeje-card,
+.quiz-card {
+    max-width: min(760px, 100%);
+}
+
+.planeje-passo {
+    min-width: 0;
+}
+
+.versiculo-card {
+    max-width: min(700px, 100%);
+}
+
+.versiculo-conteudo,
+.quiz-respostas button,
+.planeje-resultado {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 360px) {
+    .programacao .cultos {
+        width: 100%;
+    }
+
+    .programacao .cultos .cultos-grid {
+        box-sizing: border-box;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .programacao h3,
+    .programacao h3 strong {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+}
