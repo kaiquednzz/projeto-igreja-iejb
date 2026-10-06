@@ -1,9 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
-/* Montserrat */
-@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
-/* Oswald */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Jost:ital,wght@0,100..900;1,100..900&family=Mukta+Mahee:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto+Slab:wght@100..900&display=swap');
-/* Playfair Display */
 
 :root {
     --principal: #8F0D0B;
@@ -35,6 +29,16 @@ header {
     background-color: var(--principal);
     padding: 10px;
     justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    transition: padding 0.3s ease, box-shadow 0.3s ease;
+}
+
+header.rolou {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 header .logo {
@@ -1903,7 +1907,7 @@ footer .footer-copyright {
     }
 
     header {
-        position: relative;
+        position: sticky;
     }
 
     header nav {
@@ -2290,4 +2294,1143 @@ footer .footer-copyright {
         font-size: 12px;
         margin-top: 28px;
     }
+}
+
+/* ===== UX: novos componentes ===== */
+
+[hidden] {
+    display: none !important;
+}
+
+section[id] {
+    scroll-margin-top: 70px;
+}
+
+header nav ul li a {
+    position: relative;
+}
+
+header nav ul li a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 100%;
+    height: 2px;
+    background-color: var(--background);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+header nav ul li a.link-ativo::after,
+header nav ul li a[aria-current="page"]::after {
+    transform: scaleX(1);
+}
+
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+[role="button"]:focus-visible {
+    outline: 3px solid #e8a33d;
+    outline-offset: 3px;
+}
+
+.barra-progresso {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0;
+    background-color: var(--principal-brighter);
+    z-index: 1200;
+}
+
+.botao-topo {
+    position: fixed;
+    bottom: 20px;
+    right: 80px;
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 14px;
+    background-color: var(--principal);
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.botao-topo i {
+    margin: 0;
+}
+
+.botao-topo.visivel {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.botao-topo:hover {
+    background-color: var(--principal-brighter);
+}
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 90px;
+    transform: translate(-50%, 20px);
+    background-color: #1f1f1f;
+    color: white;
+    padding: 12px 22px;
+    border-radius: 30px;
+    font-family: 'Montserrat';
+    font-size: 15px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 2000;
+}
+
+.toast.visivel {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+/* Próximo culto */
+
+.proximo-culto {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 18px;
+    border-radius: 30px;
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    font-family: 'Montserrat';
+    font-size: 16px;
+    backdrop-filter: blur(4px);
+}
+
+.proximo-culto::before {
+    content: '';
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background-color: #5fe08a;
+    animation: pulsa 1.8s infinite;
+}
+
+@keyframes pulsa {
+    0% { box-shadow: 0 0 0 0 rgba(95, 224, 138, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(95, 224, 138, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(95, 224, 138, 0); }
+}
+
+.cultos-grid.proximo {
+    outline: 2px solid var(--principal-brighter);
+    outline-offset: 4px;
+    position: relative;
+}
+
+.cultos-grid.proximo::before {
+    content: 'PRÓXIMO';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background-color: var(--principal-brighter);
+    color: white;
+    font-family: 'Montserrat';
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* Agenda vazia */
+
+.eventos-vazio {
+    text-align: center;
+    padding: 30px 20px;
+    font-family: 'Montserrat';
+    font-size: 18px;
+    color: var(--principal);
+}
+
+.eventos-vazio a {
+    color: var(--principal-brighter);
+    font-weight: 500;
+}
+
+/* Versículo do dia */
+
+.versiculo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px;
+    background-color: var(--secondary);
+    text-align: center;
+}
+
+.versiculo h2 {
+    font-size: 20px;
+    color: var(--principal);
+    font-family: 'Montserrat';
+    font-weight: 400;
+}
+
+.versiculo h3 {
+    font-size: 42px;
+    color: var(--principal);
+    font-family: 'Playfair Display';
+    margin-bottom: 30px;
+}
+
+.versiculo-card {
+    width: 100%;
+    max-width: 700px;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    border-radius: 16px;
+    background-color: var(--background);
+    border: 1px solid var(--principal);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.versiculo-botao,
+.versiculo-acoes button,
+.versiculo-acoes a,
+.localizacao-acoes button,
+.localizacao .localizacao-acoes a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 30px;
+    background-color: var(--principal-brighter);
+    color: white;
+    font-family: 'Montserrat';
+    font-size: 17px;
+    font-weight: 400;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.versiculo-botao:hover,
+.versiculo-acoes button:hover,
+.versiculo-acoes a:hover,
+.localizacao-acoes button:hover,
+.localizacao .localizacao-acoes a:hover {
+    background-color: #b1252a;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.versiculo-botao {
+    animation: respira 2.4s ease-in-out infinite;
+}
+
+@keyframes respira {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+}
+
+.versiculo-conteudo.animar {
+    animation: aparece 0.8s ease both;
+}
+
+@keyframes aparece {
+    from { opacity: 0; transform: translateY(14px) scale(0.97); }
+    to { opacity: 1; transform: none; }
+}
+
+.versiculo blockquote {
+    font-family: 'Playfair Display';
+    font-style: italic;
+    font-size: 26px;
+    line-height: 1.4;
+    color: #3a0a09;
+}
+
+.versiculo-ref {
+    margin-top: 14px;
+    font-family: 'Montserrat';
+    font-weight: 600;
+    color: var(--principal);
+}
+
+.versiculo-acoes {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.versiculo-acoes button,
+.versiculo-acoes a {
+    font-size: 15px;
+    padding: 10px 20px;
+}
+
+.versiculo-aviso {
+    margin-top: 18px;
+    font-family: 'Montserrat';
+    font-size: 13px;
+    font-weight: 300;
+    color: #6b4d4c;
+}
+
+/* Dúvidas frequentes */
+
+.duvidas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 20px;
+    background-color: var(--secondary);
+}
+
+.duvidas h2 {
+    font-size: 20px;
+    color: var(--principal);
+    font-family: 'Montserrat';
+    font-weight: 400;
+}
+
+.duvidas h3 {
+    font-size: 42px;
+    color: var(--principal);
+    font-family: 'Playfair Display';
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.duvidas-lista {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.duvidas details {
+    background-color: var(--background);
+    border: 1px solid var(--principal);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+}
+
+.duvidas details:hover,
+.duvidas details[open] {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.duvidas summary {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    cursor: pointer;
+    font-family: 'Montserrat';
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--principal);
+}
+
+.duvidas summary::-webkit-details-marker {
+    display: none;
+}
+
+.duvidas summary::after {
+    content: '+';
+    font-size: 26px;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+
+.duvidas details[open] summary::after {
+    transform: rotate(45deg);
+}
+
+.duvidas details p {
+    padding: 0 22px 20px;
+    font-family: 'Montserrat';
+    font-weight: 300;
+    line-height: 1.6;
+}
+
+.duvidas details a {
+    color: var(--principal-brighter);
+    font-weight: 500;
+}
+
+/* Localização: ações */
+
+.localizacao .localizacao-acoes {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 0 20px 24px;
+}
+
+.localizacao .localizacao-acoes a {
+    margin: 0;
+    align-self: auto;
+    font-size: 16px;
+    padding: 10px 22px;
+}
+
+.localizacao-acoes button {
+    font-size: 16px;
+    padding: 10px 22px;
+}
+
+/* Lightbox */
+
+.lightbox-alvo {
+    cursor: zoom-in;
+}
+
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.92);
+    animation: aparece 0.25s ease both;
+}
+
+.lightbox figure {
+    margin: 0;
+    max-width: 92vw;
+    text-align: center;
+}
+
+.lightbox figure img {
+    max-width: 92vw;
+    max-height: 80vh;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
+.lightbox button {
+    position: absolute;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.12);
+    color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.lightbox button:hover {
+    background-color: rgba(255, 255, 255, 0.28);
+}
+
+.lightbox button i {
+    margin: 0;
+}
+
+.lightbox-fechar {
+    top: 20px;
+    right: 20px;
+}
+
+.lightbox-anterior {
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.lightbox-proxima {
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+body.lightbox-aberto {
+    overflow: hidden;
+}
+
+@media (max-width: 600px) {
+    .versiculo h3,
+    .duvidas h3 {
+        font-size: 30px;
+    }
+
+    .versiculo blockquote {
+        font-size: 21px;
+    }
+
+    .lightbox-nav {
+        top: auto;
+        bottom: 20px;
+        transform: none;
+    }
+
+    .botao-topo {
+        right: 20px;
+        bottom: 80px;
+    }
+}
+
+/* Movimento reduzido */
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        transition-delay: 0s !important;
+    }
+
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
+    }
+}
+
+/* ===== Rodada 2: conversão e engajamento ===== */
+
+/* Botão do calendário no hero */
+
+.btn-calendario {
+    display: block;
+    margin-top: 12px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: rgba(255, 255, 255, 0.85);
+    font-family: 'Montserrat';
+    font-size: 15px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    cursor: pointer;
+}
+
+.btn-calendario:hover {
+    color: white;
+}
+
+/* Cabeçalhos padrão das novas seções */
+
+.planeje,
+.quiz,
+.historia,
+.domingo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 20px;
+}
+
+.planeje h2,
+.quiz h2,
+.historia h2,
+.domingo h2 {
+    font-size: 20px;
+    font-family: 'Montserrat';
+    font-weight: 400;
+}
+
+.planeje h3,
+.quiz h3,
+.historia h3,
+.domingo h3 {
+    font-size: 42px;
+    font-family: 'Playfair Display';
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.planeje,
+.quiz {
+    background-color: var(--secondary);
+    color: var(--principal);
+}
+
+.historia,
+.domingo {
+    background-color: var(--background);
+    color: var(--principal);
+}
+
+.domingo {
+    background-color: #500403;
+    color: var(--background);
+}
+
+.domingo strong {
+    color: #f2b8b5;
+}
+
+/* Chips (planeje) */
+
+.planeje-card,
+.quiz-card {
+    width: 100%;
+    max-width: 760px;
+    padding: 28px;
+    border-radius: 16px;
+    background-color: var(--background);
+    border: 1px solid var(--principal);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.planeje-passo {
+    border: none;
+    margin-bottom: 22px;
+}
+
+.planeje-passo legend {
+    font-family: 'Montserrat';
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.chip {
+    padding: 10px 18px;
+    border-radius: 30px;
+    border: 2px solid var(--principal);
+    background: transparent;
+    color: var(--principal);
+    font-family: 'Montserrat';
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chip:hover {
+    background-color: var(--secondary);
+}
+
+.chip[aria-pressed="true"] {
+    background-color: var(--principal);
+    color: white;
+}
+
+.planeje-resultado {
+    padding: 22px;
+    border-radius: 12px;
+    background-color: var(--secondary);
+    font-family: 'Montserrat';
+    line-height: 1.6;
+    animation: aparece 0.5s ease both;
+}
+
+.planeje-resultado h4 {
+    font-family: 'Playfair Display';
+    font-size: 26px;
+    margin-bottom: 8px;
+}
+
+.planeje-sugestao {
+    font-size: 18px;
+}
+
+.planeje-sugestao strong {
+    color: var(--principal);
+    font-style: normal;
+}
+
+.planeje-local {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.planeje-acoes,
+.quiz-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.planeje-acoes button,
+.planeje-acoes a,
+.quiz-acoes a,
+.quiz-acoes button,
+.evento-acoes button,
+.convite-acoes a {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 30px;
+    background-color: var(--principal-brighter);
+    color: white;
+    font-family: 'Montserrat';
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.planeje-acoes button:hover,
+.planeje-acoes a:hover,
+.quiz-acoes a:hover,
+.quiz-acoes button:hover,
+.evento-acoes button:hover,
+.convite-acoes a:hover {
+    background-color: #b1252a;
+    transform: translateY(-2px);
+}
+
+/* Quiz */
+
+.quiz-progresso {
+    font-family: 'Montserrat';
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 14px;
+}
+
+.quiz-progresso div {
+    height: 6px;
+    margin-top: 6px;
+    border-radius: 6px;
+    background-color: var(--secondary);
+    overflow: hidden;
+}
+
+.quiz-progresso i {
+    display: block;
+    height: 100%;
+    margin: 0;
+    background-color: var(--principal-brighter);
+    transition: width 0.4s ease;
+}
+
+.quiz-card h4 {
+    font-family: 'Playfair Display';
+    font-size: 26px;
+    margin-bottom: 16px;
+}
+
+.quiz-respostas {
+    display: grid;
+    gap: 10px;
+}
+
+.quiz-respostas button {
+    padding: 14px 18px;
+    text-align: left;
+    border-radius: 12px;
+    border: 2px solid var(--secondary);
+    background-color: white;
+    color: #3a0a09;
+    font-family: 'Montserrat';
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quiz-respostas button:hover {
+    border-color: var(--principal);
+    transform: translateX(4px);
+}
+
+.quiz-rotulo {
+    font-family: 'Montserrat';
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--principal-brighter);
+}
+
+.quiz-card .quiz-resultado-nome {
+    font-size: 34px;
+}
+
+.quiz-card > p:not(.quiz-rotulo) {
+    font-family: 'Montserrat';
+    font-weight: 300;
+    line-height: 1.6;
+    color: #3a0a09;
+}
+
+.quiz-refazer {
+    background-color: transparent !important;
+    color: var(--principal) !important;
+    border: 2px solid var(--principal) !important;
+}
+
+.ministerios-grid.destaque {
+    animation: destaque 2.5s ease;
+}
+
+@keyframes destaque {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(191, 38, 43, 0); }
+    20%, 70% { box-shadow: 0 0 0 6px rgba(191, 38, 43, 0.55); }
+}
+
+/* Linha do tempo e passos */
+
+.historia-anos {
+    margin-bottom: 30px;
+    font-family: 'Montserrat';
+    font-size: 20px;
+}
+
+.historia-anos span {
+    font-family: 'Playfair Display';
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--principal-brighter);
+    margin-right: 6px;
+}
+
+.linha-tempo,
+.domingo-passos {
+    list-style: none;
+    width: 100%;
+    max-width: 760px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.linha-tempo::before,
+.domingo-passos::before {
+    content: '';
+    position: absolute;
+    left: 29px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background-color: currentColor;
+    opacity: 0.25;
+}
+
+.linha-tempo li,
+.domingo-passos li {
+    position: relative;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.linha-tempo-marca,
+.domingo-icone {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: var(--principal);
+    color: white;
+    font-family: 'Montserrat';
+    font-weight: 600;
+    font-size: 15px;
+    z-index: 1;
+}
+
+.linha-tempo-marca i,
+.domingo-icone i {
+    margin: 0;
+    font-size: 22px;
+}
+
+.domingo-icone {
+    background-color: var(--background);
+    color: var(--principal);
+}
+
+.linha-tempo h4,
+.domingo-passos h4 {
+    font-family: 'Playfair Display';
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+
+.linha-tempo p,
+.domingo-passos p {
+    font-family: 'Montserrat';
+    font-weight: 300;
+    line-height: 1.6;
+}
+
+.linha-tempo-fotos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.linha-tempo-fotos img {
+    width: 190px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease;
+}
+
+.linha-tempo-fotos img:hover {
+    transform: scale(1.04);
+}
+
+.linha-tempo-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--principal-brighter);
+    font-family: 'Montserrat';
+    font-weight: 500;
+}
+
+/* Versículo: sequência */
+
+.versiculo-sequencia {
+    margin-top: 16px;
+    font-family: 'Montserrat';
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--principal-brighter);
+}
+
+.versiculo-sequencia i {
+    margin-right: 6px;
+}
+
+/* Agenda: contagem e ações */
+
+.eventos-grid .data {
+    position: relative;
+}
+
+.contagem {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 3px 12px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    font-family: 'Montserrat';
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.contagem.urgente {
+    background-color: #f2b8b5;
+    color: #500403;
+}
+
+.evento-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.evento-acoes button {
+    padding: 8px 14px;
+    font-size: 13px;
+}
+
+.evento-acoes button i {
+    margin-right: 6px;
+}
+
+/* Localização: distância */
+
+.localizacao .localizacao-distancia {
+    margin: 0 20px 24px;
+    text-align: center;
+    font-family: 'Montserrat';
+    font-weight: 400;
+}
+
+.localizacao .localizacao-distancia a {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+    color: var(--principal-brighter);
+    font-size: inherit;
+    font-weight: 600;
+}
+
+.localizacao .localizacao-distancia a:hover {
+    background: none;
+    box-shadow: none;
+    transform: none;
+    text-decoration: underline;
+}
+
+/* Barra fixa (celular) */
+
+.barra-visita {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .barra-visita {
+        display: flex;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1050;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 16px;
+        background-color: #500403;
+        color: white;
+        font-family: 'Montserrat';
+        font-size: 14px;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+        box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.3);
+    }
+
+    .barra-visita.visivel {
+        transform: translateY(0);
+    }
+
+    .barra-visita a {
+        flex-shrink: 0;
+        padding: 9px 16px;
+        border-radius: 30px;
+        background-color: var(--principal-brighter);
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    body.barra-ativa .botao-instagram {
+        bottom: 76px;
+    }
+
+    body.barra-ativa .botao-topo {
+        bottom: 136px;
+    }
+
+    .planeje h3,
+    .quiz h3,
+    .historia h3,
+    .domingo h3 {
+        font-size: 30px;
+    }
+
+    .planeje-card,
+    .quiz-card {
+        padding: 20px;
+    }
+
+    .linha-tempo-fotos img {
+        width: calc(50% - 6px);
+    }
+}
+
+/* Convite gentil (computador) */
+
+.convite {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    width: 300px;
+    padding: 18px 20px;
+    border-radius: 14px;
+    background-color: var(--background);
+    border: 1px solid var(--principal);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+    font-family: 'Montserrat';
+    color: var(--principal);
+    z-index: 1050;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+}
+
+.convite.visivel {
+    opacity: 1;
+    transform: none;
+}
+
+.convite-titulo {
+    font-family: 'Playfair Display';
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.convite-texto {
+    margin-top: 4px;
+    font-size: 14px;
+    color: #3a0a09;
+}
+
+.convite-acoes {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.convite-fechar {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: none;
+    color: var(--principal);
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.convite-fechar i {
+    margin: 0;
+}
+
+.eventos .eventos-container .eventos-grid .horario-localizacao {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+}
+
+.evento-acoes {
+    flex-basis: 100%;
 }

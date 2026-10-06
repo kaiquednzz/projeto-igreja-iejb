@@ -1,0 +1,15 @@
+{
+    "name": "IEJB - Igreja Evangélica do Jardim Brasil",
+    "short_name": "IEJB",
+    "description": "Cultos, eventos e o versículo do dia da IEJB em Araçariguama, SP.",
+    "lang": "pt-BR",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
+    "background_color": "#FDFAF5",
+    "theme_color": "#8F0D0B",
+    "icons": [
+        { "src": "images/icone-192.png", "sizes": "192x192", "type": "image/png" },
+        { "src": "images/icone-512.png", "sizes": "512x512", "type": "image/png" }
+    ]
+}

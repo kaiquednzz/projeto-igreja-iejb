@@ -5,10 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="view-transition" content="same-origin" />
-    <meta name="description" content="Política de Privacidade do site da IEJB — Igreja Evangélica em Araçariguama, SP.">
+    <meta name="description" content="Galeria de fotos da IEJB — Igreja Evangélica em Araçariguama, SP: cultos, cantatas e a história da nossa fundação.">
     <meta name="google-site-verification" content="epbdVr2cXV4FJen0Nl3TCTnnBgFvCkcp04smA-PDTZ0" />
     <title>Galeria de Fotos | IEJB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Oswald:wght@200..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap">
     <link rel="stylesheet" href="../estilo/style.css">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <meta name="theme-color" content="#8F0D0B">
+    <link rel="apple-touch-icon" href="../images/icone-192.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="shortcut icon" href="../images/favicon-96x96.png" type="image/x-icon">
     <script src="../script/script.js" defer></script>
@@ -17,7 +23,7 @@
 <body>
     <header>
         <div class="logo"><a href="../index.html">
-                <img src="../images/logo-iejb.png" alt="IEJB Logo">
+                <img src="../images/logo-iejb-pequeno.png" alt="IEJB Logo">
                 <h1>UMA <br> IGREJA <br> FAMILIA</h1>
             </a>
         </div>
@@ -25,6 +31,7 @@
             <ul>
                 <li><a href="../index.html#quem-somos">SOBRE</a></li>
                 <li><a href="../index.html#programacao">CULTOS</a></li>
+                <li><a href="galeria.html" aria-current="page">GALERIA</a></li>
                 <li><a href="../index.html#ministerios">MINISTÉRIOS</a></li>
                 <li><a href="../index.html#eventos">EVENTOS</a></li>
                 <li><a href="../index.html#cta">SOU NOVO</a></li>
@@ -58,7 +65,7 @@
                 <img src="../images/pag-galeria/cantata-25/cantata25-03.webp" alt="mulher adorando" loading="lazy">
                 <img src="../images/pag-galeria/cantata-25/cantata25-06.webp" alt="casal orando" loading="lazy">
                 <img src="../images/pag-galeria/cultos/cultos02.webp" alt="pastor pregando" loading="lazy">
-                <img src="../images/pag-galeria/cultos/cultos04.webp" alt="homem pregando">
+                <img src="../images/pag-galeria/cultos/cultos04.webp" alt="homem pregando" loading="lazy">
                 <img src="../images/pag-galeria/cultos/cultos05.webp" alt="pastor pregando" loading="lazy">
                 <img src="../images/pag-galeria/cantata-26/cantata26-01.webp" alt="pastor orando" loading="lazy">
                 <img src="../images/pag-galeria/cantata-26/cantata26-05.webp" alt="mulher cantando na igreja" loading="lazy">
@@ -102,7 +109,7 @@
             <h3>Nosso começo, <br> nossa <strong>História</strong></h3>
         </section>
 
-        <section id="pag-galeria-container" class="pag-galeria-container">
+        <section id="fundacao-container" class="pag-galeria-container">
             <div class="pag-galeria-grid">
                 <img src="../images/pag-galeria/fundacao/fundacao04.webp" alt="igreja em construção" loading="lazy">
                 <img src="../images/pag-galeria/fundacao/fundacao07.webp" alt="pessoas reunidas na construção da igreja" loading="lazy">
@@ -132,7 +139,7 @@
         <section id="pag-galeria-cta" class="pag-galeria-cta">
             <h2><strong>Gostou</strong> do que viu?</h2>
             <h3>Nos visite e faça parte dessa <strong>família</strong>. Estamos abertos para você!</h3>
-            <a href="https://www.instagram.com/iejbrasil/" target="_blank" class="galeria-cta-btn-simples">
+            <a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer" class="galeria-cta-btn-simples">
                 Entrar em Contato
             </a>
         </section>
@@ -142,17 +149,17 @@
         <div class="footer-conteudo">
             <div class="footer-social">
                 <div class="logo"><a href="../index.html">
-                        <img src="../images/logo-iejb.png"
+                        <img src="../images/logo-iejb-pequeno.png"
                             alt="Logo da IEJB - Igreja Evangélica do Jardim Brasil em Araçariguama">
                         <h1>UMA <br> IGREJA <br> FAMILIA</h1>
                     </a>
                 </div>
                 <div class="media-icons">
-                    <a href="https://share.google/aOF0icxRkhImlSw2n" target="_blank" aria-label="IEJB no google"><i
+                    <a href="https://share.google/aOF0icxRkhImlSw2n" target="_blank" rel="noopener noreferrer" aria-label="IEJB no google"><i
                             class="fa-brands fa-google"></i></a>
-                    <a href="https://www.instagram.com/iejbrasil/" target="_blank"><i
+                    <a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer" aria-label="Instagram da IEJB"><i
                             class="fa-brands fa-instagram"></i></a>
-                    <a href="mailto:contatoiejb@gmail.com" target="_blank"><i class="fa-regular fa-envelope"></i></a>
+                    <a href="mailto:contatoiejb@gmail.com" aria-label="Enviar email para IEJB"><i class="fa-regular fa-envelope"></i></a>
                 </div>
             </div>
             <div class="footer-colunas">
@@ -167,16 +174,16 @@
             <div class="footer-colunas">
                 <ul>
                     <li><a href="../index.html#quem-somos">Sobre nós</a></li>
-                    <li><a href="https://www.instagram.com/iejbrasil/" target="_blank">Contato</a></li>
-                    <li><a href="https://share.google/aOF0icxRkhImlSw2n" target="_blank">IEJB no Google</a></li>
-                    <li><a href="https://g.page/r/CdfJHd47s_IREAE/review" target="_blank">Avalie - nos</a></li>
+                    <li><a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer">Contato</a></li>
+                    <li><a href="https://share.google/aOF0icxRkhImlSw2n" target="_blank" rel="noopener noreferrer">IEJB no Google</a></li>
+                    <li><a href="https://g.page/r/CdfJHd47s_IREAE/review" target="_blank" rel="noopener noreferrer">Avalie - nos</a></li>
                 </ul>
             </div>
             <div class="footer-colunas">
                 <ul>
                     <li><a href="../pages/termos.html">Termos de uso</a></li>
                     <li><a href="../pages/privacidade.html">Privacidade</a></li>
-                    <li><a href="https://www.instagram.com/iejbrasil/" target="_blank">Fale conosco</a></li>
+                    <li><a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer">Fale conosco</a></li>
                 </ul>
             </div>
         </div>

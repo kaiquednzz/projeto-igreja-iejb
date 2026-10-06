@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://kaiquednzz.github.io/projeto-igreja-iejb/</loc>
+        <loc>https://iejb.com.br/</loc>
         <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>https://iejb.com.br/pages/galeria.html</loc>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://iejb.com.br/pages/termos.html</loc>
+        <priority>0.2</priority>
+    </url>
+    <url>
+        <loc>https://iejb.com.br/pages/privacidade.html</loc>
+        <priority>0.2</priority>
     </url>
 </urlset>
