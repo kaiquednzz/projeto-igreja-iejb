@@ -526,29 +526,31 @@
             <section id="domingo" class="domingo">
                 <h2 class="reveal">COMO É UM CULTO</h2>
                 <h3 class="reveal">O que esperar na sua <strong>primeira visita</strong></h3>
+                <!-- Foto de cada passo no "Veja como é um culto" (visita.js): data-foto, a versão
+                     maior para telas de alta densidade (data-foto-grande) e a descrição (data-foto-alt) -->
                 <ol class="domingo-passos">
-                    <li class="reveal">
+                    <li class="reveal" data-foto="images/fachada-iejb-800.webp" data-foto-grande="images/fachada-iejb.webp" data-foto-alt="Fachada da IEJB, com a placa “Igreja Evangélica do Jardim Brasil” sobre o portão de entrada">
                         <span class="domingo-icone"><i class="fa-solid fa-hands-holding-child" aria-hidden="true"></i></span>
                         <div>
                             <h4>Chegada e acolhimento</h4>
                             <p>Venha como você é. Avise que é sua primeira vez e vamos te receber e mostrar tudo por aqui.</p>
                         </div>
                     </li>
-                    <li class="reveal">
+                    <li class="reveal" data-foto="images/pag-galeria/cantata-22/cantata22-01-800.webp" data-foto-grande="images/pag-galeria/cantata-22/cantata22-01.webp" data-foto-alt="Homem cantando com a mão levantada, com a banda ao fundo, em uma cantata na IEJB">
                         <span class="domingo-icone"><i class="fa-solid fa-hands-praying" aria-hidden="true"></i></span>
                         <div>
                             <h4>Louvor e adoração</h4>
                             <p>Um tempo de adoração para viver com a família. O louvor é o coração da nossa comunidade.</p>
                         </div>
                     </li>
-                    <li class="reveal">
+                    <li class="reveal" data-foto="images/pag-galeria/cultos/cultos05-800.webp" data-foto-grande="images/pag-galeria/cultos/cultos05.webp" data-foto-alt="Pastor pregando com a Bíblia na mão em um culto na IEJB">
                         <span class="domingo-icone"><i class="fa-solid fa-book-bible" aria-hidden="true"></i></span>
                         <div>
                             <h4>Palavra para o dia a dia</h4>
                             <p>Ensinamentos práticos, que ajudam na vida real e não só no domingo.</p>
                         </div>
                     </li>
-                    <li class="reveal">
+                    <li class="reveal" data-foto="images/pag-galeria/cantata-24/cantata24-03-800.webp" data-foto-grande="images/pag-galeria/cantata-24/cantata24-03.webp" data-foto-alt="Grupo de pessoas da igreja sorrindo juntas para uma foto na IEJB">
                         <span class="domingo-icone"><i class="fa-solid fa-people-arrows" aria-hidden="true"></i></span>
                         <div>
                             <h4>Comunhão no pátio</h4>
@@ -556,6 +558,8 @@
                         </div>
                     </li>
                 </ol>
+                <!-- Só aparece com JS e <dialog> (visita.js) -->
+                <button type="button" class="botao-vidro domingo-stories reveal" id="abrir-stories" aria-haspopup="dialog" hidden><i class="fa-solid fa-play" aria-hidden="true"></i>Veja como é um culto</button>
             </section>
 
             <section id="cta" class="cta">

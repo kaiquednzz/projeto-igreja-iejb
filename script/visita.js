@@ -556,6 +556,473 @@ const dadosEventos = [];
 
 // @@FEATURE-STORIES@@ ("Veja como é" entra logo abaixo)
 
+// "Veja como é um culto": os passos da seção #domingo em tela cheia, no formato dos
+// Stories. Título e texto vêm de cada <li> (h4 e p) e a foto do data-foto; o último
+// cartão convida para o próximo culto. O <dialog> aberto com showModal() já prende o
+// foco, fecha no Esc e deixa o resto da página inerte. O tempo de cada passo é a própria
+// animação da barra de progresso (CSS, --stories-duracao): quando ela termina, o passo
+// avança, e pausar é só congelar a animação (classe .pausado).
+
+(function vejaComoEUmCulto() {
+    const secao = document.getElementById('domingo');
+    const botao = document.getElementById('abrir-stories');
+    if (!secao || !botao) return;
+    // Navegador sem <dialog>: o botão continua escondido e a seção segue como lista
+    if (typeof HTMLDialogElement !== 'function' || typeof HTMLDialogElement.prototype.showModal !== 'function') return;
+
+    const passos = [...secao.querySelectorAll('.domingo-passos > li')].map(li => ({
+        titulo: limparTexto(li.querySelector('h4')?.textContent),
+        texto: limparTexto(li.querySelector('p')?.textContent),
+        foto: li.dataset.foto || '',
+        fotoGrande: li.dataset.fotoGrande || '',
+        alt: limparTexto(li.dataset.fotoAlt),
+        icone: li.querySelector('.domingo-icone i')
+    })).filter(p => p.titulo);
+    if (!passos.length) return;
+
+    const TITULO_CONVITE = 'Te esperamos!';
+    const total = passos.length + 1; // os passos e o convite no fim
+
+    let dialogo, palco, slides, barras, aviso, botaoPausa, toqueProximo;
+    let atual = 0;
+    let aberto = false;
+    let fechando = false;
+    let devolverFoco = true;
+    // O passo fica parado se a pessoa pausou, está segurando o dedo na tela,
+    // a foto ainda está carregando ou a aba está escondida
+    let pausadoPeloUsuario = false;
+    let segurando = false;
+    let carregando = false;
+    let gesto = null;     // toque em andamento: posição inicial e se virou "segurar" ou "arrastar"
+    let fimDoGesto = 0;   // quando acabou o último segurar/arrastar (o clique que vem junto é ignorado)
+    let timerSegurar = 0;
+    let timerFechar = 0;
+    let timerAviso = 0;
+
+    const criarIcone = (classes) => {
+        const i = document.createElement('i');
+        i.className = classes;
+        i.setAttribute('aria-hidden', 'true');
+        return i;
+    };
+
+    const criarBotao = (classe, rotulo, icone) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = classe;
+        b.setAttribute('aria-label', rotulo);
+        b.appendChild(criarIcone(icone));
+        return b;
+    };
+
+    // A foto ocupa a tela toda: em telas de alta densidade (celulares) vai a versão maior
+    const prepararFoto = (img, passo) => {
+        if (passo.fotoGrande) img.srcset = `${passo.foto} 1x, ${passo.fotoGrande} 2x`;
+        img.src = passo.foto;
+        return img;
+    };
+
+    const criarLink = (href, classe, icone, texto) => {
+        const a = document.createElement('a');
+        a.href = href;
+        a.className = classe;
+        a.append(criarIcone(icone), texto);
+        // Fecha na hora (sem animação) para a página destravar antes de rolar até a seção
+        a.addEventListener('click', () => fechar({ animar: false, focarBotao: false }));
+        return a;
+    };
+
+    // Mesmo texto do hero; se ele ainda não estiver pronto, calcula pelos cards dos cultos
+    function textoProximoCulto() {
+        const faixa = document.getElementById('proximo-culto');
+        if (faixa && !faixa.classList.contains('aguardando')) return limparTexto(faixa.textContent);
+        if (!cardsCultos.length) return '';
+        const { card, inicio } = cardsCultos
+            .map(c => ({ card: c, inicio: proximoInicio(c) }))
+            .sort((a, b) => a.inicio - b.inicio)[0];
+        return `Próximo culto: ${textoDataLonga(inicio)} às ${formatarHora(card.dataset.hora)} · ${card.dataset.nome}`;
+    }
+
+    function criarPasso(passo) {
+        const slide = document.createElement('div');
+        slide.className = 'stories-slide';
+        const foto = document.createElement('div');
+        foto.className = 'stories-foto';
+        if (passo.foto) {
+            const img = prepararFoto(document.createElement('img'), passo);
+            img.alt = passo.alt;
+            img.decoding = 'async';
+            img.draggable = false;
+            foto.appendChild(img);
+        }
+
+        const legenda = document.createElement('div');
+        legenda.className = 'stories-legenda stories-passo';
+        if (passo.icone) {
+            const icone = document.createElement('span');
+            icone.className = 'stories-icone';
+            icone.appendChild(passo.icone.cloneNode(true));
+            legenda.appendChild(icone);
+        }
+        const titulo = document.createElement('h2');
+        titulo.textContent = passo.titulo;
+        const texto = document.createElement('p');
+        texto.textContent = passo.texto;
+        legenda.append(titulo, texto);
+
+        slide.append(foto, legenda);
+        return slide;
+    }
+
+    function criarConvite() {
+        const slide = document.createElement('div');
+        slide.className = 'stories-slide';
+        const fundo = document.createElement('div');
+        fundo.className = 'stories-foto stories-fundo-convite';
+        const legenda = document.createElement('div');
+        legenda.className = 'stories-legenda stories-convite';
+
+        const logoHeader = document.querySelector('header .logo img');
+        if (logoHeader) {
+            const logo = document.createElement('img');
+            logo.className = 'stories-logo';
+            logo.src = logoHeader.src;
+            logo.alt = '';
+            logo.width = logoHeader.width;
+            logo.height = logoHeader.height;
+            legenda.appendChild(logo);
+        }
+        const titulo = document.createElement('h2');
+        titulo.textContent = TITULO_CONVITE;
+        legenda.appendChild(titulo);
+
+        const quando = textoProximoCulto();
+        if (quando) {
+            const chip = document.createElement('p');
+            chip.className = 'stories-quando';
+            chip.append(criarIcone('fa-regular fa-clock'), quando);
+            legenda.appendChild(chip);
+        }
+
+        const acoes = document.createElement('div');
+        acoes.className = 'stories-acoes';
+        const planeje = document.getElementById('planeje');
+        if (planeje && !planeje.hidden) {
+            acoes.appendChild(criarLink('#planeje', 'botao-principal', 'fa-regular fa-calendar-check', 'Planejar minha visita'));
+        }
+        if (document.getElementById('localizacao')) {
+            acoes.appendChild(criarLink('#localizacao', 'botao-vidro', 'fa-solid fa-location-dot', 'Como chegar'));
+        }
+        if (acoes.children.length) legenda.appendChild(acoes);
+
+        slide.append(fundo, legenda);
+        return slide;
+    }
+
+    function atualizarPausa() {
+        dialogo.classList.toggle('pausado', pausadoPeloUsuario || segurando || carregando || document.hidden);
+        botaoPausa.setAttribute('aria-label', pausadoPeloUsuario ? 'Continuar' : 'Pausar');
+        botaoPausa.firstElementChild.className = pausadoPeloUsuario ? 'fa-solid fa-play' : 'fa-solid fa-pause';
+    }
+
+    const alternarPausa = () => {
+        pausadoPeloUsuario = !pausadoPeloUsuario;
+        atualizarPausa();
+    };
+
+    function mostrar(i) {
+        const indice = Math.min(Math.max(i, 0), total - 1);
+        const mudou = indice !== atual;
+        atual = indice;
+        const ultimo = atual === total - 1;
+        // Se o foco está num link do cartão que vai sair, ele não pode se perder
+        const focoNoCartao = slides.contains(document.activeElement);
+
+        // Sobras de trocas rápidas saem já; o cartão atual fica por baixo até o novo aparecer
+        slides.querySelectorAll('.stories-slide:not(:last-child)').forEach(s => s.remove());
+        const velho = slides.lastElementChild;
+        velho?.querySelector('.stories-legenda')?.remove();
+        const novo = ultimo ? criarConvite() : criarPasso(passos[atual]);
+        slides.appendChild(novo);
+        const foto = novo.querySelector('.stories-foto');
+        foto.addEventListener('animationend', function surgiu(e) {
+            if (e.target !== foto) return;
+            foto.removeEventListener('animationend', surgiu);
+            velho?.remove();
+        });
+        if (focoNoCartao) palco.focus({ preventScroll: true });
+
+        // A barra de progresso só começa a andar quando a foto chega
+        const img = foto.querySelector('img');
+        carregando = Boolean(img && !img.complete);
+        if (img) {
+            const pronta = () => {
+                if (slides.lastElementChild !== novo) return;
+                carregando = false;
+                atualizarPausa();
+            };
+            img.addEventListener('load', pronta, { once: true });
+            img.addEventListener('error', () => { img.remove(); pronta(); }, { once: true });
+        }
+        const seguinte = passos[atual + 1];
+        if (seguinte?.foto) prepararFoto(new Image(), seguinte);
+
+        [...barras.children].forEach((barra, j) => {
+            barra.classList.toggle('vista', j < atual);
+            barra.classList.remove('atual');
+        });
+        atualizarPausa();
+        void barras.offsetWidth; // recomeça a animação mesmo quando volta para o mesmo passo
+        barras.children[atual].classList.add('atual');
+
+        toqueProximo.setAttribute('aria-label', ultimo ? 'Fechar' : 'Próximo passo');
+        dialogo.classList.toggle('no-inicio', atual === 0);
+        dialogo.classList.toggle('no-fim', ultimo);
+
+        if (mudou) {
+            const texto = `Passo ${atual + 1} de ${total}: ${ultimo ? TITULO_CONVITE : passos[atual].titulo}`;
+            clearTimeout(timerAviso);
+            // Um instante depois: ao abrir, a região viva precisa já estar na tela para ser lida
+            timerAviso = setTimeout(() => { aviso.textContent = texto; }, 120);
+        }
+    }
+
+    // No último cartão, "próximo" fecha, como nos Stories
+    const proximo = () => (atual < total - 1 ? mostrar(atual + 1) : fechar());
+    // No primeiro, "anterior" recomeça o passo
+    const anterior = () => mostrar(atual - 1);
+
+    // Clique que encerra um "segurar" ou "arrastar" não troca de passo
+    // (detail 0 = Enter/Espaço no botão, que sempre vale)
+    const foiGesto = (e) => e.detail !== 0 && performance.now() - fimDoGesto < 600;
+
+    function montar() {
+        dialogo = document.createElement('dialog');
+        dialogo.className = 'stories';
+        dialogo.setAttribute('aria-label', limparTexto(botao.textContent));
+
+        palco = document.createElement('div');
+        palco.className = 'stories-palco';
+        palco.tabIndex = -1;
+
+        barras = document.createElement('div');
+        barras.className = 'stories-barras';
+        barras.setAttribute('aria-hidden', 'true');
+        for (let i = 0; i < total; i++) {
+            const barra = document.createElement('span');
+            barra.className = 'stories-barra';
+            barra.appendChild(document.createElement('span'));
+            barras.appendChild(barra);
+        }
+
+        // Topo: "perfil" da igreja (como nos Stories), pausar e fechar
+        const topo = document.createElement('div');
+        topo.className = 'stories-topo';
+        const autor = document.createElement('div');
+        autor.className = 'stories-autor';
+        autor.setAttribute('aria-hidden', 'true'); // o nome do diálogo já diz isso
+        const icone = document.querySelector('link[rel="apple-touch-icon"]');
+        if (icone) {
+            const avatar = document.createElement('img');
+            avatar.src = icone.href;
+            avatar.alt = '';
+            avatar.width = 32;
+            avatar.height = 32;
+            autor.appendChild(avatar);
+        }
+        const nomes = document.createElement('span');
+        const nome = document.createElement('span');
+        nome.className = 'stories-autor-nome';
+        nome.textContent = 'IEJB';
+        const tema = document.createElement('span');
+        tema.className = 'stories-autor-tema';
+        tema.textContent = limparTexto(secao.querySelector('h2')?.textContent);
+        nomes.append(nome, tema);
+        autor.appendChild(nomes);
+
+        botaoPausa = criarBotao('stories-botao', 'Pausar', 'fa-solid fa-pause');
+        botaoPausa.autofocus = true; // o showModal() leva o foco para cá
+        const botaoFechar = criarBotao('stories-botao', 'Fechar', 'fa-solid fa-xmark');
+        topo.append(autor, botaoPausa, botaoFechar);
+
+        slides = document.createElement('div');
+        slides.className = 'stories-slides';
+
+        // Metade esquerda volta, metade direita avança (no computador, as setas ficam ao lado do cartão)
+        const toqueAnterior = criarBotao('stories-toque stories-anterior', 'Passo anterior', 'fa-solid fa-chevron-left');
+        toqueProximo = criarBotao('stories-toque stories-proximo', 'Próximo passo', 'fa-solid fa-chevron-right');
+
+        aviso = document.createElement('p');
+        aviso.className = 'sr-only';
+        aviso.setAttribute('aria-live', 'polite');
+        aviso.setAttribute('aria-atomic', 'true');
+
+        palco.append(barras, topo, slides, toqueAnterior, toqueProximo, aviso);
+        dialogo.appendChild(palco);
+        document.body.appendChild(dialogo);
+
+        botaoPausa.addEventListener('click', alternarPausa);
+        botaoFechar.addEventListener('click', () => fechar());
+        toqueAnterior.addEventListener('click', (e) => { if (!foiGesto(e)) anterior(); });
+        toqueProximo.addEventListener('click', (e) => { if (!foiGesto(e)) proximo(); });
+
+        // A barra do passo atual chegou ao fim: hora de avançar (o convite final fica parado)
+        barras.addEventListener('animationend', (e) => {
+            if (e.animationName === 'storiesProgresso' && e.target.parentElement === barras.children[atual] && atual < total - 1) {
+                mostrar(atual + 1);
+            }
+        });
+
+        // Esc: fecha com a animação de saída
+        dialogo.addEventListener('cancel', (e) => {
+            e.preventDefault();
+            fechar();
+        });
+        dialogo.addEventListener('close', () => { if (!dialogo.open) limpar(); });
+
+        dialogo.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                proximo();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                anterior();
+            } else if (e.key === ' ' && !e.target.closest('button, a')) {
+                // Num botão ou link, o Espaço continua apertando o que tem foco
+                e.preventDefault();
+                if (!e.repeat) alternarPausa();
+            }
+        });
+
+        // Clique fora do cartão (computador) fecha, se o clique também começou fora
+        let comecouFora = false;
+        dialogo.addEventListener('pointerdown', (e) => { comecouFora = e.target === dialogo; });
+        dialogo.addEventListener('click', (e) => {
+            if (e.target === dialogo && comecouFora) fechar();
+        });
+
+        // Gestos: segurar pausa, arrastar para o lado troca de passo, puxar para baixo fecha
+        palco.addEventListener('pointerdown', (e) => {
+            if (!e.isPrimary || e.button !== 0 || e.target.closest('.stories-topo button, .stories-acoes')) return;
+            gesto = { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, dy: 0, segurou: false, arrastou: false };
+            clearTimeout(timerSegurar);
+            timerSegurar = setTimeout(() => {
+                if (!gesto || gesto.arrastou) return;
+                gesto.segurou = true;
+                segurando = true;
+                dialogo.classList.add('segurando'); // esconde barras e textos para ver a foto
+                atualizarPausa();
+            }, 220);
+        });
+
+        dialogo.addEventListener('pointermove', (e) => {
+            if (!gesto || e.pointerId !== gesto.id) return;
+            gesto.dx = e.clientX - gesto.x;
+            gesto.dy = e.clientY - gesto.y;
+            if (!gesto.arrastou && Math.hypot(gesto.dx, gesto.dy) > 12) {
+                gesto.arrastou = true;
+                clearTimeout(timerSegurar);
+                segurando = true;
+                atualizarPausa();
+            }
+            // Puxando para baixo, o cartão acompanha o dedo
+            if (gesto.arrastou && gesto.dy > 0 && gesto.dy > Math.abs(gesto.dx)) {
+                dialogo.classList.add('arrastando');
+                palco.style.setProperty('--arrasto', `${gesto.dy}px`);
+            }
+        });
+
+        const terminarGesto = (e) => {
+            if (!gesto || e.pointerId !== gesto.id) return;
+            clearTimeout(timerSegurar);
+            const { dx, dy, segurou, arrastou } = gesto;
+            gesto = null;
+            segurando = false;
+            dialogo.classList.remove('segurando', 'arrastando');
+            if (segurou || arrastou) fimDoGesto = performance.now();
+            if (arrastou && e.type === 'pointerup') {
+                if (dy > 110 && dy > Math.abs(dx)) {
+                    fechar({ arrastado: true });
+                    return;
+                }
+                if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+                    if (dx < 0) proximo();
+                    else anterior();
+                }
+            }
+            palco.style.setProperty('--arrasto', '0px'); // volta com a mola (CSS)
+            atualizarPausa();
+        };
+        dialogo.addEventListener('pointerup', terminarGesto);
+        dialogo.addEventListener('pointercancel', terminarGesto);
+        // Segurar o dedo na foto abriria o menu de salvar imagem do celular
+        palco.addEventListener('contextmenu', (e) => e.preventDefault());
+    }
+
+    function abrir() {
+        if (!dialogo) montar();
+        if (aberto) return;
+        aberto = true;
+        fechando = false;
+        devolverFoco = true;
+        // Movimento reduzido: começa parado e a pessoa avança no próprio ritmo
+        pausadoPeloUsuario = reduzirMovimento;
+        segurando = false;
+        gesto = null;
+        document.documentElement.classList.add('stories-aberto');
+        document.addEventListener('visibilitychange', atualizarPausa);
+        dialogo.showModal();
+        atual = -1;
+        mostrar(0);
+    }
+
+    function fechar({ animar = true, arrastado = false, focarBotao = true } = {}) {
+        if (!aberto || fechando) return;
+        devolverFoco = focarBotao;
+        if (!animar || reduzirMovimento) {
+            concluirFechamento();
+            return;
+        }
+        fechando = true;
+        dialogo.classList.toggle('arrastado', arrastado);
+        dialogo.classList.add('fechando');
+        timerFechar = setTimeout(concluirFechamento, 240);
+    }
+
+    function concluirFechamento() {
+        if (dialogo.open) dialogo.close();
+        limpar();
+    }
+
+    // Roda uma vez a cada fechamento, venha de onde vier (botão, Esc, gesto ou link)
+    function limpar() {
+        if (!aberto) return;
+        aberto = false;
+        fechando = false;
+        [timerFechar, timerSegurar, timerAviso].forEach(clearTimeout);
+        document.removeEventListener('visibilitychange', atualizarPausa);
+        document.documentElement.classList.remove('stories-aberto');
+        dialogo.classList.remove('fechando', 'arrastado', 'arrastando', 'segurando', 'pausado');
+        palco.style.setProperty('--arrasto', '0px');
+        slides.replaceChildren(); // para as animações e solta as fotos
+        aviso.textContent = '';
+        gesto = null;
+        segurando = false;
+        carregando = false;
+        if (devolverFoco) botao.focus({ preventScroll: true });
+        // O header escolhe o vidro claro ou escuro pelo que está atrás dele, e isso só é
+        // refeito ao rolar: um "scroll" avisa o script.js para conferir de novo
+        window.dispatchEvent(new Event('scroll'));
+    }
+
+    botao.addEventListener('click', abrir);
+    // Começa a baixar a primeira foto quando a pessoa mira no botão
+    const preCarregar = () => { if (passos[0].foto) prepararFoto(new Image(), passos[0]); };
+    botao.addEventListener('pointerenter', preCarregar, { once: true });
+    botao.addEventListener('focus', preCarregar, { once: true });
+    botao.hidden = false;
+})();
+
 
 
 // @@FEATURE-LOCAL@@ (agenda semanal e links de eventos entram logo abaixo)
