@@ -306,7 +306,9 @@ const dadosEventos = [];
             const { texto, respostas } = perguntas[passo];
             const progresso = document.createElement('div');
             progresso.className = 'quiz-progresso';
-            progresso.innerHTML = `<span>Pergunta ${passo + 1} de ${perguntas.length}</span><div><i style="width:${(passo / perguntas.length) * 100}%"></i></div>`;
+            // --de: largura da pergunta anterior, para a barra crescer a partir dela (CSS)
+            const antes = (Math.max(passo - 1, 0) / perguntas.length) * 100;
+            progresso.innerHTML = `<span>Pergunta ${passo + 1} de ${perguntas.length}</span><div><i style="--de:${antes}%; width:${(passo / perguntas.length) * 100}%"></i></div>`;
             const pergunta = document.createElement('h4');
             pergunta.textContent = texto;
             const lista = document.createElement('div');
