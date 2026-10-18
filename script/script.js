@@ -1,24 +1,21 @@
 const reduzirMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Reveal
+// Reveal: os elementos que entram na tela na mesma "leva" aparecem em cascata,
+// um 70ms depois do outro (--atraso no CSS). Quem entra sozinho aparece na hora.
+// Também revela o que já ficou acima da tela (ex.: recarregar a página no meio dela).
 
 const observer = new IntersectionObserver((entries) => {
+    let ordem = 0;
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
+        const jaPassou = entry.boundingClientRect.bottom < 0;
+        if (!entry.isIntersecting && !jaPassou) return;
+        entry.target.style.setProperty('--atraso', `${Math.min(ordem++, 6) * 0.07}s`);
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
     });
-}, { threshold: 0.12 });
+}, { rootMargin: '0px 0px -8% 0px' });
 
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-// Atraso em cascata: os .reveal de cada container entram um depois do outro (--atraso no CSS)
-document.querySelectorAll('.cultos, .hero, .ministerios-container, .galeria, .galeria-grid, .galeria-item, .depoimentos-container, .eventos, .eventos-grid, .eventos-container, .cta-container')
-    .forEach(container => {
-        container.querySelectorAll('.reveal').forEach((el, i) => {
-            el.style.setProperty('--atraso', `${i * 0.08}s`);
-        });
-    });
 
 // Aviso rápido (toast)
 

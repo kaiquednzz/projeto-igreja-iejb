@@ -170,27 +170,30 @@ summary:focus-visible,
 
 /* Reveal: o script.js adiciona .visible quando o elemento entra na tela.
    É uma animation (e não transition) para não brigar com as transições de
-   hover de cada card. Usa translate/scale (e não transform) pelo mesmo motivo. */
+   hover de cada card, e usa translate (e não transform) pelo mesmo motivo.
+   Regra de ouro: só "folhas" levam .reveal. Um .reveal dentro de outro soma
+   os movimentos e multiplica a opacidade, e o efeito fica arrastado. */
 .reveal {
     opacity: 0;
 }
 
 .reveal.visible {
-    animation: revelar 1s var(--ease-out) both;
+    animation: revelar 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: var(--atraso, 0s);
 }
 
+/* Sobe um pouquinho e "desembaça", como os textos que surgem nas páginas da Apple */
 @keyframes revelar {
     from {
         opacity: 0;
-        translate: 0 32px;
-        scale: 0.98;
+        translate: 0 24px;
+        filter: blur(8px);
     }
 
     to {
         opacity: 1;
         translate: none;
-        scale: none;
+        filter: none;
     }
 }
 
