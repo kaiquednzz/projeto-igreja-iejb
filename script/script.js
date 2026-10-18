@@ -1,38 +1,52 @@
 const reduzirMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Navegador sem IntersectionObserver (muito antigo): tira o html.js, então nada fica
+// invisível esperando o reveal, e os efeitos que dependem de rolagem são pulados
+const temObserver = 'IntersectionObserver' in window;
+if (!temObserver) document.documentElement.classList.remove('js');
+
 // Reveal: os elementos que entram na tela na mesma "leva" aparecem em cascata,
 // um 70ms depois do outro (--atraso no CSS). Quem entra sozinho aparece na hora.
 // Também revela o que já ficou acima da tela (ex.: recarregar a página no meio dela).
 
-const observer = new IntersectionObserver((entries) => {
-    let ordem = 0;
-    entries.forEach(entry => {
-        const jaPassou = entry.boundingClientRect.bottom < 0;
-        if (!entry.isIntersecting && !jaPassou) return;
-        entry.target.style.setProperty('--atraso', `${Math.min(ordem++, 6) * 0.07}s`);
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-    });
-}, { rootMargin: '0px 0px -8% 0px' });
+if (temObserver) {
+    const observadorReveal = new IntersectionObserver((entries) => {
+        let ordem = 0;
+        entries.forEach(entry => {
+            const jaPassou = entry.boundingClientRect.bottom < 0;
+            if (!entry.isIntersecting && !jaPassou) return;
+            entry.target.style.setProperty('--atraso', `${Math.min(ordem++, 6) * 0.07}s`);
+            entry.target.classList.add('visible');
+            observadorReveal.unobserve(entry.target);
+        });
+    }, { rootMargin: '0px 0px -8% 0px' });
 
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    document.querySelectorAll('.reveal').forEach(el => observadorReveal.observe(el));
+}
 
 // Aviso rápido (toast)
 
+// A região viva (role=status) é criada vazia logo no início: um leitor de tela só anuncia
+// mudanças em regiões que já existiam antes do texto aparecer
+const toast = document.createElement('div');
+toast.className = 'toast';
+toast.setAttribute('role', 'status');
+toast.setAttribute('aria-live', 'polite');
+document.body.appendChild(toast);
+
 let toastTimer;
 function mostrarToast(mensagem) {
-    let toast = document.querySelector('.toast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.setAttribute('role', 'status');
-        toast.setAttribute('aria-live', 'polite');
-        document.body.appendChild(toast);
-    }
-    toast.textContent = mensagem;
-    toast.classList.add('visivel');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('visivel'), 2200);
+    toast.textContent = '';
+    // Esvazia e repõe num instante, para a mesma mensagem ser anunciada de novo se repetir
+    toastTimer = setTimeout(() => {
+        toast.textContent = mensagem;
+        toast.classList.add('visivel');
+        toastTimer = setTimeout(() => {
+            toast.classList.remove('visivel');
+            toastTimer = setTimeout(() => { toast.textContent = ''; }, 400);
+        }, 2200);
+    }, 50);
 }
 
 async function copiarTexto(texto, mensagemOk) {
@@ -58,8 +72,15 @@ if (mobileMenu && nav) {
         mobileMenu.setAttribute('aria-label', ativo ? 'Fechar menu' : 'Abrir menu');
     };
 
-    mobileMenu.addEventListener('click', () => alternarMenu());
-    nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => alternarMenu(false)));
+    mobileMenu.addEventListener('click', () => {
+        alternarMenu();
+        // No HTML o painel vem antes do botão: sem isso, o Tab de quem usa teclado pularia os links
+        if (nav.classList.contains('ativo')) nav.querySelector('a').focus({ preventScroll: true });
+    });
+    header.querySelectorAll('nav a, p a').forEach(a => a.addEventListener('click', () => alternarMenu(false)));
+    header.addEventListener('focusout', (e) => {
+        if (nav.classList.contains('ativo') && !header.contains(e.relatedTarget)) alternarMenu(false);
+    });
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && nav.classList.contains('ativo')) {
             alternarMenu(false);
@@ -144,7 +165,7 @@ const botaoTopo = document.createElement('button');
 botaoTopo.type = 'button';
 botaoTopo.className = 'botao-topo';
 botaoTopo.setAttribute('aria-label', 'Voltar ao topo');
-botaoTopo.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
+botaoTopo.innerHTML = '<i class="fa-solid fa-chevron-up" aria-hidden="true"></i>';
 botaoTopo.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduzirMovimento ? 'auto' : 'smooth' }));
 document.body.appendChild(botaoTopo);
 
@@ -172,8 +193,10 @@ window.addEventListener('resize', () => {
     moverIndicador();
     agendarRolagem();
 });
-aoRolar();
-moverIndicador();
+requestAnimationFrame(() => {
+    aoRolar();
+    moverIndicador();
+});
 document.fonts.ready.then(moverIndicador);
 
 // Próximo culto (usa os data-attributes dos cards da programação)
@@ -193,6 +216,13 @@ function proximaOcorrencia(card, agora = new Date()) {
     inicio.setHours(h, m, 0, 0);
     inicio.setDate(inicio.getDate() + ((Number(card.dataset.dia) - agora.getDay() + 7) % 7));
     if (inicio.getTime() + DURACAO_CULTO_MS <= agora.getTime()) inicio.setDate(inicio.getDate() + 7);
+    return inicio;
+}
+
+// Próxima vez que o culto COMEÇA (pula o que já está acontecendo): para planejar e lembrar
+function proximoInicio(card, agora = new Date()) {
+    const inicio = proximaOcorrencia(card, agora);
+    if (inicio <= agora) inicio.setDate(inicio.getDate() + 7);
     return inicio;
 }
 
@@ -219,7 +249,7 @@ function atualizarProximoCulto() {
     else texto = `Próximo culto: ${dias[inicio.getDay()]} às ${hora} · ${nome}`;
 
     faixa.textContent = texto;
-    faixa.hidden = false;
+    faixa.classList.remove('aguardando');
     cards.forEach(c => c.classList.toggle('proximo', c === card));
 }
 
@@ -295,7 +325,7 @@ setInterval(atualizarProximoCulto, 60000);
             try { localStorage.setItem(CHAVE_SEQ, JSON.stringify(dados)); } catch { /* modo privado */ }
         }
         if (sequencia && dados.total > 1) {
-            sequencia.innerHTML = `<i class="fa-solid fa-fire"></i>${dados.total} dias seguidos com a Palavra`;
+            sequencia.innerHTML = `<i class="fa-solid fa-fire" aria-hidden="true"></i>${dados.total} dias seguidos com a Palavra`;
             sequencia.hidden = false;
         }
     };
@@ -314,6 +344,7 @@ setInterval(atualizarProximoCulto, 60000);
 
     botao.addEventListener('click', () => {
         abrir(!reduzirMovimento);
+        frase.focus();
         try { localStorage.setItem(CHAVE, chaveHoje); } catch { /* modo privado */ }
     });
 
@@ -428,15 +459,17 @@ async function gerarImagemVersiculo(versiculo) {
     overlay.setAttribute('aria-modal', 'true');
     overlay.setAttribute('aria-label', 'Visualizador de fotos');
     overlay.innerHTML = `
-        <button type="button" class="lightbox-fechar" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
-        <button type="button" class="lightbox-nav lightbox-anterior" aria-label="Foto anterior"><i class="fa-solid fa-chevron-left"></i></button>
+        <button type="button" class="lightbox-fechar" aria-label="Fechar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <button type="button" class="lightbox-nav lightbox-anterior" aria-label="Foto anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
         <figure>
             <img alt="">
         </figure>
-        <button type="button" class="lightbox-nav lightbox-proxima" aria-label="Próxima foto"><i class="fa-solid fa-chevron-right"></i></button>`;
+        <p class="sr-only" aria-live="polite"></p>
+        <button type="button" class="lightbox-nav lightbox-proxima" aria-label="Próxima foto"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>`;
     document.body.appendChild(overlay);
 
     const foto = overlay.querySelector('figure img');
+    const posicao = overlay.querySelector('[aria-live]');
     const botaoFechar = overlay.querySelector('.lightbox-fechar');
     let atual = 0;
     let abertoPor = null;
@@ -444,8 +477,10 @@ async function gerarImagemVersiculo(versiculo) {
     const mostrar = (i) => {
         atual = (i + imagens.length) % imagens.length;
         const img = imagens[atual];
-        foto.src = img.currentSrc || img.src;
+        // img.src é sempre a foto grande; currentSrc seria a miniatura escolhida pelo srcset
+        foto.src = img.src;
         foto.alt = img.alt;
+        posicao.textContent = `Foto ${atual + 1} de ${imagens.length}: ${img.alt}`;
         foto.classList.remove('trocando');
         if (!overlay.hidden) {
             void foto.offsetWidth; // força o navegador a reiniciar a animação de troca
@@ -460,13 +495,14 @@ async function gerarImagemVersiculo(versiculo) {
         abertoPor = origem;
         mostrar(i);
         overlay.hidden = false;
-        document.body.classList.add('lightbox-aberto');
+        // overflow no <html>: com o overflow-x: clip do html, o do body não trava a rolagem
+        document.documentElement.classList.add('lightbox-aberto');
         botaoFechar.focus();
     };
 
     const fechar = () => {
         overlay.hidden = true;
-        document.body.classList.remove('lightbox-aberto');
+        document.documentElement.classList.remove('lightbox-aberto');
         if (abertoPor) abertoPor.focus();
     };
 
@@ -474,6 +510,7 @@ async function gerarImagemVersiculo(versiculo) {
         img.classList.add('lightbox-alvo');
         img.tabIndex = 0;
         img.setAttribute('role', 'button');
+        img.setAttribute('aria-haspopup', 'dialog');
         img.addEventListener('click', () => abrir(i, img));
         img.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -522,10 +559,10 @@ if (botaoEndereco) {
 // Depoimentos
 
 document.addEventListener("DOMContentLoaded", () => {
-    const paragrafos = document.querySelectorAll('.depoimentos .depoimentos-container .depoimentos-grid p');
+    const paragrafos = document.querySelectorAll('.depoimentos .depoimentos-container .depoimentos-grid p:not(.autor)');
 
-    // Sem animação (movimento reduzido): mantém o texto completo
-    if (reduzirMovimento) {
+    // Sem animação (movimento reduzido, alto contraste ou navegador antigo): mantém o texto completo
+    if (reduzirMovimento || !temObserver || window.matchMedia('(forced-colors: active)').matches) {
         paragrafos.forEach(p => p.classList.add('digitado'));
         return;
     }
@@ -534,7 +571,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // (reserva o tamanho do card e é a que o leitor de tela lê inteira); a animação
     // digita por cima, numa cópia visual que os leitores ignoram (aria-hidden)
     paragrafos.forEach(p => {
-        p.dataset.textoCompleto = p.textContent.trim();
+        p.dataset.textoCompleto = p.textContent.replace(/\s+/g, ' ').trim();
         const leitor = document.createElement('span');
         leitor.className = 'texto-molde';
         leitor.textContent = p.dataset.textoCompleto;
@@ -555,7 +592,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (i < texto.length) {
                 visual.textContent += texto.charAt(i);
                 i++;
-                setTimeout(tipo, 40); // Velocidade da digitação (em milissegundos)
+                setTimeout(tipo, 22); // Velocidade da digitação (em milissegundos)
             } else {
                 elemento.classList.add('digitado'); // Some com o cursor no final
             }
@@ -585,7 +622,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!el) return;
     const anos = new Date().getFullYear() - Number(el.dataset.desde);
     el.textContent = anos;
-    if (reduzirMovimento) return;
+    if (reduzirMovimento || !temObserver) return;
+
+    // Mesmo truque dos depoimentos: cópia escondida com o texto final para o leitor de tela,
+    // e a contagem animada só na parte visual (aria-hidden)
+    const paragrafo = el.parentElement;
+    const leitor = document.createElement('span');
+    leitor.className = 'sr-only';
+    leitor.textContent = paragrafo.textContent.replace(/\s+/g, ' ').trim();
+    const visual = document.createElement('span');
+    visual.setAttribute('aria-hidden', 'true');
+    visual.append(...paragrafo.childNodes);
+    paragrafo.append(visual, leitor);
+    window.addEventListener('beforeprint', () => { el.textContent = anos; });
 
     el.textContent = '0';
     const iniciar = new IntersectionObserver((entries, obs) => {

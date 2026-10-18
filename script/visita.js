@@ -1,11 +1,25 @@
 // Recursos da página inicial para levar o visitante à igreja.
-// Depende de script.js (mostrarToast, copiarTexto, proximaOcorrencia, formatarHora, reduzirMovimento).
+// Depende de script.js (mostrarToast, copiarTexto, proximaOcorrencia, proximoInicio, formatarHora,
+// reduzirMovimento, temObserver).
 
 const LOCAL_IEJB = 'IEJB - Rua Ceará, 128, Jardim Brasil, Araçariguama - SP';
 const COORDENADAS_IEJB = { lat: -23.42888942, lng: -47.07071296 };
 const NOMES_DIAS = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
 
+const ENDERECO_IEJB = {
+    '@type': 'PostalAddress',
+    streetAddress: 'Rua Ceará, 128 - Jardim Brasil',
+    addressLocality: 'Araçariguama',
+    addressRegion: 'SP',
+    postalCode: '18147-000',
+    addressCountry: 'BR'
+};
+
 const doisDigitos = (n) => String(n).padStart(2, '0');
+// Texto do HTML sem as quebras e espaços de indentação
+const limparTexto = (t) => (t || '').replace(/\s+/g, ' ').trim();
+const paraSlug = (t) => limparTexto(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 // Calendário (.ics)
 
@@ -18,7 +32,11 @@ function escaparICS(texto) {
     return texto.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
 }
 
-function baixarICS({ titulo, inicio, duracaoMin = 120, diaInteiro = false, descricao = '' }) {
+// Os horários do site são de Brasília. Com o TZID, quem estiver em outro fuso recebe o horário certo.
+const FUSO_ICS = ['BEGIN:VTIMEZONE', 'TZID:America/Sao_Paulo', 'BEGIN:STANDARD', 'DTSTART:19700101T000000',
+    'TZOFFSETFROM:-0300', 'TZOFFSETTO:-0300', 'TZNAME:-03', 'END:STANDARD', 'END:VTIMEZONE'];
+
+function baixarICS({ titulo, inicio, duracaoMin = 120, diaInteiro = false, descricao = '', local = LOCAL_IEJB }) {
     const fim = new Date(inicio.getTime() + duracaoMin * 60000);
     const fimDia = new Date(inicio);
     fimDia.setDate(fimDia.getDate() + 1);
@@ -29,13 +47,15 @@ function baixarICS({ titulo, inicio, duracaoMin = 120, diaInteiro = false, descr
         'VERSION:2.0',
         'PRODID:-//IEJB//Site//PT',
         'CALSCALE:GREGORIAN',
+        ...FUSO_ICS,
         'BEGIN:VEVENT',
-        `UID:${Date.now()}-${Math.floor(Math.random() * 1e6)}@iejb.com.br`,
+        // UID estável: baixar o mesmo lembrete duas vezes atualiza o evento em vez de duplicar
+        `UID:${formatoICS(inicio, true)}-${paraSlug(titulo)}@iejb.com.br`,
         `DTSTAMP:${agoraUTC}`,
-        diaInteiro ? `DTSTART;VALUE=DATE:${formatoICS(inicio, true)}` : `DTSTART:${formatoICS(inicio)}`,
-        diaInteiro ? `DTEND;VALUE=DATE:${formatoICS(fimDia, true)}` : `DTEND:${formatoICS(fim)}`,
+        diaInteiro ? `DTSTART;VALUE=DATE:${formatoICS(inicio, true)}` : `DTSTART;TZID=America/Sao_Paulo:${formatoICS(inicio)}`,
+        diaInteiro ? `DTEND;VALUE=DATE:${formatoICS(fimDia, true)}` : `DTEND;TZID=America/Sao_Paulo:${formatoICS(fim)}`,
         `SUMMARY:${escaparICS(titulo)}`,
-        `LOCATION:${escaparICS(LOCAL_IEJB)}`,
+        `LOCATION:${escaparICS(local)}`,
         `DESCRIPTION:${escaparICS(descricao || 'IEJB - Igreja Evangélica do Jardim Brasil. https://iejb.com.br')}`,
         'BEGIN:VALARM',
         'ACTION:DISPLAY',
@@ -66,7 +86,7 @@ const cardsCultos = [...document.querySelectorAll('.cultos-grid[data-dia]')];
 function baixarICSDoCulto(card) {
     baixarICS({
         titulo: `${card.dataset.nome} - IEJB`,
-        inicio: proximaOcorrencia(card),
+        inicio: proximoInicio(card),
         descricao: `${card.dataset.nome} na IEJB. Venha como você é! https://iejb.com.br`
     });
 }
@@ -83,11 +103,13 @@ const dadosEventos = [];
         const [a, m, d] = el.dataset.data.split('-').map(Number);
         const dia = new Date(a, m - 1, d);
         const textos = el.querySelector('.textos');
-        const titulo = [textos.querySelector('h4'), textos.querySelector('h3')]
-            .map(n => n && n.textContent.trim()).filter(Boolean).join(' - ');
-        const descricao = textos.querySelector('p')?.textContent.trim() || '';
-        const horarioTxt = el.querySelector('.horario p')?.textContent.trim() || '';
-        const local = el.querySelector('.horario address, .horario p:nth-of-type(2)')?.textContent.trim() || LOCAL_IEJB;
+        const nomeEvento = limparTexto(textos.querySelector('h4')?.textContent);
+        const titulo = [limparTexto(textos.querySelector('.evento-categoria')?.textContent), nomeEvento].filter(Boolean).join(' - ');
+        const descricao = limparTexto(textos.querySelector('p:not(.evento-categoria)')?.textContent);
+        const horarioTxt = limparTexto(el.querySelector('.horario p')?.textContent);
+        // Evento fora da igreja: data-local-nome e data-local-cidade no card
+        const externo = Boolean(el.dataset.localNome);
+        const local = externo ? `${el.dataset.localNome} - ${el.dataset.localCidade}` : LOCAL_IEJB;
         const hora = horarioTxt.match(/(\d{1,2})h(\d{2})?/);
         const inicio = new Date(a, m - 1, d, hora ? Number(hora[1]) : 0, hora ? Number(hora[2] || 0) : 0);
 
@@ -102,13 +124,16 @@ const dadosEventos = [];
         // Ações
         const acoes = document.createElement('div');
         acoes.className = 'evento-acoes';
-        acoes.innerHTML = '<button type="button" data-acao="calendario"><i class="fa-regular fa-calendar-plus"></i>Lembrar</button>' +
-            '<button type="button" data-acao="compartilhar"><i class="fa-solid fa-share-nodes"></i>Compartilhar</button>';
+        acoes.innerHTML = '<button type="button" data-acao="calendario"><i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>Lembrar</button>' +
+            '<button type="button" data-acao="compartilhar"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i>Compartilhar</button>';
+        // Quatro botões "Lembrar" iguais confundem o leitor de tela: o nome inclui o evento
+        acoes.querySelector('[data-acao="calendario"]').setAttribute('aria-label', `Lembrar: ${nomeEvento}`);
+        acoes.querySelector('[data-acao="compartilhar"]').setAttribute('aria-label', `Compartilhar: ${nomeEvento}`);
         el.querySelector('.horario-localizacao')?.appendChild(acoes);
 
         const textoData = `${textoDataLonga(dia)}${hora ? ` às ${formatarHora(`${hora[1]}:${hora[2] || '00'}`)}` : ''}`;
         acoes.querySelector('[data-acao="calendario"]').addEventListener('click', () => {
-            baixarICS({ titulo: titulo, inicio, diaInteiro: !hora, duracaoMin: 120, descricao });
+            baixarICS({ titulo: titulo, inicio, diaInteiro: !hora, duracaoMin: 120, descricao, local });
         });
         acoes.querySelector('[data-acao="compartilhar"]').addEventListener('click', async () => {
             const texto = `${titulo}\n${textoData}\n${local}\n\nIEJB · https://iejb.com.br/#eventos`;
@@ -119,7 +144,11 @@ const dadosEventos = [];
             }
         });
 
-        dadosEventos.push({ titulo, descricao, inicio, comHora: Boolean(hora), local });
+        dadosEventos.push({
+            titulo, descricao, inicio, comHora: Boolean(hora), externo,
+            localNome: el.dataset.localNome, localCidade: el.dataset.localCidade,
+            imagem: el.dataset.imagem ? new URL(el.dataset.imagem, location.href).href : null
+        });
     });
 })();
 
@@ -146,19 +175,18 @@ const dadosEventos = [];
             startDate: iso(e.inicio, e.comHora),
             eventStatus: 'https://schema.org/EventScheduled',
             eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-            location: {
-                '@type': 'Place',
-                name: e.local,
-                address: { '@type': 'PostalAddress', addressLocality: 'Araçariguama', addressRegion: 'SP', addressCountry: 'BR' }
-            },
-            organizer: { '@type': 'Organization', name: 'IEJB', url: 'https://iejb.com.br' }
+            location: e.externo
+                ? { '@type': 'Place', name: e.localNome, address: { '@type': 'PostalAddress', addressLocality: e.localCidade, addressRegion: 'SP', addressCountry: 'BR' } }
+                : { '@type': 'Place', name: 'IEJB - Igreja Evangélica do Jardim Brasil', address: ENDERECO_IEJB },
+            ...(e.imagem ? { image: [e.imagem] } : {}),
+            organizer: { '@type': 'Organization', '@id': 'https://iejb.com.br/#igreja', name: 'IEJB - Igreja Evangélica do Jardim Brasil', url: 'https://iejb.com.br/' }
         })));
     }
 
     const perguntas = [...document.querySelectorAll('.duvidas details')].map(d => ({
         '@type': 'Question',
-        name: d.querySelector('summary').textContent.trim(),
-        acceptedAnswer: { '@type': 'Answer', text: d.querySelector('p').textContent.trim() }
+        name: limparTexto(d.querySelector('summary').textContent),
+        acceptedAnswer: { '@type': 'Answer', text: limparTexto(d.querySelector('p').textContent) }
     }));
     if (perguntas.length) {
         inserir({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: perguntas });
@@ -198,11 +226,10 @@ const dadosEventos = [];
     const atualizar = () => {
         if (estado.quem === null || estado.quando === null) return;
         const card = cardsCultos[estado.quando];
-        const inicio = proximaOcorrencia(card);
+        const inicio = proximoInicio(card);
         const hora = formatarHora(card.dataset.hora);
         const ministerio = ministerioDe[estado.quem];
 
-        resultado.innerHTML = '';
         const titulo = document.createElement('h4');
         titulo.textContent = 'Seu plano de visita';
         const sugestao = document.createElement('p');
@@ -214,32 +241,40 @@ const dadosEventos = [];
         dica.textContent = dicas[estado.quem];
         const local = document.createElement('p');
         local.className = 'planeje-local';
-        local.innerHTML = '<i class="fa-solid fa-location-dot"></i>Rua Ceará, 128 — Jardim Brasil, Araçariguama';
+        local.innerHTML = '<i class="fa-solid fa-location-dot" aria-hidden="true"></i>Rua Ceará, 128 - Jardim Brasil, Araçariguama';
 
         const acoes = document.createElement('div');
         acoes.className = 'planeje-acoes';
         const cal = document.createElement('button');
         cal.type = 'button';
-        cal.innerHTML = '<i class="fa-regular fa-calendar-plus"></i>Adicionar ao calendário';
+        cal.innerHTML = '<i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>Adicionar ao calendário';
         cal.addEventListener('click', () => baixarICSDoCulto(card));
         const rota = document.createElement('a');
         rota.href = `https://www.google.com/maps/dir/?api=1&destination=${COORDENADAS_IEJB.lat},${COORDENADAS_IEJB.lng}`;
         rota.target = '_blank';
         rota.rel = 'noopener noreferrer';
-        rota.innerHTML = '<i class="fa-solid fa-route"></i>Como chegar';
+        rota.innerHTML = '<i class="fa-solid fa-route" aria-hidden="true"></i>Como chegar';
         acoes.append(cal, rota);
         if (ministerio) {
             const link = document.createElement('a');
             link.href = `#ministerio-${ministerio}`;
-            link.innerHTML = '<i class="fa-solid fa-arrow-down"></i>Ver o ministério';
+            link.innerHTML = '<i class="fa-solid fa-arrow-down" aria-hidden="true"></i>Ver o ministério';
             acoes.append(link);
         }
 
-        resultado.append(titulo, sugestao, dica, local, acoes);
-        resultado.hidden = false;
-        if (!resultado.dataset.visto) {
-            resultado.dataset.visto = '1';
-            resultado.scrollIntoView({ behavior: reduzirMovimento ? 'auto' : 'smooth', block: 'nearest' });
+        const preencher = () => {
+            resultado.replaceChildren(titulo, sugestao, dica, local, acoes);
+            if (!resultado.dataset.visto) {
+                resultado.dataset.visto = '1';
+                resultado.scrollIntoView({ behavior: reduzirMovimento ? 'auto' : 'smooth', block: 'nearest' });
+            }
+        };
+        // A região viva (aria-live) precisa estar visível antes do texto mudar para ser anunciada
+        if (resultado.hidden) {
+            resultado.hidden = false;
+            requestAnimationFrame(preencher);
+        } else {
+            preencher();
         }
     };
 
@@ -297,10 +332,23 @@ const dadosEventos = [];
 
     let passo = 0;
     let pontos = {};
+    let historico = []; // pontos de cada resposta, na ordem, para desempatar
 
-    const reiniciar = () => { passo = 0; pontos = {}; desenhar(); };
+    const reiniciar = () => { passo = 0; pontos = {}; historico = []; desenhar(true); };
 
-    function desenhar() {
+    // Em empate, vence o ministério que pesou mais na resposta mais recente
+    function escolherVencedor(ordem) {
+        const maximo = Math.max(...ordem.map(m => pontos[m] || 0));
+        let empatados = ordem.filter(m => (pontos[m] || 0) === maximo);
+        for (let i = historico.length - 1; i >= 0 && empatados.length > 1; i--) {
+            const maior = Math.max(...empatados.map(m => historico[i][m] || 0));
+            if (maior > 0) empatados = empatados.filter(m => (historico[i][m] || 0) === maior);
+        }
+        return empatados[0];
+    }
+
+    // focar: depois de uma resposta, o foco vai para o novo título (o botão clicado sumiu)
+    function desenhar(focar = false) {
         caixa.innerHTML = '';
         if (passo < perguntas.length) {
             const { texto, respostas } = perguntas[passo];
@@ -311,6 +359,8 @@ const dadosEventos = [];
             progresso.innerHTML = `<span>Pergunta ${passo + 1} de ${perguntas.length}</span><div><i style="--de:${antes}%; width:${(passo / perguntas.length) * 100}%"></i></div>`;
             const pergunta = document.createElement('h4');
             pergunta.textContent = texto;
+            pergunta.tabIndex = -1;
+            pergunta.setAttribute('aria-label', `Pergunta ${passo + 1} de ${perguntas.length}: ${texto}`);
             const lista = document.createElement('div');
             lista.className = 'quiz-respostas';
             respostas.forEach(([rotulo, valores]) => {
@@ -319,17 +369,19 @@ const dadosEventos = [];
                 b.textContent = rotulo;
                 b.addEventListener('click', () => {
                     Object.entries(valores).forEach(([k, v]) => { pontos[k] = (pontos[k] || 0) + v; });
+                    historico.push(valores);
                     passo++;
-                    desenhar();
+                    desenhar(true);
                 });
                 lista.appendChild(b);
             });
             caixa.append(progresso, pergunta, lista);
+            if (focar) pergunta.focus({ preventScroll: true });
             return;
         }
 
         const ordem = [...document.querySelectorAll('[data-ministerio]')].map(c => c.dataset.ministerio);
-        const vencedor = ordem.reduce((melhor, atual) => ((pontos[atual] || 0) > (pontos[melhor] || 0) ? atual : melhor), ordem[0]);
+        const vencedor = escolherVencedor(ordem);
         const card = document.getElementById(`ministerio-${vencedor}`);
 
         const rotulo = document.createElement('p');
@@ -338,6 +390,7 @@ const dadosEventos = [];
         const nome = document.createElement('h4');
         nome.className = 'quiz-resultado-nome';
         nome.textContent = card.querySelector('.textos h4').textContent;
+        nome.tabIndex = -1;
         const descricao = document.createElement('p');
         descricao.textContent = card.querySelector('.textos p').textContent;
 
@@ -345,7 +398,7 @@ const dadosEventos = [];
         acoes.className = 'quiz-acoes';
         const ver = document.createElement('a');
         ver.href = `#ministerio-${vencedor}`;
-        ver.innerHTML = '<i class="fa-solid fa-arrow-up"></i>Ver o ministério';
+        ver.innerHTML = '<i class="fa-solid fa-arrow-up" aria-hidden="true"></i>Ver o ministério';
         ver.addEventListener('click', () => {
             card.classList.add('destaque');
             setTimeout(() => card.classList.remove('destaque'), 2500);
@@ -354,15 +407,16 @@ const dadosEventos = [];
         falar.href = 'https://www.instagram.com/iejbrasil/';
         falar.target = '_blank';
         falar.rel = 'noopener noreferrer';
-        falar.innerHTML = '<i class="fa-brands fa-instagram"></i>Quero participar';
+        falar.innerHTML = '<i class="fa-brands fa-instagram" aria-hidden="true"></i>Quero participar';
         const refazer = document.createElement('button');
         refazer.type = 'button';
         refazer.className = 'quiz-refazer';
-        refazer.innerHTML = '<i class="fa-solid fa-rotate-left"></i>Refazer';
+        refazer.innerHTML = '<i class="fa-solid fa-rotate-left" aria-hidden="true"></i>Refazer';
         refazer.addEventListener('click', reiniciar);
         acoes.append(ver, falar, refazer);
 
         caixa.append(rotulo, nome, descricao, acoes);
+        if (focar) nome.focus({ preventScroll: true });
     }
 
     desenhar();
@@ -385,9 +439,17 @@ const dadosEventos = [];
         return 6371 * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
     };
 
+    let buscando = false;
+    const terminar = () => {
+        buscando = false;
+        botao.removeAttribute('aria-disabled');
+    };
+
     botao.addEventListener('click', () => {
-        botao.disabled = true;
-        saida.hidden = false;
+        if (buscando) return;
+        // aria-disabled em vez de disabled: um botão desabilitado perde o foco do teclado
+        buscando = true;
+        botao.setAttribute('aria-disabled', 'true');
         saida.textContent = 'Buscando a sua localização...';
         navigator.geolocation.getCurrentPosition((pos) => {
             const origem = { lat: pos.coords.latitude, lng: pos.coords.longitude };
@@ -396,15 +458,17 @@ const dadosEventos = [];
             saida.innerHTML = '';
             saida.append(`Você está a ${distancia} da IEJB, em linha reta. `);
             const rota = document.createElement('a');
-            rota.href = `https://www.google.com/maps/dir/?api=1&origin=${origem.lat},${origem.lng}&destination=${COORDENADAS_IEJB.lat},${COORDENADAS_IEJB.lng}`;
+            // Sem "origin": o Google Maps usa a localização atual sozinho, e as coordenadas
+            // da pessoa não precisam ir no link
+            rota.href = `https://www.google.com/maps/dir/?api=1&destination=${COORDENADAS_IEJB.lat},${COORDENADAS_IEJB.lng}`;
             rota.target = '_blank';
             rota.rel = 'noopener noreferrer';
-            rota.textContent = 'Traçar rota →';
+            rota.innerHTML = 'Traçar rota <span aria-hidden="true">→</span>';
             saida.appendChild(rota);
-            botao.disabled = false;
+            terminar();
         }, () => {
             saida.textContent = 'Não foi possível pegar a sua localização. Use os botões do Google Maps ou do Waze acima.';
-            botao.disabled = false;
+            terminar();
         }, { timeout: 10000, maximumAge: 300000 });
     });
 })();
@@ -418,10 +482,13 @@ const dadosEventos = [];
     const localizacao = document.getElementById('localizacao');
     if (!barra || !hero) return;
 
-    const celular = () => window.matchMedia('(max-width: 700px)').matches;
+    const telaDeCelular = window.matchMedia('(max-width: 700px)');
+    const celular = () => telaDeCelular.matches;
+    let alturaHero = hero.offsetHeight;
     let naLocalizacao = false;
+    const proximoPronto = (el) => el && !el.classList.contains('aguardando');
 
-    if (localizacao) {
+    if (localizacao && temObserver) {
         new IntersectionObserver((entries) => {
             naLocalizacao = entries[0].isIntersecting;
             atualizarBarra();
@@ -430,15 +497,25 @@ const dadosEventos = [];
 
     function atualizarBarra() {
         const proximo = document.getElementById('proximo-culto');
-        const passouDoHero = window.scrollY > hero.offsetHeight - 100;
-        const mostrar = celular() && passouDoHero && !naLocalizacao && proximo && !proximo.hidden;
+        const passouDoHero = window.scrollY > alturaHero - 100;
+        const mostrar = Boolean(celular() && passouDoHero && !naLocalizacao && proximoPronto(proximo));
         if (mostrar) textoBarra.textContent = proximo.textContent;
-        barra.classList.toggle('visivel', Boolean(mostrar));
-        document.body.classList.toggle('barra-ativa', Boolean(mostrar));
+        barra.classList.toggle('visivel', mostrar);
+        // Fora da tela, a barra não pode receber o foco do Tab nem ser lida
+        barra.inert = !mostrar;
+        document.body.classList.toggle('barra-ativa', mostrar);
     }
 
-    window.addEventListener('scroll', atualizarBarra, { passive: true });
-    window.addEventListener('resize', atualizarBarra);
+    let agendada = false;
+    window.addEventListener('scroll', () => {
+        if (agendada) return;
+        agendada = true;
+        requestAnimationFrame(() => { agendada = false; atualizarBarra(); });
+    }, { passive: true });
+    window.addEventListener('resize', () => {
+        alturaHero = hero.offsetHeight;
+        atualizarBarra();
+    });
     atualizarBarra();
 
     // Aviso gentil (uma vez por sessão): só no computador, depois de ler boa parte da página
@@ -451,7 +528,7 @@ const dadosEventos = [];
         const total = document.documentElement.scrollHeight - window.innerHeight;
         const profundidade = total > 0 ? window.scrollY / total : 0;
         const proximo = document.getElementById('proximo-culto');
-        if (celular() || naLocalizacao || !proximo || proximo.hidden) return;
+        if (celular() || naLocalizacao || !proximoPronto(proximo)) return;
         if (Date.now() - inicio < 20000 || profundidade < 0.6) return;
 
         clearInterval(verificar);
@@ -460,7 +537,7 @@ const dadosEventos = [];
         const aviso = document.createElement('aside');
         aviso.className = 'convite';
         aviso.setAttribute('aria-label', 'Convite para visitar a IEJB');
-        aviso.innerHTML = '<button type="button" class="convite-fechar" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>' +
+        aviso.innerHTML = '<button type="button" class="convite-fechar" aria-label="Fechar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>' +
             '<p class="convite-titulo">Quer nos visitar?</p><p class="convite-texto"></p>' +
             '<div class="convite-acoes"><a href="#planeje">Planejar visita</a><a href="#localizacao">Como chegar</a></div>';
         aviso.querySelector('.convite-texto').textContent = proximo.textContent;

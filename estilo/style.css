@@ -89,7 +89,14 @@
 
 html {
     scroll-behavior: smooth;
+    /* Âncoras e o foco do Tab param abaixo do header fixo, não escondidos atrás dele */
+    scroll-padding-top: 88px;
     -webkit-text-size-adjust: 100%;
+}
+
+/* No celular a barra "Como chegar" cobre o rodapé da tela */
+html:has(body.barra-ativa) {
+    scroll-padding-bottom: 96px;
 }
 
 html,
@@ -119,6 +126,12 @@ iframe {
     max-width: 100%;
 }
 
+/* As <img> têm width/height no HTML (o navegador reserva o espaço antes de baixar
+   e a página não pula). Quando o CSS muda só a largura, a altura acompanha */
+img {
+    height: auto;
+}
+
 :where(button) {
     font: inherit;
     color: inherit;
@@ -135,10 +148,6 @@ strong {
 
 ::selection {
     background-color: rgba(191, 38, 43, 0.18);
-}
-
-section[id] {
-    scroll-margin-top: 88px;
 }
 
 /* ===== Utilitários ===== */
@@ -160,12 +169,61 @@ section[id] {
     border: 0;
 }
 
+/* Anel de foco do teclado: vermelho da marca nos fundos claros e branco nos
+   escuros (o laranja antigo sumia no rosado e não passava no contraste 3:1) */
+:root {
+    --foco: var(--principal);
+}
+
+.hero,
+.brand,
+.galeria,
+.depoimentos,
+.domingo,
+footer,
+.pag-galeria-hero,
+.fundacao-hero,
+header.sobre-escuro,
+.lightbox,
+.barra-visita {
+    --foco: #fff;
+}
+
 a:focus-visible,
 button:focus-visible,
 summary:focus-visible,
-[role="button"]:focus-visible {
-    outline: 3px solid #e8a33d;
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+    outline: 3px solid var(--foco);
     outline-offset: 3px;
+}
+
+/* Elementos que só recebem foco pelo script (pergunta do quiz, versículo) não
+   precisam do anel: o leitor de tela anuncia e quem enxerga já vê a mudança */
+[tabindex="-1"]:focus {
+    outline: none;
+}
+
+/* Atalho do teclado: aparece só quando recebe foco (primeiro Tab da página) */
+.pular {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1200;
+    padding: 12px 20px;
+    border-radius: var(--raio-capsula);
+    background-color: var(--principal);
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: var(--sombra-2);
+    translate: 0 -150%;
+    transition: translate 0.3s var(--ease-ios);
+}
+
+.pular:focus-visible {
+    --foco: var(--principal);
+    translate: none;
 }
 
 /* Reveal: o script.js adiciona .visible quando o elemento entra na tela.
@@ -173,7 +231,7 @@ summary:focus-visible,
    hover de cada card, e usa translate (e não transform) pelo mesmo motivo.
    Regra de ouro: só "folhas" levam .reveal. Um .reveal dentro de outro soma
    os movimentos e multiplica a opacidade, e o efeito fica arrastado. */
-.reveal {
+.js .reveal:not(.visible) {
     opacity: 0;
 }
 
@@ -211,10 +269,15 @@ summary:focus-visible,
     }
 }
 
-/* Sem JavaScript o IntersectionObserver não roda: mostra tudo em vez de deixar invisível */
+/* Sem JavaScript: o .reveal já aparece (a classe .js não existe) e some o que
+   depende de script para funcionar */
 @media (scripting: none) {
-    .reveal {
-        opacity: 1;
+    .mobile-menu,
+    .proximo-culto,
+    #versiculo,
+    #btn-distancia,
+    #copiar-endereco {
+        display: none;
     }
 }
 
@@ -231,7 +294,7 @@ summary:focus-visible,
     .versiculo-botao, .versiculo-acoes a, .versiculo-acoes button,
     .eventos-grid .botao a, .evento-acoes button,
     .planeje-acoes a, .planeje-acoes button, .quiz-acoes a, .quiz-acoes button,
-    .convite-acoes a, .barra-visita a) {
+    .convite-acoes a, .barra-visita a, .erro-acoes a) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -257,7 +320,7 @@ summary:focus-visible,
     .versiculo-botao, .versiculo-acoes a, .versiculo-acoes button,
     .eventos-grid .botao a, .evento-acoes button,
     .planeje-acoes a, .planeje-acoes button, .quiz-acoes a, .quiz-acoes button,
-    .convite-acoes a, .barra-visita a) i {
+    .convite-acoes a, .barra-visita a, .erro-acoes a) i {
     margin: 0;
 }
 
@@ -266,7 +329,7 @@ summary:focus-visible,
     .versiculo-botao, .versiculo-acoes a, .versiculo-acoes button,
     .eventos-grid .botao a, .evento-acoes button,
     .planeje-acoes a, .planeje-acoes button, .quiz-acoes a, .quiz-acoes button,
-    .convite-acoes a, .barra-visita a):active {
+    .convite-acoes a, .barra-visita a, .erro-acoes a):active {
     transform: scale(0.95);
     transition-duration: 0.12s;
 }
@@ -279,7 +342,7 @@ summary:focus-visible,
 /* Principal: vermelho preenchido */
 :is(.btn-sou-novo, header p a, .cta a:not(.botao-email), .pag-galeria-cta a,
     .localizacao-container > a, .versiculo-botao, .eventos-grid .botao a,
-    .planeje-acoes button, .quiz-acoes a, .convite-acoes a:first-child, .barra-visita a) {
+    .planeje-acoes button, .quiz-acoes a, .convite-acoes a:first-child, .barra-visita a, .erro-acoes a:first-child) {
     color: white;
     background-color: var(--principal-brighter);
     background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
@@ -288,7 +351,7 @@ summary:focus-visible,
 
 :is(.btn-sou-novo, header p a, .cta a:not(.botao-email), .pag-galeria-cta a,
     .localizacao-container > a, .versiculo-botao, .eventos-grid .botao a,
-    .planeje-acoes button, .quiz-acoes a, .convite-acoes a:first-child, .barra-visita a):hover {
+    .planeje-acoes button, .quiz-acoes a, .convite-acoes a:first-child, .barra-visita a, .erro-acoes a:first-child):hover {
     background-color: #cc2f35;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 10px 26px rgba(191, 38, 43, 0.42);
 }
@@ -296,14 +359,14 @@ summary:focus-visible,
 /* Secundário: vermelho clarinho, texto vermelho */
 :is(.cta .botao-email, .localizacao-acoes a, .localizacao-acoes button,
     .versiculo-acoes a, .versiculo-acoes button, .evento-acoes button,
-    .planeje-acoes a, .quiz-acoes button, .convite-acoes a + a) {
-    color: var(--principal-brighter);
+    .planeje-acoes a, .quiz-acoes button, .convite-acoes a + a, .erro-acoes a + a) {
+    color: var(--principal);
     background-color: rgba(191, 38, 43, 0.1);
 }
 
 :is(.cta .botao-email, .localizacao-acoes a, .localizacao-acoes button,
     .versiculo-acoes a, .versiculo-acoes button, .evento-acoes button,
-    .planeje-acoes a, .quiz-acoes button, .convite-acoes a + a):hover {
+    .planeje-acoes a, .quiz-acoes button, .convite-acoes a + a, .erro-acoes a + a):hover {
     background-color: rgba(191, 38, 43, 0.16);
 }
 
@@ -709,6 +772,12 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
         linear-gradient(90deg, rgba(10, 0, 0, 0.55), transparent 75%);
 }
 
+@media (max-width: 700px) and (orientation: portrait) {
+    .hero::before {
+        background-image: url(../images/iejb-principal-retrato.webp);
+    }
+}
+
 @keyframes heroZoom {
     from {
         scale: 1.12;
@@ -721,6 +790,23 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 
 .hero .textos {
     max-width: 680px;
+}
+
+/* Entrada do texto do hero: só desliza (sem opacity 0 nem blur), assim o
+   título já conta como pintado para o LCP desde o primeiro quadro */
+.hero .textos,
+.hero .buttons {
+    animation: heroSobe 1s var(--ease-out) both;
+}
+
+.hero .buttons {
+    animation-delay: 0.12s;
+}
+
+@keyframes heroSobe {
+    from {
+        translate: 0 28px;
+    }
 }
 
 .hero h2 {
@@ -741,7 +827,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     -webkit-text-fill-color: transparent;
 }
 
-.hero h3 {
+.hero .hero-sub {
     max-width: 540px;
     margin-top: 18px;
     font-size: clamp(17px, 1.6vw, 21px);
@@ -782,6 +868,14 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     font-weight: 500;
 }
 
+.proximo-culto.aguardando {
+    visibility: hidden;
+}
+
+.proximo-culto {
+    position: relative;
+}
+
 .proximo-culto::before {
     content: '';
     flex-shrink: 0;
@@ -789,13 +883,33 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     height: 8px;
     border-radius: 50%;
     background-color: #34c759;
-    animation: pulsa 1.8s infinite;
+}
+
+/* A onda verde é um círculo à parte que cresce e some: scale e opacity rodam
+   na GPU, enquanto animar box-shadow repintaria o chip a cada quadro */
+.proximo-culto::after {
+    content: '';
+    position: absolute;
+    left: 13px;
+    top: calc(50% - 4px);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(52, 199, 89, 0.7);
+    animation: pulsa 1.8s ease-out infinite;
 }
 
 @keyframes pulsa {
-    0% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7); }
-    70% { box-shadow: 0 0 0 9px rgba(52, 199, 89, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+    from {
+        scale: 1;
+        opacity: 1;
+    }
+
+    70%,
+    to {
+        scale: 3.2;
+        opacity: 0;
+    }
 }
 
 /* ===== Versículo da marca ===== */
@@ -875,7 +989,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 /* Rótulo pequeno acima do título (estilo "eyebrow" da Apple) */
 :is(.versiculo, .historia, .programacao, .planeje, .galeria, .ministerios, .quiz,
     .depoimentos, .eventos, .domingo, .duvidas, .localizacao) > h2,
-.quem-somos .textos h3,
+.quem-somos .rotulo,
 .quiz-rotulo,
 .pagina-legal .label {
     margin-bottom: 10px;
@@ -900,6 +1014,16 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     color: var(--principal);
     text-align: center;
     text-wrap: balance;
+}
+
+.secao-intro {
+    max-width: 620px;
+    margin: calc(clamp(32px, 4vw, 52px) * -0.55) auto clamp(32px, 4vw, 48px);
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--texto-2);
+    text-align: center;
+    text-wrap: pretty;
 }
 
 :is(.galeria, .depoimentos, .domingo) > h2 {
@@ -936,7 +1060,12 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     padding: 14px 28px;
     font-size: 17px;
     white-space: normal;
-    animation: respira 2.6s ease-in-out infinite;
+}
+
+/* Respira 3 vezes quando o card aparece na tela e para: chama a atenção de
+   quem chegou ali sem ficar repintando o botão para sempre */
+.versiculo-card.visible .versiculo-botao {
+    animation: respira 2.6s ease-in-out 0.8s 3;
 }
 
 /* Um halo que "respira" em volta do botão (sem mexer no tamanho, para o toque continuar fluido) */
@@ -1043,7 +1172,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     padding: var(--espaco-secao) clamp(20px, 5vw, 72px);
 }
 
-.quem-somos .textos h3 {
+.quem-somos .rotulo {
     text-align: left;
 }
 
@@ -1056,7 +1185,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     text-wrap: balance;
 }
 
-.quem-somos .textos > p {
+.quem-somos .textos > p:not(.rotulo) {
     margin: 20px 0 32px;
     font-size: 18px;
     line-height: 1.65;
@@ -1078,7 +1207,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     border-radius: var(--raio-m);
 }
 
-.quem-somos .textos ul li h4,
+.quem-somos .textos ul li h3,
 .cta .textos ul li h4 {
     display: flex;
     align-items: center;
@@ -1089,7 +1218,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 }
 
 /* Ícone num "squircle" com degradê, como os ícones de app do iOS */
-.quem-somos .textos ul li h4 i,
+.quem-somos .textos ul li h3 i,
 .cta .textos ul li h4 i {
     flex-shrink: 0;
     width: 34px;
@@ -1135,7 +1264,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     text-align: center;
 }
 
-.historia-anos span {
+#historia-anos {
     margin-right: 6px;
     font-family: var(--fonte-titulo);
     font-size: clamp(56px, 7vw, 80px);
@@ -1348,14 +1477,15 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     color: white;
 }
 
-.programacao .cultos .cultos-grid h4 {
+.programacao .cultos .cultos-grid .culto-dia {
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--principal-brighter);
 }
 
-.programacao .cultos .cultos-grid h5 {
+.programacao .cultos .cultos-grid h4 {
     margin-top: 6px;
     font-family: var(--fonte-titulo);
     font-size: 30px;
@@ -1365,7 +1495,12 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     color: var(--texto);
 }
 
-.programacao .cultos .cultos-grid h6 {
+/* "EBD" tem o nome por extenso no title; sem o pontilhado padrão do navegador */
+abbr[title] {
+    text-decoration: none;
+}
+
+.programacao .cultos .cultos-grid .culto-hora {
     display: inline-flex;
     align-items: center;
     margin-top: 12px;
@@ -1378,15 +1513,11 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     font-variant-numeric: tabular-nums;
 }
 
-.programacao .cultos .cultos-grid h6 i {
+.programacao .cultos .cultos-grid .culto-hora i {
     margin-right: 6px;
 }
 
-.programacao .cultos .cultos-grid hr {
-    display: none;
-}
-
-.programacao .cultos .cultos-grid p {
+.programacao .cultos .cultos-grid p:last-child {
     margin-top: 16px;
     font-size: 15px;
     line-height: 1.55;
@@ -1619,6 +1750,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 
 .quiz-respostas button::after {
     content: '›';
+    content: '›' / '';
     flex-shrink: 0;
     font-size: 24px;
     line-height: 1;
@@ -1844,6 +1976,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 
 .depoimentos .depoimentos-container .depoimentos-grid::before {
     content: '“';
+    content: '“' / '';
     position: absolute;
     top: 10px;
     left: 22px;
@@ -1856,7 +1989,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 
 /* O texto inteiro fica invisível por baixo (reserva o espaço e é o que o leitor
    de tela lê) e a digitação acontece por cima, na mesma célula do grid */
-.depoimentos .depoimentos-container .depoimentos-grid p {
+.depoimentos .depoimentos-container .depoimentos-grid p:not(.autor) {
     display: grid;
     font-size: 17px;
     line-height: 1.6;
@@ -1883,7 +2016,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     50% { opacity: 0; }
 }
 
-.depoimentos .depoimentos-container .depoimentos-grid h4 {
+.depoimentos .depoimentos-container .depoimentos-grid .autor {
     margin-top: 18px;
     font-size: 15px;
     font-weight: 600;
@@ -1930,12 +2063,13 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 .eventos .eventos-container .eventos-grid .data {
     position: relative;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 14px;
 }
 
 /* Dia num quadradinho igual ao ícone do Calendário do iPhone */
-.eventos .eventos-container .eventos-grid .data h4 {
+.eventos .eventos-container .eventos-grid .data-dia {
     flex-shrink: 0;
     width: 60px;
     height: 64px;
@@ -1957,14 +2091,15 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     flex-direction: column;
 }
 
-.eventos .eventos-container .eventos-grid .data .dia h5 {
+.eventos .eventos-container .eventos-grid .data-mes {
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.1em;
+    text-transform: uppercase;
     color: var(--principal-brighter);
 }
 
-.eventos .eventos-container .eventos-grid .data .dia h6 {
+.eventos .eventos-container .eventos-grid .data-semana {
     font-size: 15px;
     font-weight: 500;
     color: var(--texto-2);
@@ -1991,7 +2126,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     margin: 18px 0 16px;
 }
 
-.eventos .eventos-container .eventos-grid .textos h4 {
+.eventos .eventos-container .eventos-grid .evento-categoria {
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -1999,7 +2134,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     color: var(--principal-brighter);
 }
 
-.eventos .eventos-container .eventos-grid .textos h3 {
+.eventos .eventos-container .eventos-grid .textos h4 {
     margin: 4px 0 8px;
     font-family: var(--fonte-titulo);
     font-size: 28px;
@@ -2007,14 +2142,10 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     color: var(--texto);
 }
 
-.eventos .eventos-container .eventos-grid .textos p {
+.eventos .eventos-container .eventos-grid .textos p:not(.evento-categoria) {
     font-size: 16px;
     line-height: 1.55;
     color: var(--texto-2);
-}
-
-.eventos .eventos-container .eventos-grid .textos hr {
-    display: none;
 }
 
 .eventos .eventos-container .eventos-grid .horario-localizacao {
@@ -2035,10 +2166,6 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     flex-direction: column;
     gap: 4px;
     min-width: 0;
-}
-
-.eventos .eventos-container .eventos-grid .horario-localizacao address {
-    font-style: normal;
 }
 
 .eventos .eventos-container .eventos-grid .horario-localizacao .horario i {
@@ -2169,6 +2296,10 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     box-shadow: var(--brilho), var(--sombra-3);
 }
 
+.duvidas summary:focus-visible {
+    outline-offset: -3px;
+}
+
 .duvidas summary {
     list-style: none;
     display: flex;
@@ -2189,6 +2320,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 
 .duvidas summary::after {
     content: '+';
+    content: '+' / '';
     flex-shrink: 0;
     width: 28px;
     height: 28px;
@@ -2259,7 +2391,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     padding: 12px 0 0;
 }
 
-.localizacao .textos address {
+.localizacao .textos > div {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -2274,10 +2406,12 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--principal-brighter);
 }
 
-.localizacao .textos p {
+.localizacao .textos :is(p, address) {
+    font-style: normal;
     font-size: 15px;
     line-height: 1.55;
     color: var(--texto-2);
@@ -2363,6 +2497,18 @@ footer .footer-social .logo .logo-texto {
     color: white;
 }
 
+footer .footer-endereco,
+footer .footer-cultos {
+    font-size: 14px;
+    font-style: normal;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+footer .footer-cultos {
+    margin-top: -12px;
+}
+
 footer .footer-social .media-icons {
     display: flex;
     gap: 10px;
@@ -2419,7 +2565,7 @@ footer .footer-copyright {
     margin: 48px auto 0;
     padding-top: 22px;
     border-top: 1px solid rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.66);
     font-size: 13px;
     text-align: center;
 }
@@ -2429,11 +2575,23 @@ footer .footer-copyright {
         grid-template-columns: repeat(3, 1fr);
     }
 
+    /* Logo e redes nas pontas, endereço e horários no meio */
     footer .footer-social {
         grid-column: 1 / -1;
-        flex-direction: row;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
         align-items: center;
-        justify-content: space-between;
+        gap: 4px 28px;
+    }
+
+    footer .footer-social .logo,
+    footer .footer-social .media-icons {
+        grid-row: span 2;
+    }
+
+    footer .footer-cultos {
+        grid-column: 2;
+        margin-top: 0;
     }
 }
 
@@ -2444,8 +2602,14 @@ footer .footer-copyright {
     }
 
     footer .footer-social {
+        display: flex;
         flex-direction: column;
         align-items: flex-start;
+        gap: 20px;
+    }
+
+    footer .footer-cultos {
+        margin-top: -12px;
     }
 }
 
@@ -2624,9 +2788,14 @@ footer .footer-copyright {
     body.barra-ativa .botao-topo {
         bottom: 144px;
     }
+
+    /* O fim do rodapé não pode ficar escondido atrás da barra */
+    body:has(.barra-visita) footer {
+        padding-bottom: calc(28px + 76px);
+    }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
     .botao-topo {
         right: 20px;
         bottom: 80px;
@@ -2715,6 +2884,12 @@ footer .footer-copyright {
 
 .lightbox-alvo {
     cursor: zoom-in;
+}
+
+/* As fotos ficam dentro de caixas com overflow: hidden, que cortariam o anel
+   de foco por fora: desenha por dentro */
+.lightbox-alvo:focus-visible {
+    outline-offset: -4px;
 }
 
 .lightbox {
@@ -2814,7 +2989,7 @@ footer .footer-copyright {
     top: calc(50% - 23px);
 }
 
-body.lightbox-aberto {
+html.lightbox-aberto {
     overflow: hidden;
 }
 
@@ -2847,9 +3022,7 @@ body.lightbox-aberto {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(rgba(20, 2, 2, 0.6), rgba(40, 3, 2, 0.85)), url(../images/cantata22-wide.webp) center / cover no-repeat;
-    filter: blur(3px);
-    scale: 1.1;
+    background: linear-gradient(rgba(20, 2, 2, 0.6), rgba(40, 3, 2, 0.85)), url(../images/cantata22-wide-desfocada.webp) center / cover no-repeat;
     animation: heroZoom 2.4s var(--ease-out) both;
 }
 
@@ -3021,18 +3194,50 @@ body.lightbox-aberto {
     color: var(--principal);
 }
 
+.pagina-legal .breadcrumb ol {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+}
+
+.pagina-legal .breadcrumb li + li::before {
+    content: '›';
+    content: '›' / '';
+    margin-right: 8px;
+    opacity: 0.5;
+}
+
 .pagina-legal .breadcrumb a {
     color: inherit;
     font-weight: 600;
     text-decoration: none;
 }
 
-.pagina-legal .breadcrumb span {
-    opacity: 0.5;
-}
-
 .pagina-legal .label {
     text-align: left;
+}
+
+/* Página 404 (usa o mesmo miolo das páginas legais) */
+.erro-404 {
+    min-height: 70vh;
+}
+
+.erro-404 > p:not(.label) {
+    margin-top: 16px;
+    font-size: 18px;
+    color: var(--texto-2);
+}
+
+.erro-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+}
+
+.pagina-legal .erro-acoes a {
+    text-decoration: none;
 }
 
 .pagina-legal h1 {
@@ -3159,6 +3364,40 @@ body.lightbox-aberto {
     to {
         transform: translateX(0);
         opacity: 1;
+    }
+}
+
+/* ===== Alto contraste e impressão ===== */
+
+@media (forced-colors: active) {
+    .depoimentos-grid .digitando {
+        display: none;
+    }
+
+    .depoimentos-grid .texto-molde {
+        color: CanvasText;
+    }
+}
+
+@media print {
+    .reveal {
+        opacity: 1 !important;
+        animation: none !important;
+    }
+
+    header,
+    .pular,
+    .barra-progresso,
+    .botao-topo,
+    .botao-instagram,
+    .barra-visita,
+    .convite,
+    .toast {
+        display: none !important;
+    }
+
+    .hero {
+        min-height: auto;
     }
 }
 

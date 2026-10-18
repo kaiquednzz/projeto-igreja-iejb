@@ -5,130 +5,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="view-transition" content="same-origin" />
+    <!-- Marca que o JS está ligado (o .reveal só fica invisível com ele); script.js tira se falhar -->
+    <script>document.documentElement.classList.add('js')</script>
+    <title>IEJB - Igreja Evangélica do Jardim Brasil | Araçariguama, SP</title>
     <meta name="description"
-        content="IEJB - Igreja Evangélica em Araçariguama, SP no Jardim Brasil. Cultos aos domingos (9h e 18h) e terças (19h30). Comunidade acolhedora, ministérios ativos e eventos mensais. Venha nos visitar!">
-    <meta name="keywords"
-        content="igreja em araçariguama, igreja evangélica araçariguama, iejb, evangélica jardim brasil, cultos araçariguama">
+        content="Igreja evangélica no Jardim Brasil, Araçariguama-SP. Cultos: domingo às 9h (EBD) e 18h, terça às 19h30. Rua Ceará, 128. Venha como você é!">
     <meta name="author" content="IEJB - Igreja Evangélica do Jardim Brasil">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-    <meta property="og:title" content="IEJB - Igreja Evangélica em Araçariguama, SP | Uma Família que Recebe">
-    <meta property="og:description"
-        content="Bem-vindo à IEJB. Uma comunidade evangélica acolhedora em Araçariguama com cultos aos domingos e terças. Conheça nossos ministérios e eventos.">
+    <meta name="google-site-verification" content="epbdVr2cXV4FJen0Nl3TCTnnBgFvCkcp04smA-PDTZ0">
+    <link rel="canonical" href="https://iejb.com.br/">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="IEJB - Igreja Evangélica do Jardim Brasil">
     <meta property="og:locale" content="pt_BR">
-    <meta property="og:url" content="https://iejb.com.br">
-    <meta property="og:image" content="https://iejb.com.br/images/logo-iejb.png">
-    <meta name="twitter:card" content="summary">
-    <title>IEJB - Igreja Evangélica em Araçariguama, SP | Cultos e Ministérios</title>
-    <link rel="canonical" href="https://iejb.com.br">
+    <meta property="og:url" content="https://iejb.com.br/">
+    <meta property="og:title" content="IEJB - Igreja Evangélica do Jardim Brasil | Araçariguama, SP">
+    <meta property="og:description"
+        content="Uma família que te recebe de braços abertos. Cultos aos domingos (9h e 18h) e às terças (19h30), na Rua Ceará, 128 - Jardim Brasil.">
+    <meta property="og:image" content="https://iejb.com.br/images/og-iejb.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Culto na IEJB, igreja evangélica em Araçariguama, com os horários dos cultos">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"></noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" media="print" onload="this.media='all'">
+    <!-- Oswald só com as letras do logo ("UMA IGREJA FAMÍLIA"): se o texto do logo mudar, atualize o text= -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&text=UMAIGREJF%C3%8DL%20&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&text=UMAIGREJF%C3%8DL%20&display=swap">
+    </noscript>
     <!-- ?v=2: faz quem já visitou o site baixar o CSS/JS novo uma vez (o service worker antigo
          guardava cópias). O sw.js atual já busca CSS/JS na rede primeiro, então não precisa mudar de novo. -->
     <link rel="stylesheet" href="estilo/style.css?v=2">
-    <link rel="preload" as="image" href="images/iejb-principal.webp" fetchpriority="high">
+    <link rel="stylesheet" href="estilo/icones.css">
+    <!-- Foto do hero: recorte retrato no celular em pé, foto inteira no resto -->
+    <link rel="preload" as="image" href="images/iejb-principal-retrato.webp" fetchpriority="high" media="(max-width: 700px) and (orientation: portrait)">
+    <link rel="preload" as="image" href="images/iejb-principal.webp" fetchpriority="high" media="not all and (max-width: 700px) and (orientation: portrait)">
     <link rel="manifest" href="manifest.webmanifest">
     <meta name="theme-color" content="#8F0D0B">
+    <link rel="icon" href="images/favicon-96x96.png" type="image/png" sizes="96x96">
     <link rel="apple-touch-icon" href="images/icone-192.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
-    <link rel="shortcut icon" href="./images/favicon-96x96.png" type="image/x-icon">
     <script src="script/versiculos.js?v=2" defer></script>
-    <script src="script/script.js?v=2" defer></script>
+    <script src="script/script.js?v=2" defer onerror="document.documentElement.classList.remove('js')"></script>
     <script src="script/visita.js?v=2" defer></script>
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        "name": "IEJB - Igreja Evangélica do Jardim Brasil",
-        "alternateName": ["IEJB", "Igreja Evangélica do Jardim Brasil", "IEJB Araçariguama"],
-        "image": "https://iejb.com.br/images/logo-iejb.png",
-        "description": "Igreja evangélica acolhedora em Araçariguama, SP, com cultos aos domingos e terças.",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "Rua Ceará, 128",
-            "addressLocality": "Araçariguama",
-            "addressRegion": "SP",
-            "postalCode": "18147-000",
-            "addressCountry": "BR"
-        },
-        "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": "-23.42888942462941",
-            "longitude": "-47.07071295527709"
-        },
-        "url": "https://iejb.com.br",
-        "sameAs": [
-            "https://www.instagram.com/iejbrasil/"
-        ],
-        "areaServed": {
-            "@type": "City",
-            "name": "Araçariguama",
-            "containedInPlace": {
-            "@type": "State",
-            "name": "São Paulo"
-            }
-        },
-        "priceRange": "$",
-        "openingHoursSpecification": [
+        "@graph": [
             {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": "Sunday",
-            "opens": "09:00",
-            "closes": "12:00"
+                "@type": ["Church", "LocalBusiness"],
+                "@id": "https://iejb.com.br/#igreja",
+                "name": "IEJB - Igreja Evangélica do Jardim Brasil",
+                "alternateName": ["IEJB", "Igreja Evangélica do Jardim Brasil"],
+                "description": "Igreja evangélica no Jardim Brasil, em Araçariguama-SP, fundada em 2013. Cultos aos domingos às 9h (Escola Bíblica Dominical) e às 18h (Culto da Família), e às terças às 19h30 (Culto de Oração).",
+                "url": "https://iejb.com.br/",
+                "logo": "https://iejb.com.br/images/icone-512.png",
+                "image": [
+                    "https://iejb.com.br/images/fachada-iejb.webp",
+                    "https://iejb.com.br/images/iejb-principal.webp",
+                    "https://iejb.com.br/images/og-iejb.jpg"
+                ],
+                "email": "contatoiejb@gmail.com",
+                "foundingDate": "2013",
+                "founder": { "@type": "Person", "name": "Luiz Roiz", "jobTitle": "Pastor" },
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "Rua Ceará, 128 - Jardim Brasil",
+                    "addressLocality": "Araçariguama",
+                    "addressRegion": "SP",
+                    "postalCode": "18147-000",
+                    "addressCountry": "BR"
+                },
+                "geo": { "@type": "GeoCoordinates", "latitude": -23.42888942, "longitude": -47.07071296 },
+                "hasMap": "https://maps.app.goo.gl/t8zvQi2DQzQXud8M9",
+                "sameAs": ["https://www.instagram.com/iejbrasil/"],
+                "areaServed": { "@type": "City", "name": "Araçariguama" },
+                "isAccessibleForFree": true,
+                "publicAccess": true,
+                "contactPoint": {
+                    "@type": "ContactPoint",
+                    "contactType": "customer service",
+                    "email": "contatoiejb@gmail.com",
+                    "availableLanguage": "Portuguese"
+                }
             },
             {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": "Sunday",
-            "opens": "18:00",
-            "closes": "20:00"
-            },
-            {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": "Tuesday",
-            "opens": "19:30",
-            "closes": "21:00"
+                "@type": "WebSite",
+                "@id": "https://iejb.com.br/#site",
+                "url": "https://iejb.com.br/",
+                "name": "IEJB",
+                "alternateName": ["IEJB - Igreja Evangélica do Jardim Brasil", "Igreja Evangélica do Jardim Brasil"],
+                "inLanguage": "pt-BR",
+                "publisher": { "@id": "https://iejb.com.br/#igreja" }
             }
-        ],
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "contactType": "Customer Support",
-            "email": "contatoiejb@gmail.com",
-            "url": "https://www.instagram.com/iejbrasil/"
-        }
-    }
-    </script>
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "IEJB",
-        "description": "Igreja Evangélica do Jardim Brasil - uma comunidade acolhedora em Araçariguama",
-        "url": "https://iejb.com.br",
-        "logo": "https://iejb.com.br/images/logo-iejb.png",
-        "sameAs": [
-            "https://www.instagram.com/iejbrasil/"
-        ],
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "Rua Ceará, 128",
-            "addressLocality": "Araçariguama",
-            "addressRegion": "SP",
-            "postalCode": "18147-000",
-            "addressCountry": "BR"
-        }
+        ]
     }
     </script>
 </head>
 
 <body>
+    <a class="pular" href="#conteudo">Pular para o conteúdo</a>
     <header class="sobre-escuro">
         <div class="logo"><a href="./index.html">
-                <img src="./images/logo-iejb-pequeno.png"
-                    alt="Logo da IEJB - Igreja Evangélica do Jardim Brasil em Araçariguama">
-                <span class="logo-texto">UMA <br> IGREJA <br> FAMÍLIA</span>
+                <img src="./images/logo-iejb-pequeno.png" width="160" height="365"
+                    alt="IEJB - página inicial">
+                <span class="logo-texto" aria-hidden="true">UMA <br> IGREJA <br> FAMÍLIA</span>
             </a>
         </div>
 
@@ -151,17 +133,17 @@
         </button>
     </header>
 
-    <main>
+    <main id="conteudo">
         <section class="hero">
-            <div class="textos reveal">
+            <div class="textos">
                 <h1 class="sr-only">IEJB - Igreja Evangélica em Araçariguama</h1>
                 <h2>Uma família que te <strong>recebe</strong> de braços abertos</h2>
-                <h3>No Jardim Brasil, em Araçariguama, SP. Aqui você não é visitante, você é parte.</h3>
-                <p class="proximo-culto" id="proximo-culto" hidden></p>
+                <p class="hero-sub">No Jardim Brasil, em Araçariguama, SP. Aqui você não é visitante, você é parte.</p>
+                <p class="proximo-culto aguardando" id="proximo-culto">&nbsp;</p>
             </div>
-            <div class="buttons reveal">
-                <a class="btn-sou-novo" href="#cta">Sou Novo Aqui →</a>
-                <a class="btn-ver-cultos" href="#programacao">Ver os cultos ↓</a>
+            <div class="buttons">
+                <a class="btn-sou-novo" href="#cta">Sou Novo Aqui <span aria-hidden="true">→</span></a>
+                <a class="btn-ver-cultos" href="#programacao">Ver os cultos <span aria-hidden="true">↓</span></a>
             </div>
         </section>
 
@@ -176,15 +158,15 @@
             <h3 class="reveal">Um versículo <strong>para o seu dia</strong></h3>
             <div class="versiculo-card reveal">
                 <button type="button" class="versiculo-botao" id="versiculo-botao" aria-expanded="false" aria-controls="versiculo-texto">
-                    <i class="fa-solid fa-book-bible"></i>Toque para receber o versículo de hoje
+                    <i class="fa-solid fa-book-bible" aria-hidden="true"></i>Toque para receber o versículo de hoje
                 </button>
                 <div class="versiculo-conteudo" id="versiculo-texto" hidden>
-                    <blockquote id="versiculo-frase"></blockquote>
+                    <blockquote id="versiculo-frase" tabindex="-1"></blockquote>
                     <p class="versiculo-ref" id="versiculo-ref"></p>
                     <div class="versiculo-acoes">
-                        <button type="button" id="versiculo-copiar"><i class="fa-regular fa-copy"></i>Copiar</button>
-                        <button type="button" id="versiculo-imagem"><i class="fa-regular fa-image"></i>Imagem</button>
-                        <a id="versiculo-whatsapp" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i>Compartilhar</a>
+                        <button type="button" id="versiculo-copiar"><i class="fa-regular fa-copy" aria-hidden="true"></i>Copiar</button>
+                        <button type="button" id="versiculo-imagem"><i class="fa-regular fa-image" aria-hidden="true"></i>Imagem</button>
+                        <a id="versiculo-whatsapp" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i>Compartilhar</a>
                     </div>
                     <p class="versiculo-sequencia" id="versiculo-sequencia" hidden></p>
                     <p class="versiculo-aviso">Volte amanhã para receber um novo versículo.</p>
@@ -196,10 +178,10 @@
             <section id="quem-somos" class="quem-somos">
                 <div class="imagem">
                     <img loading="lazy" decoding="async" src="./images/iejb-sobre.webp"
-                        alt="Comunidade reunida em culto na IEJB, Igreja Evangélica em Araçariguama">
+                        alt="Comunidade reunida em culto na IEJB, Igreja Evangélica em Araçariguama" width="1600" height="1066" srcset="./images/iejb-sobre-400.webp 400w, ./images/iejb-sobre-800.webp 800w, ./images/iejb-sobre.webp 1600w" sizes="(max-width: 800px) 100vw, 1600px">
                 </div>
                 <div class="textos">
-                    <h3 class="reveal">QUEM SOMOS</h3>
+                    <p class="rotulo reveal">QUEM SOMOS</p>
                     <h2 class="reveal">Uma <strong>comunidade evangélica</strong> que cresce junta em Araçariguama</h2>
                     <p class="reveal">A IEJB (Igreja Evangélica do Jardim Brasil) nasceu em 2013 em Araçariguama, SP,
                         fundada pelo Pastor Luiz Roiz com uma visão clara: ser uma igreja família de verdade, não só no
@@ -209,15 +191,15 @@
                         ir mais fundo.</p>
                     <ul>
                         <li class="reveal">
-                            <h4><i class="fa-solid fa-dove"></i>Graça que transforma</h4>
+                            <h3><i class="fa-solid fa-dove" aria-hidden="true"></i>Graça que transforma</h3>
                             <p>Acreditamos que toda pessoa merece uma nova chance.</p>
                         </li>
                         <li class="reveal">
-                            <h4><i class="fa-solid fa-handshake"></i>Comunidade real</h4>
+                            <h3><i class="fa-solid fa-handshake" aria-hidden="true"></i>Comunidade real</h3>
                             <p>Relacionamentos autênticos que vão além do domingo.</p>
                         </li>
                         <li class="reveal">
-                            <h4><i class="fa-solid fa-book-bible"></i>Palavra que fala</h4>
+                            <h3><i class="fa-solid fa-book-bible" aria-hidden="true"></i>Palavra que fala</h3>
                             <p>Ensinamentos práticos para o dia a dia.</p>
                         </li>
                     </ul>
@@ -235,27 +217,27 @@
                             <h4>O começo</h4>
                             <p>A IEJB nasce em Araçariguama, fundada pelo Pastor Luiz Roiz, com a visão de ser uma igreja família de verdade, não só no domingo.</p>
                             <div class="linha-tempo-fotos">
-                                <img loading="lazy" decoding="async" src="./images/pag-galeria/fundacao/fundacao04.webp" alt="Igreja em construção na fundação da IEJB">
-                                <img loading="lazy" decoding="async" src="./images/pag-galeria/fundacao/fundacao10.webp" alt="Homem colocando uma bíblia na construção da igreja">
+                                <img loading="lazy" decoding="async" src="./images/pag-galeria/fundacao/fundacao04.webp" alt="Igreja em construção na fundação da IEJB" width="1600" height="1200" srcset="./images/pag-galeria/fundacao/fundacao04-400.webp 400w, ./images/pag-galeria/fundacao/fundacao04-800.webp 800w, ./images/pag-galeria/fundacao/fundacao04.webp 1600w" sizes="(max-width: 600px) 45vw, 180px">
+                                <img loading="lazy" decoding="async" src="./images/pag-galeria/fundacao/fundacao10.webp" alt="Homem colocando uma bíblia na construção da igreja" width="1600" height="1200" srcset="./images/pag-galeria/fundacao/fundacao10-400.webp 400w, ./images/pag-galeria/fundacao/fundacao10-800.webp 800w, ./images/pag-galeria/fundacao/fundacao10.webp 1600w" sizes="(max-width: 600px) 45vw, 180px">
                             </div>
                         </div>
                     </li>
                     <li class="reveal">
-                        <span class="linha-tempo-marca"><i class="fa-solid fa-handshake"></i></span>
+                        <span class="linha-tempo-marca"><i class="fa-solid fa-handshake" aria-hidden="true"></i></span>
                         <div>
                             <h4>Vida na vida</h4>
                             <p>Desde o início, o princípio é o discipulado: a fé vivida junto, no dia a dia, em relacionamentos reais.</p>
                             <div class="linha-tempo-fotos">
-                                <img loading="lazy" decoding="async" src="./images/pag-galeria/fundacao/fundacao16.webp" alt="Igreja reunida na fundação da IEJB">
+                                <img loading="lazy" decoding="async" src="./images/pag-galeria/fundacao/fundacao16.webp" alt="Igreja reunida na fundação da IEJB" width="1600" height="1200" srcset="./images/pag-galeria/fundacao/fundacao16-400.webp 400w, ./images/pag-galeria/fundacao/fundacao16-800.webp 800w, ./images/pag-galeria/fundacao/fundacao16.webp 1600w" sizes="(max-width: 600px) 45vw, 180px">
                             </div>
                         </div>
                     </li>
                     <li class="reveal">
-                        <span class="linha-tempo-marca"><i class="fa-solid fa-people-roof"></i></span>
+                        <span class="linha-tempo-marca"><i class="fa-solid fa-people-roof" aria-hidden="true"></i></span>
                         <div>
                             <h4>Hoje</h4>
                             <p>Uma comunidade com ministérios de louvor, evangelismo, infantil, jovens e dança, de portas abertas para você.</p>
-                            <a class="linha-tempo-link" href="./pages/galeria.html">Ver a galeria completa →</a>
+                            <a class="linha-tempo-link" href="./pages/galeria.html">Ver a galeria completa <span aria-hidden="true">→</span></a>
                         </div>
                     </li>
                 </ol>
@@ -264,33 +246,31 @@
             <section id="programacao" class="programacao">
                 <h2 class="reveal">PROGRAMAÇÃO DE CULTOS</h2>
                 <h3 class="reveal">Nossos <strong>cultos em Araçariguama</strong></h3>
+                <p class="secao-intro reveal">Cultos todo domingo e toda terça-feira no Jardim Brasil, em Araçariguama-SP. Venha como você é.</p>
                 <div class="cultos">
                     <div class="cultos-grid reveal" data-dia="0" data-hora="09:00" data-nome="EBD">
-                        <div class="culto-icone"><i class="fa-solid fa-book-open"></i></div>
-                        <h4>DOMINGO</h4>
-                        <h5>EBD</h5>
-                        <h6><i class="fa-regular fa-clock"></i>09:00h</h6>
-                        <hr>
-                        <p>Aprendizado bíblico e comunhão durante as manhãs de domingo. Sua escola perfeita da palavra
-                            de Deus.</p>
+                        <div class="culto-icone"><i class="fa-solid fa-book-open" aria-hidden="true"></i></div>
+                        <p class="culto-dia">Domingo</p>
+                        <h4><abbr title="Escola Bíblica Dominical">EBD</abbr></h4>
+                        <p class="culto-hora"><i class="fa-regular fa-clock" aria-hidden="true"></i><time datetime="09:00">9h</time></p>
+                        <p>Escola Bíblica Dominical: aprendizado bíblico e comunhão nas manhãs de domingo. Sua escola perfeita da
+                            Palavra de Deus.</p>
                     </div>
 
                     <div class="cultos-grid reveal" data-dia="0" data-hora="18:00" data-nome="Culto da Família">
-                        <div class="culto-icone"><i class="fa-solid fa-people-roof"></i></div>
-                        <h4>DOMINGO</h4>
-                        <h5>Culto da Família</h5>
-                        <h6><i class="fa-regular fa-clock"></i>18:00h</h6>
-                        <hr>
-                        <p>Culto de adoração, adore a Deus com sua familia. Venha como você é!</p>
+                        <div class="culto-icone"><i class="fa-solid fa-people-roof" aria-hidden="true"></i></div>
+                        <p class="culto-dia">Domingo</p>
+                        <h4>Culto da Família</h4>
+                        <p class="culto-hora"><i class="fa-regular fa-clock" aria-hidden="true"></i><time datetime="18:00">18h</time></p>
+                        <p>Culto de adoração: adore a Deus com sua família. Venha como você é!</p>
                     </div>
 
                     <div class="cultos-grid reveal" data-dia="2" data-hora="19:30" data-nome="Culto de Oração">
-                        <div class="culto-icone"><i class="fa-solid fa-hands-praying"></i></div>
-                        <h4>TERÇA-FEIRA</h4>
-                        <h5>Culto de Oração</h5>
-                        <h6><i class="fa-regular fa-clock"></i>19:30h</h6>
-                        <hr>
-                        <p>A adoração continua na semana, venha adorar a Jesus nas terças feiras conosco.</p>
+                        <div class="culto-icone"><i class="fa-solid fa-hands-praying" aria-hidden="true"></i></div>
+                        <p class="culto-dia">Terça-feira</p>
+                        <h4>Culto de Oração</h4>
+                        <p class="culto-hora"><i class="fa-regular fa-clock" aria-hidden="true"></i><time datetime="19:30">19h30</time></p>
+                        <p>A adoração continua na semana: venha adorar a Jesus nas terças-feiras conosco.</p>
                     </div>
                 </div>
             </section>
@@ -323,37 +303,37 @@
                 <div class="galeria-grid">
                     <div class="galeria-item reveal">
                         <img loading="lazy" decoding="async" src="./images/pag-galeria/cantata-22/cantata22-01.webp"
-                            alt="Momento de louvor e adoração na IEJB - Igreja Evangélica em Araçariguama">
+                            alt="Momento de louvor e adoração na IEJB - Igreja Evangélica em Araçariguama" width="1067" height="1600" srcset="./images/pag-galeria/cantata-22/cantata22-01-400.webp 400w, ./images/pag-galeria/cantata-22/cantata22-01-800.webp 800w, ./images/pag-galeria/cantata-22/cantata22-01.webp 1067w" sizes="(max-width: 520px) 75vw, (max-width: 1199px) 50vw, 660px">
                     </div>
 
                     <div class="galeria-item reveal">
                         <img loading="lazy" decoding="async" src="./images/pag-galeria/cantata-25/cantata25-03.webp"
-                            alt="Mulher orando durante culto na IEJB">
+                            alt="Mulher orando durante culto na IEJB" width="1600" height="1067" srcset="./images/pag-galeria/cantata-25/cantata25-03-400.webp 400w, ./images/pag-galeria/cantata-25/cantata25-03-800.webp 800w, ./images/pag-galeria/cantata-25/cantata25-03.webp 1600w" sizes="(max-width: 520px) 75vw, (max-width: 1199px) 50vw, 300px">
                     </div>
 
                     <div class="galeria-item reveal">
                         <img loading="lazy" decoding="async" src="./images/pag-galeria/cantata-25/cantata25-05.webp"
-                            alt="Pastor pregando na IEJB - Igreja Evangélica do Jardim Brasil">
+                            alt="Pastor pregando na IEJB - Igreja Evangélica do Jardim Brasil" width="1600" height="1067" srcset="./images/pag-galeria/cantata-25/cantata25-05-400.webp 400w, ./images/pag-galeria/cantata-25/cantata25-05-800.webp 800w, ./images/pag-galeria/cantata-25/cantata25-05.webp 1600w" sizes="(max-width: 520px) 75vw, (max-width: 1199px) 50vw, 300px">
                     </div>
 
                     <div class="galeria-item reveal">
                         <img loading="lazy" decoding="async" src="./images/pag-galeria/cantata-ieja/cantataieja-02.webp"
-                            alt="Comunidade reunida em culto na IEJB Araçariguama">
+                            alt="Comunidade reunida em culto na IEJB Araçariguama" width="1920" height="1280" srcset="./images/pag-galeria/cantata-ieja/cantataieja-02-400.webp 400w, ./images/pag-galeria/cantata-ieja/cantataieja-02-800.webp 800w, ./images/pag-galeria/cantata-ieja/cantataieja-02.webp 1920w" sizes="(max-width: 520px) 75vw, (max-width: 1199px) 50vw, 300px">
                     </div>
 
                     <div class="galeria-item reveal">
                         <img loading="lazy" decoding="async" src="./images/pag-galeria/cantata-22/cantata22-02.webp"
-                            alt="Pastores e líderes na IEJB durante evento especial">
+                            alt="Pastores e líderes na IEJB durante evento especial" width="1600" height="1067" srcset="./images/pag-galeria/cantata-22/cantata22-02-400.webp 400w, ./images/pag-galeria/cantata-22/cantata22-02-800.webp 800w, ./images/pag-galeria/cantata-22/cantata22-02.webp 1600w" sizes="(max-width: 520px) 75vw, (max-width: 1199px) 50vw, 300px">
                     </div>
 
                     <div class="galeria-item reveal">
                         <img loading="lazy" decoding="async" src="./images/pag-galeria/cantata-23-pascoa/cantata23pascoa-02.webp"
-                            alt="Conversão e momento marcante de fé na IEJB">
+                            alt="Conversão e momento marcante de fé na IEJB" width="1600" height="1067" srcset="./images/pag-galeria/cantata-23-pascoa/cantata23pascoa-02-400.webp 400w, ./images/pag-galeria/cantata-23-pascoa/cantata23pascoa-02-800.webp 800w, ./images/pag-galeria/cantata-23-pascoa/cantata23pascoa-02.webp 1600w" sizes="(max-width: 520px) 75vw, (max-width: 1199px) 50vw, 660px">
                     </div>
                 </div>
 
                 <div class="galeria-cta reveal">
-                    <a href="./pages/galeria.html" class="btn-galeria">Ver mais fotos →</a>
+                    <a href="./pages/galeria.html" class="btn-galeria">Ver mais fotos <span aria-hidden="true">→</span></a>
                 </div>
             </section>
 
@@ -363,7 +343,7 @@
                 <div class="ministerios-container">
                     <div class="ministerios-grid reveal" id="ministerio-louvor" data-ministerio="louvor">
                         <div class="imagem">
-                            <img loading="lazy" decoding="async" src="./images/louvor.webp" alt="Ministério de Louvor - momento musical na IEJB">
+                            <img loading="lazy" decoding="async" src="./images/louvor.webp" alt="Ministério de Louvor - momento musical na IEJB" width="1600" height="1067" srcset="./images/louvor-400.webp 400w, ./images/louvor-800.webp 800w, ./images/louvor.webp 1600w" sizes="(max-width: 760px) 170vw, (max-width: 1099px) 88vw, 630px">
                         </div>
                         <div class="textos">
                             <h4>Louvor</h4>
@@ -375,7 +355,7 @@
                     <div class="ministerios-grid reveal" id="ministerio-evangelismo" data-ministerio="evangelismo">
                         <div class="imagem">
                             <img loading="lazy" decoding="async" src="./images/evangelismo.webp"
-                                alt="Ministério de Evangelismo - ações sociais na IEJB">
+                                alt="Ministério de Evangelismo - ações sociais na IEJB" width="1672" height="941" srcset="./images/evangelismo-400.webp 400w, ./images/evangelismo-800.webp 800w, ./images/evangelismo.webp 1672w" sizes="(max-width: 760px) 170vw, (max-width: 1099px) 88vw, 630px">
                         </div>
                         <div class="textos">
                             <h4>Evangelismo</h4>
@@ -386,7 +366,7 @@
 
                     <div class="ministerios-grid reveal" id="ministerio-infantil" data-ministerio="infantil">
                         <div class="imagem">
-                            <img loading="lazy" decoding="async" src="./images/infantil.webp" alt="Ministério Infantil - crianças na IEJB">
+                            <img loading="lazy" decoding="async" src="./images/infantil.webp" alt="Ministério Infantil - crianças na IEJB" width="1311" height="930" srcset="./images/infantil-400.webp 400w, ./images/infantil-800.webp 800w, ./images/infantil.webp 1311w" sizes="(max-width: 760px) 170vw, (max-width: 1099px) 88vw, 630px">
                         </div>
                         <div class="textos">
                             <h4>Infantil</h4>
@@ -397,7 +377,7 @@
 
                     <div class="ministerios-grid reveal" id="ministerio-jovens" data-ministerio="jovens">
                         <div class="imagem">
-                            <img loading="lazy" decoding="async" src="./images/jovens.webp" alt="Ministério de Jovens - atividades na IEJB">
+                            <img loading="lazy" decoding="async" src="./images/jovens.webp" alt="Ministério de Jovens - atividades na IEJB" width="1311" height="930" srcset="./images/jovens-400.webp 400w, ./images/jovens-800.webp 800w, ./images/jovens.webp 1311w" sizes="(max-width: 760px) 170vw, (max-width: 1099px) 88vw, 630px">
                         </div>
                         <div class="textos">
                             <h4>Jovens e Adolescentes</h4>
@@ -408,7 +388,7 @@
 
                     <div class="ministerios-grid reveal" id="ministerio-danca" data-ministerio="danca">
                         <div class="imagem">
-                            <img loading="lazy" decoding="async" src="./images/danca.webp" alt="Ministério de Dança - atividades na IEJB">
+                            <img loading="lazy" decoding="async" src="./images/danca.webp" alt="Ministério de Dança - atividades na IEJB" width="1280" height="852" srcset="./images/danca-400.webp 400w, ./images/danca-800.webp 800w, ./images/danca.webp 1280w" sizes="(max-width: 760px) 170vw, (max-width: 1099px) 88vw, 630px">
                         </div>
                         <div class="textos">
                             <h4>Dança</h4>
@@ -422,7 +402,7 @@
             <section id="quiz" class="quiz" hidden>
                 <h2 class="reveal">QUIZ RÁPIDO</h2>
                 <h3 class="reveal">Qual <strong>ministério</strong> combina com você?</h3>
-                <div class="quiz-card reveal" id="quiz-card" aria-live="polite"></div>
+                <div class="quiz-card reveal" id="quiz-card"></div>
             </section>
 
             <section id="depoimentos" class="depoimentos">
@@ -431,19 +411,19 @@
                 <div class="depoimentos-container">
                     <div class="depoimentos-grid reveal">
                         <p>"Para mim, a IEJB significa ser uma vida a oferecer, para o Propósito Divino"</p>
-                        <h4>— Miriam</h4>
+                        <p class="autor">— Miriam</p>
                     </div>
 
                     <div class="depoimentos-grid reveal">
                         <p>"A IEJB é uma igreja acolhedora e familiar. Aprendemos a Palavra de Deus e encontramos apoio
                             para crescer na fé."</p>
-                        <h4>— Alessandra</h4>
+                        <p class="autor">— Alessandra</p>
                     </div>
 
                     <div class="depoimentos-grid reveal">
                         <p>"A IEJB é mais que uma igreja para mim, é uma família de fé. Aqui cresço espiritualmente e
                             fortaleço minha caminhada com Deus."</p>
-                        <h4>— Maria</h4>
+                        <p class="autor">— Maria</p>
                     </div>
                 </div>
             </section>
@@ -453,97 +433,90 @@
                 <h3 class="reveal">Próximos <strong>eventos</strong> da IEJB</h3>
                 <p class="eventos-vazio reveal" id="eventos-vazio" hidden>Em breve novos eventos por aqui. Acompanhe as novidades no nosso <a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer">Instagram</a>.</p>
                 <div class="eventos-container">
-                    <div class="eventos-grid reveal" data-data="2026-09-19">
+                    <div class="eventos-grid reveal" data-data="2026-09-19" data-imagem="images/jovens.webp">
                         <div class="data">
-                            <h4>19</h4>
+                            <p class="data-dia">19</p>
                             <div class="dia">
-                                <h5>SETEMBRO</h5>
-                                <h6>Sábado</h6>
+                                <p class="data-mes">Setembro</p>
+                                <p class="data-semana">Sábado</p>
                             </div>
                         </div>
                         <div class="textos">
-                            <h4>Culto de Jovens</h4>
-                            <h3><strong>Incendeia</strong></h3>
+                            <p class="evento-categoria">Culto de Jovens</p>
+                            <h4><strong>Incendeia</strong></h4>
                             <p>Prepare o coração e venha viver uma noite de louvor, adoração e muita presença de Deus. Você não vai querer ficar de fora!</p>
-                            <hr>
                         </div>
                         <div class="horario-localizacao">
                             <div class="horario">
-                                <p><i class="fa-solid fa-clock"></i>19h30</p>
-                                <address><i class="fa-solid fa-location-dot"></i>IEJB - Araçariguama
-                                </address>
+                                <p><i class="fa-solid fa-clock" aria-hidden="true"></i>19h30</p>
+                                <p><i class="fa-solid fa-location-dot" aria-hidden="true"></i>IEJB - Araçariguama</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="eventos-grid reveal" data-data="2026-10-17">
+                    <div class="eventos-grid reveal" data-data="2026-10-17" data-imagem="images/infantil.webp">
                         <div class="data">
-                            <h4>17</h4>
+                            <p class="data-dia">17</p>
                             <div class="dia">
-                                <h5>OUTUBRO</h5>
-                                <h6>Sábado</h6>
+                                <p class="data-mes">Outubro</p>
+                                <p class="data-semana">Sábado</p>
                             </div>
                         </div>
                         <div class="textos">
-                            <h4>Infantil</h4>
-                            <h3>Noite da <strong>Pizza</strong> Kids</h3>
+                            <p class="evento-categoria">Infantil</p>
+                            <h4>Noite da <strong>Pizza</strong> Kids</h4>
                             <p>Uma noite deliciosa preparada com muito carinho para as crianças! Venha aproveitar muita pizza, brincadeiras divertidas e aprender mais sobre o amor de Deus conosco.</p>
-                            <hr>
                         </div>
                         <div class="horario-localizacao">
                             <div class="horario">
-                                <p><i class="fa-solid fa-clock"></i>18h00</p>
-                                <address><i class="fa-solid fa-location-dot"></i>IEJB - Araçariguama</address>
+                                <p><i class="fa-solid fa-clock" aria-hidden="true"></i>18h00</p>
+                                <p><i class="fa-solid fa-location-dot" aria-hidden="true"></i>IEJB - Araçariguama</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="eventos-grid reveal" data-data="2026-09-26">
+                    <div class="eventos-grid reveal" data-data="2026-09-26" data-imagem="images/evangelismo.webp">
                         <div class="data">
-                            <h4>26</h4>
+                            <p class="data-dia">26</p>
                             <div class="dia">
-                                <h5>SETEMBRO</h5>
-                                <h6>Sábado</h6>
+                                <p class="data-mes">Setembro</p>
+                                <p class="data-semana">Sábado</p>
                             </div>
                         </div>
                         <div class="textos">
-                            <h4>Faça o Ide</h4>
-                            <h3><strong>Evangelismo</strong></h3>
+                            <p class="evento-categoria">Faça o Ide</p>
+                            <h4><strong>Evangelismo</strong></h4>
                             <p>E se hoje você pudesse ser resposta na vida de alguém? Venha com a gente levar esperança, amor e a mensagem de Cristo para quem precisa ouvir.</p>
-                            <hr>
                         </div>
                         <div class="horario-localizacao">
                             <div class="horario">
-                                <p><i class="fa-solid fa-clock"></i>17h00</p>
-                                <address><i class="fa-solid fa-location-dot"></i>IEJB - Araçariguama</address>
+                                <p><i class="fa-solid fa-clock" aria-hidden="true"></i>17h00</p>
+                                <p><i class="fa-solid fa-location-dot" aria-hidden="true"></i>IEJB - Araçariguama</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="eventos-grid reveal" data-data="2026-10-09">
+                    <div class="eventos-grid reveal" data-data="2026-10-09" data-local-nome="Espaço Liboredo" data-local-cidade="São Roque" data-imagem="images/jovens.webp">
                         <div class="data">
-                            <h4>09</h4>
+                            <p class="data-dia">09</p>
                             <div class="dia">
-                                <h5>OUTUBRO</h5>
-                                <h6>Sexta - Feira</h6>
+                                <p class="data-mes">Outubro</p>
+                                <p class="data-semana">Sexta-feira</p>
                             </div>
                         </div>
                         <div class="textos">
-                            <h4>ACAMPAMENTO CULTURA 24/7</h4>
-                            <h3>Acampa de <strong>Jovens</strong></h3>
-                            <p>Um tempo separado pra sair da rotina, fortalecer a fé e criar conexões de verdade. Nosso
-                                Acampa de Jovens vai ser um momento único de comunhão, palavra, louvor e muita troca
-                                entre a galera.</p>
-                            <hr>
+                            <p class="evento-categoria">ACAMPAMENTO CULTURA 24/7</p>
+                            <h4>Acampa de <strong>Jovens</strong></h4>
+                            <p>Um tempo separado pra sair da rotina, fortalecer a fé e criar conexões de verdade. Nosso Acampa de Jovens vai ser um momento único de comunhão, palavra, louvor e muita troca entre a galera.</p>
                         </div>
                         <div class="horario-localizacao">
                             <div class="horario">
-                                <p><i class="fa-solid fa-clock"></i>Horário a conversar</p>
-                                <p><i class="fa-solid fa-location-dot"></i>Espaço Liboredo - São Roque</p>
+                                <p><i class="fa-solid fa-clock" aria-hidden="true"></i>Horário a conversar</p>
+                                <p><i class="fa-solid fa-location-dot" aria-hidden="true"></i>Espaço Liboredo - São Roque</p>
                             </div>
                             <div class="botao">
                                 <a href="https://docs.google.com/forms/d/1fFBGBFLmNZAuNLaJ-6H3hddgMu18PPXks_xGiTyydRg/viewform"
-                                    target="_blank" rel="noopener noreferrer">Inscreva - se</a>
+                                    target="_blank" rel="noopener noreferrer">Inscreva-se</a>
                             </div>
                         </div>
                     </div>
@@ -555,28 +528,28 @@
                 <h3 class="reveal">O que esperar na sua <strong>primeira visita</strong></h3>
                 <ol class="domingo-passos">
                     <li class="reveal">
-                        <span class="domingo-icone"><i class="fa-solid fa-hands-holding-child"></i></span>
+                        <span class="domingo-icone"><i class="fa-solid fa-hands-holding-child" aria-hidden="true"></i></span>
                         <div>
                             <h4>Chegada e acolhimento</h4>
                             <p>Venha como você é. Avise que é sua primeira vez e vamos te receber e mostrar tudo por aqui.</p>
                         </div>
                     </li>
                     <li class="reveal">
-                        <span class="domingo-icone"><i class="fa-solid fa-hands-praying"></i></span>
+                        <span class="domingo-icone"><i class="fa-solid fa-hands-praying" aria-hidden="true"></i></span>
                         <div>
                             <h4>Louvor e adoração</h4>
                             <p>Um tempo de adoração para viver com a família. O louvor é o coração da nossa comunidade.</p>
                         </div>
                     </li>
                     <li class="reveal">
-                        <span class="domingo-icone"><i class="fa-solid fa-book-bible"></i></span>
+                        <span class="domingo-icone"><i class="fa-solid fa-book-bible" aria-hidden="true"></i></span>
                         <div>
                             <h4>Palavra para o dia a dia</h4>
                             <p>Ensinamentos práticos, que ajudam na vida real e não só no domingo.</p>
                         </div>
                     </li>
                     <li class="reveal">
-                        <span class="domingo-icone"><i class="fa-solid fa-people-arrows"></i></span>
+                        <span class="domingo-icone"><i class="fa-solid fa-people-arrows" aria-hidden="true"></i></span>
                         <div>
                             <h4>Comunhão no pátio</h4>
                             <p>Depois do culto, o pátio vira um espaço de conversa e conexão. É o melhor momento para conhecer pessoas e se sentir em casa.</p>
@@ -595,15 +568,15 @@
                             Evangélica de Araçariguama!</p>
                         <ul>
                             <li class="reveal">
-                                <h4><i class="fa-solid fa-hands-holding-child"></i>Venha como você é</h4>
+                                <h4><i class="fa-solid fa-hands-holding-child" aria-hidden="true"></i>Venha como você é</h4>
                                 <p>Sem dress code, sem julgamento. Traje casual está mais do que ok.</p>
                             </li>
                             <li class="reveal">
-                                <h4><i class="fa-solid fa-people-arrows"></i>Nos diga que é sua primeira vez</h4>
+                                <h4><i class="fa-solid fa-people-arrows" aria-hidden="true"></i>Nos diga que é sua primeira vez</h4>
                                 <p>Vamos te acolher e mostrar tudo por aqui.</p>
                             </li>
                             <li class="reveal">
-                                <h4><i class="fa-solid fa-handshake"></i>Fique um pouco mais</h4>
+                                <h4><i class="fa-solid fa-handshake" aria-hidden="true"></i>Fique um pouco mais</h4>
                                 <p>Após o culto, o pátio vira um espaço de conversa e conexão. É o melhor momento pra
                                     conhecer pessoas e se sentir em casa.
                                 </p>
@@ -614,8 +587,8 @@
                         <h4>Tem dúvidas?</h4>
                         <p>Entre em contato conosco pelo Instagram ou E-mail. Estamos aqui para ajudar!
                         </p>
-                        <a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer">Fale Conosco →</a>
-                        <a class="botao-email" href="mailto:contatoiejb@gmail.com" target="_blank" rel="noopener noreferrer">Envie um E-mail →</a>
+                        <a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer">Fale Conosco <span aria-hidden="true">→</span></a>
+                        <a class="botao-email" href="mailto:contatoiejb@gmail.com" target="_blank" rel="noopener noreferrer">Envie um E-mail <span aria-hidden="true">→</span></a>
                     </div>
                 </div>
             </section>
@@ -638,11 +611,11 @@
                     </details>
                     <details>
                         <summary>Quais são os dias e horários dos cultos?</summary>
-                        <p>Você encontra a programação completa na seção <a href="#programacao">Cultos</a>.</p>
+                        <p>Domingo às 9h (Escola Bíblica Dominical) e às 18h (Culto da Família); terça-feira às 19h30 (Culto de Oração), na Rua Ceará, 128 - Jardim Brasil, Araçariguama-SP. Veja os detalhes na seção <a href="#programacao">Cultos</a>.</p>
                     </details>
                     <details>
                         <summary>Onde fica a igreja?</summary>
-                        <p>Rua Ceará, 128 — Jardim Brasil, Araçariguama — SP, próximo ao Araçarizão. Veja o mapa na seção <a href="#localizacao">Onde estamos</a>.</p>
+                        <p>Rua Ceará, 128 - Jardim Brasil, Araçariguama - SP, CEP 18147-000, próximo ao Araçarizão. Veja o mapa na seção <a href="#localizacao">Onde estamos</a>.</p>
                     </details>
                     <details>
                         <summary>Como falo com a igreja?</summary>
@@ -661,23 +634,22 @@
                         title="Localização da IEJB - Igreja Evangélica em Araçariguama, SP" allowfullscreen=""
                         loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                     <div class="textos">
-                        <address class="endereco">
-                            <h4>ENDEREÇO</h4>
-                            <p>Rua Ceará, 128 — Jardim Brasil <br />Araçariguama — SP <br />Próximo ao Araçarizão</p>
-                        </address>
-                        <address class="cidade">
-                            <h4>HORÁRIOS</h4>
-                            <p>Domingo: EBD às 9h e Culto da Família às 18h <br />Terça-feira: Culto de Oração às 19:30h</p>
-                        </address>
+                        <div class="endereco">
+                            <h4>Endereço</h4>
+                            <address>Rua Ceará, 128 - Jardim Brasil<br>Araçariguama - SP, 18147-000<br>Próximo ao Araçarizão</address>
+                        </div>
+                        <div class="cidade">
+                            <h4>Horários</h4>
+                            <p>Domingo: <abbr title="Escola Bíblica Dominical">EBD</abbr> às 9h e Culto da Família às 18h<br>Terça-feira: Culto de Oração às 19h30</p>
+                        </div>
                     </div>
-                    <a href="https://maps.app.goo.gl/t8zvQi2DQzQXud8M9" target="_blank" rel="noopener noreferrer">Abrir no Google
-                        Maps →</a>
+                    <a href="https://maps.app.goo.gl/t8zvQi2DQzQXud8M9" target="_blank" rel="noopener noreferrer">Abrir no Google Maps <span aria-hidden="true">→</span></a>
                     <div class="localizacao-acoes">
-                        <a href="https://waze.com/ul?ll=-23.42888942,-47.07071296&navigate=yes" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-waze"></i>Abrir no Waze</a>
-                        <button type="button" id="btn-distancia"><i class="fa-solid fa-location-crosshairs"></i>Qual a distância?</button>
-                        <button type="button" id="copiar-endereco" data-endereco="Rua Ceará, 128 - Jardim Brasil, Araçariguama - SP, 18147-000"><i class="fa-regular fa-copy"></i>Copiar endereço</button>
+                        <a href="https://waze.com/ul?ll=-23.42888942,-47.07071296&navigate=yes" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-waze" aria-hidden="true"></i>Abrir no Waze</a>
+                        <button type="button" id="btn-distancia"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>Qual a distância?</button>
+                        <button type="button" id="copiar-endereco" data-endereco="Rua Ceará, 128 - Jardim Brasil, Araçariguama - SP, 18147-000"><i class="fa-regular fa-copy" aria-hidden="true"></i>Copiar endereço</button>
                     </div>
-                    <p class="localizacao-distancia" id="distancia-resultado" aria-live="polite" hidden></p>
+                    <p class="localizacao-distancia" id="distancia-resultado" aria-live="polite"></p>
                 </div>
             </section>
         </article>
@@ -686,18 +658,24 @@
         <div class="footer-conteudo">
             <div class="footer-social">
                 <div class="logo"><a href="./index.html">
-                        <img src="./images/logo-iejb-pequeno.png"
-                            alt="Logo da IEJB - Igreja Evangélica do Jardim Brasil em Araçariguama">
-                        <span class="logo-texto">UMA <br> IGREJA <br> FAMÍLIA</span>
+                        <img src="./images/logo-iejb-pequeno.png" width="160" height="365" loading="lazy"
+                            alt="IEJB - página inicial">
+                        <span class="logo-texto" aria-hidden="true">UMA <br> IGREJA <br> FAMÍLIA</span>
                     </a>
                 </div>
+                <address class="footer-endereco">
+                    IEJB - Igreja Evangélica do Jardim Brasil<br>
+                    Rua Ceará, 128 - Jardim Brasil<br>
+                    Araçariguama - SP, 18147-000
+                </address>
+                <p class="footer-cultos">Cultos: domingo 9h e 18h · terça 19h30</p>
                 <div class="media-icons">
-                    <a href="https://share.google/aOF0icxRkhImlSw2n" target="_blank" rel="noopener noreferrer" aria-label="IEJB no google"><i
-                            class="fa-brands fa-google"></i></a>
+                    <a href="https://share.google/aOF0icxRkhImlSw2n" target="_blank" rel="noopener noreferrer" aria-label="IEJB no Google"><i
+                            class="fa-brands fa-google" aria-hidden="true"></i></a>
                     <a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer" aria-label="Instagram da IEJB"><i
-                            class="fa-brands fa-instagram"></i></a>
+                            class="fa-brands fa-instagram" aria-hidden="true"></i></a>
                     <a href="mailto:contatoiejb@gmail.com" target="_blank" rel="noopener noreferrer" aria-label="Enviar email para IEJB"><i
-                            class="fa-regular fa-envelope"></i></a>
+                            class="fa-regular fa-envelope" aria-hidden="true"></i></a>
                 </div>
             </div>
             <div class="footer-colunas">
@@ -714,7 +692,7 @@
                     <li><a href="#quem-somos">Sobre nós</a></li>
                     <li><a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer">Contato</a></li>
                     <li><a href="https://share.google/aOF0icxRkhImlSw2n" target="_blank" rel="noopener noreferrer">IEJB no Google</a></li>
-                    <li><a href="https://g.page/r/CdfJHd47s_IREAE/review" target="_blank" rel="noopener noreferrer">Avalie - nos</a></li>
+                    <li><a href="https://g.page/r/CdfJHd47s_IREAE/review" target="_blank" rel="noopener noreferrer">Avalie-nos</a></li>
                 </ul>
             </div>
             <div class="footer-colunas">
@@ -730,15 +708,17 @@
         </div>
     </footer>
 
+    <aside class="atalhos" aria-label="Atalhos">
     <div class="barra-visita" id="barra-visita">
         <span id="barra-visita-texto"></span>
-        <a href="https://www.google.com/maps/dir/?api=1&destination=-23.42888942,-47.07071296" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-route"></i>Como chegar</a>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=-23.42888942,-47.07071296" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-route" aria-hidden="true"></i>Como chegar</a>
     </div>
 
     <div class="botao-instagram">
         <a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer" aria-label="Visite nosso Instagram"><i
-                class="fa-brands fa-instagram"></i></a>
+                class="fa-brands fa-instagram" aria-hidden="true"></i></a>
     </div>
+    </aside>
 </body>
 
 </html>
