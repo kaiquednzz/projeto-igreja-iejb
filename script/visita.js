@@ -71,18 +71,6 @@ function baixarICSDoCulto(card) {
     });
 }
 
-// Botão "Adicionar ao calendário" do hero (próximo culto)
-
-(function calendarioDoHero() {
-    const botao = document.getElementById('proximo-culto-cal');
-    if (!botao || !cardsCultos.length) return;
-    botao.hidden = false;
-    botao.addEventListener('click', () => {
-        const card = document.querySelector('.cultos-grid.proximo') || cardsCultos[0];
-        baixarICSDoCulto(card);
-    });
-})();
-
 // Agenda: contagem regressiva, calendário e compartilhamento
 
 const dadosEventos = [];
@@ -219,7 +207,9 @@ const dadosEventos = [];
         titulo.textContent = 'Seu plano de visita';
         const sugestao = document.createElement('p');
         sugestao.className = 'planeje-sugestao';
-        sugestao.innerHTML = `<strong>${card.dataset.nome}</strong>, ${textoDataLonga(inicio)} às ${hora}.`;
+        const nomeCulto = document.createElement('strong');
+        nomeCulto.textContent = card.dataset.nome;
+        sugestao.append(nomeCulto, `, ${textoDataLonga(inicio)} às ${hora}.`);
         const dica = document.createElement('p');
         dica.textContent = dicas[estado.quem];
         const local = document.createElement('p');
@@ -316,7 +306,9 @@ const dadosEventos = [];
             const { texto, respostas } = perguntas[passo];
             const progresso = document.createElement('div');
             progresso.className = 'quiz-progresso';
-            progresso.innerHTML = `<span>Pergunta ${passo + 1} de ${perguntas.length}</span><div><i style="width:${(passo / perguntas.length) * 100}%"></i></div>`;
+            // --de: largura da pergunta anterior, para a barra crescer a partir dela (CSS)
+            const antes = (Math.max(passo - 1, 0) / perguntas.length) * 100;
+            progresso.innerHTML = `<span>Pergunta ${passo + 1} de ${perguntas.length}</span><div><i style="--de:${antes}%; width:${(passo / perguntas.length) * 100}%"></i></div>`;
             const pergunta = document.createElement('h4');
             pergunta.textContent = texto;
             const lista = document.createElement('div');

@@ -23,18 +23,21 @@
     <link rel="canonical" href="https://iejb.com.br">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Oswald:wght@200..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Oswald:wght@200..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"></noscript>
-    <link rel="stylesheet" href="estilo/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"></noscript>
+    <!-- ?v=2: faz quem já visitou o site baixar o CSS/JS novo uma vez (o service worker antigo
+         guardava cópias). O sw.js atual já busca CSS/JS na rede primeiro, então não precisa mudar de novo. -->
+    <link rel="stylesheet" href="estilo/style.css?v=2">
+    <link rel="preload" as="image" href="images/iejb-principal.webp" fetchpriority="high">
     <link rel="manifest" href="manifest.webmanifest">
     <meta name="theme-color" content="#8F0D0B">
     <link rel="apple-touch-icon" href="images/icone-192.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
     <link rel="shortcut icon" href="./images/favicon-96x96.png" type="image/x-icon">
-    <script src="script/versiculos.js" defer></script>
-    <script src="script/script.js" defer></script>
-    <script src="script/visita.js" defer></script>
+    <script src="script/versiculos.js?v=2" defer></script>
+    <script src="script/script.js?v=2" defer></script>
+    <script src="script/visita.js?v=2" defer></script>
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -121,37 +124,37 @@
 </head>
 
 <body>
-    <header>
+    <header class="sobre-escuro">
         <div class="logo"><a href="./index.html">
                 <img src="./images/logo-iejb-pequeno.png"
                     alt="Logo da IEJB - Igreja Evangélica do Jardim Brasil em Araçariguama">
-                <h1>UMA <br> IGREJA <br> FAMILIA</h1>
+                <span class="logo-texto">UMA <br> IGREJA <br> FAMÍLIA</span>
             </a>
         </div>
 
-        <nav>
+        <nav id="menu-principal" aria-label="Principal">
             <ul>
-                <li><a href="#quem-somos">SOBRE</a></li>
-                <li><a href="#programacao">CULTOS</a></li>
-                <li><a href="#galeria">GALERIA</a></li>
-                <li><a href="#ministerios">MINISTÉRIOS</a></li>
-                <li><a href="#eventos">EVENTOS</a></li>
-                <li><a href="#cta">SOU NOVO</a></li>
+                <li><a href="#quem-somos">Sobre</a></li>
+                <li><a href="#programacao">Cultos</a></li>
+                <li><a href="#galeria">Galeria</a></li>
+                <li><a href="#ministerios">Ministérios</a></li>
+                <li><a href="#eventos">Eventos</a></li>
+                <li><a href="#cta">Sou novo</a></li>
             </ul>
         </nav>
-        <p><a href="#localizacao">VISITAR →</a></p>
+        <p><a href="#localizacao">Visitar</a></p>
 
-        <div class="mobile-menu" role="button" tabindex="0" aria-label="Abrir menu" aria-expanded="false">
+        <button type="button" class="mobile-menu" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-principal">
             <span></span>
             <span></span>
             <span></span>
-        </div>
+        </button>
     </header>
 
     <main>
-        <section class="hero reveal">
+        <section class="hero">
             <div class="textos reveal">
-                <h1>IEJB - Igreja Evangélica em Araçariguama</h1>
+                <h1 class="sr-only">IEJB - Igreja Evangélica em Araçariguama</h1>
                 <h2>Uma família que te <strong>recebe</strong> de braços abertos</h2>
                 <h3>No Jardim Brasil, em Araçariguama, SP. Aqui você não é visitante, você é parte.</h3>
                 <p class="proximo-culto" id="proximo-culto" hidden></p>
@@ -195,7 +198,7 @@
                     <img loading="lazy" decoding="async" src="./images/iejb-sobre.webp"
                         alt="Comunidade reunida em culto na IEJB, Igreja Evangélica em Araçariguama">
                 </div>
-                <div class="textos reveal">
+                <div class="textos">
                     <h3 class="reveal">QUEM SOMOS</h3>
                     <h2 class="reveal">Uma <strong>comunidade evangélica</strong> que cresce junta em Araçariguama</h2>
                     <p class="reveal">A IEJB (Igreja Evangélica do Jardim Brasil) nasceu em 2013 em Araçariguama, SP,
@@ -259,8 +262,8 @@
             </section>
 
             <section id="programacao" class="programacao">
-                <h2>PROGRAMAÇÃO DE CULTOS</h2>
-                <h3>Nossos <strong>cultos em Araçariguama</strong></h3>
+                <h2 class="reveal">PROGRAMAÇÃO DE CULTOS</h2>
+                <h3 class="reveal">Nossos <strong>cultos em Araçariguama</strong></h3>
                 <div class="cultos">
                     <div class="cultos-grid reveal" data-dia="0" data-hora="09:00" data-nome="EBD">
                         <div class="culto-icone"><i class="fa-solid fa-book-open"></i></div>
@@ -313,50 +316,50 @@
                 </div>
             </section>
 
-            <section id="galeria" class="galeria reveal">
-                <h2>GALERIA</h2>
-                <h3>Nossa História em <strong>Imagens</strong></h3>
+            <section id="galeria" class="galeria">
+                <h2 class="reveal">GALERIA</h2>
+                <h3 class="reveal">Nossa História em <strong>Imagens</strong></h3>
 
-                <div class="galeria-grid reveal">
-                    <div class="galeria-item">
+                <div class="galeria-grid">
+                    <div class="galeria-item reveal">
                         <img loading="lazy" decoding="async" src="./images/pag-galeria/cantata-22/cantata22-01.webp"
                             alt="Momento de louvor e adoração na IEJB - Igreja Evangélica em Araçariguama">
                     </div>
 
-                    <div class="galeria-item">
+                    <div class="galeria-item reveal">
                         <img loading="lazy" decoding="async" src="./images/pag-galeria/cantata-25/cantata25-03.webp"
                             alt="Mulher orando durante culto na IEJB">
                     </div>
 
-                    <div class="galeria-item">
+                    <div class="galeria-item reveal">
                         <img loading="lazy" decoding="async" src="./images/pag-galeria/cantata-25/cantata25-05.webp"
                             alt="Pastor pregando na IEJB - Igreja Evangélica do Jardim Brasil">
                     </div>
 
-                    <div class="galeria-item">
+                    <div class="galeria-item reveal">
                         <img loading="lazy" decoding="async" src="./images/pag-galeria/cantata-ieja/cantataieja-02.webp"
                             alt="Comunidade reunida em culto na IEJB Araçariguama">
                     </div>
 
-                    <div class="galeria-item">
+                    <div class="galeria-item reveal">
                         <img loading="lazy" decoding="async" src="./images/pag-galeria/cantata-22/cantata22-02.webp"
                             alt="Pastores e líderes na IEJB durante evento especial">
                     </div>
 
-                    <div class="galeria-item">
+                    <div class="galeria-item reveal">
                         <img loading="lazy" decoding="async" src="./images/pag-galeria/cantata-23-pascoa/cantata23pascoa-02.webp"
                             alt="Conversão e momento marcante de fé na IEJB">
                     </div>
                 </div>
 
-                <div class="galeria-cta">
+                <div class="galeria-cta reveal">
                     <a href="./pages/galeria.html" class="btn-galeria">Ver mais fotos →</a>
                 </div>
             </section>
 
             <section id="ministerios" class="ministerios">
-                <h2>MINISTÉRIOS</h2>
-                <h3>Nossa <strong>comunidade</strong> ativa</h3>
+                <h2 class="reveal">MINISTÉRIOS</h2>
+                <h3 class="reveal">Nossa <strong>comunidade</strong> ativa</h3>
                 <div class="ministerios-container">
                     <div class="ministerios-grid reveal" id="ministerio-louvor" data-ministerio="louvor">
                         <div class="imagem">
@@ -423,8 +426,8 @@
             </section>
 
             <section id="depoimentos" class="depoimentos">
-                <h2>HISTÓRIAS REAIS</h2>
-                <h3>O que as pessoas dizem sobre a IEJB</h3>
+                <h2 class="reveal">HISTÓRIAS REAIS</h2>
+                <h3 class="reveal">O que as pessoas dizem sobre a IEJB</h3>
                 <div class="depoimentos-container">
                     <div class="depoimentos-grid reveal">
                         <p>"Para mim, a IEJB significa ser uma vida a oferecer, para o Propósito Divino"</p>
@@ -445,11 +448,11 @@
                 </div>
             </section>
 
-            <section id="eventos" class="eventos reveal">
-                <h2>AGENDA</h2>
-                <h3>Próximos <strong>eventos</strong> da IEJB</h3>
-                <p class="eventos-vazio" id="eventos-vazio" hidden>Em breve novos eventos por aqui. Acompanhe as novidades no nosso <a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer">Instagram</a>.</p>
-                <div class="eventos-container reveal">
+            <section id="eventos" class="eventos">
+                <h2 class="reveal">AGENDA</h2>
+                <h3 class="reveal">Próximos <strong>eventos</strong> da IEJB</h3>
+                <p class="eventos-vazio reveal" id="eventos-vazio" hidden>Em breve novos eventos por aqui. Acompanhe as novidades no nosso <a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer">Instagram</a>.</p>
+                <div class="eventos-container">
                     <div class="eventos-grid reveal" data-data="2026-09-19">
                         <div class="data">
                             <h4>19</h4>
@@ -584,7 +587,7 @@
 
             <section id="cta" class="cta">
                 <div class="cta-container">
-                    <div class="textos reveal">
+                    <div class="textos">
                         <h2 class="reveal">Primeira vez em uma igreja evangélica?</h2>
                         <h3 class="reveal">É simples <strong>começar</strong> na IEJB</h3>
                         <p class="reveal">Sabemos que entrar em uma nova comunidade pode ser intimidador. Por isso
@@ -608,8 +611,8 @@
                         </ul>
                     </div>
                     <div class="tem-duvidas reveal">
-                        <h4 class="reveal">Tem dúvidas?</h4>
-                        <p class="reveal">Entre em contato conosco pelo Instagram ou E-mail. Estamos aqui para ajudar!
+                        <h4>Tem dúvidas?</h4>
+                        <p>Entre em contato conosco pelo Instagram ou E-mail. Estamos aqui para ajudar!
                         </p>
                         <a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer">Fale Conosco →</a>
                         <a class="botao-email" href="mailto:contatoiejb@gmail.com" target="_blank" rel="noopener noreferrer">Envie um E-mail →</a>
@@ -649,8 +652,8 @@
             </section>
 
             <section id="localizacao" class="localizacao">
-                <h2>ONDE ESTAMOS</h2>
-                <h3>Venha nos <strong>visitar</strong></h3>
+                <h2 class="reveal">ONDE ESTAMOS</h2>
+                <h3 class="reveal">Venha nos <strong>visitar</strong></h3>
 
                 <div class="localizacao-container reveal">
                     <iframe
@@ -658,18 +661,18 @@
                         title="Localização da IEJB - Igreja Evangélica em Araçariguama, SP" allowfullscreen=""
                         loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                     <div class="textos">
-                        <address class="endereco reveal">
+                        <address class="endereco">
                             <h4>ENDEREÇO</h4>
                             <p>Rua Ceará, 128 — Jardim Brasil <br />Araçariguama — SP <br />Próximo ao Araçarizão</p>
                         </address>
-                        <address class="cidade reveal">
+                        <address class="cidade">
                             <h4>HORÁRIOS</h4>
                             <p>Domingo: EBD às 9h e Culto da Família às 18h <br />Terça-feira: Culto de Oração às 19:30h</p>
                         </address>
                     </div>
-                    <a class="reveal" href="https://maps.app.goo.gl/t8zvQi2DQzQXud8M9" target="_blank" rel="noopener noreferrer">Abrir no Google
+                    <a href="https://maps.app.goo.gl/t8zvQi2DQzQXud8M9" target="_blank" rel="noopener noreferrer">Abrir no Google
                         Maps →</a>
-                    <div class="localizacao-acoes reveal">
+                    <div class="localizacao-acoes">
                         <a href="https://waze.com/ul?ll=-23.42888942,-47.07071296&navigate=yes" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-waze"></i>Abrir no Waze</a>
                         <button type="button" id="btn-distancia"><i class="fa-solid fa-location-crosshairs"></i>Qual a distância?</button>
                         <button type="button" id="copiar-endereco" data-endereco="Rua Ceará, 128 - Jardim Brasil, Araçariguama - SP, 18147-000"><i class="fa-regular fa-copy"></i>Copiar endereço</button>
@@ -685,7 +688,7 @@
                 <div class="logo"><a href="./index.html">
                         <img src="./images/logo-iejb-pequeno.png"
                             alt="Logo da IEJB - Igreja Evangélica do Jardim Brasil em Araçariguama">
-                        <h1>UMA <br> IGREJA <br> FAMILIA</h1>
+                        <span class="logo-texto">UMA <br> IGREJA <br> FAMÍLIA</span>
                     </a>
                 </div>
                 <div class="media-icons">

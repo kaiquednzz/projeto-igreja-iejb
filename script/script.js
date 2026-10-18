@@ -1,23 +1,21 @@
 const reduzirMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Reveal
+// Reveal: os elementos que entram na tela na mesma "leva" aparecem em cascata,
+// um 70ms depois do outro (--atraso no CSS). Quem entra sozinho aparece na hora.
+// Também revela o que já ficou acima da tela (ex.: recarregar a página no meio dela).
 
 const observer = new IntersectionObserver((entries) => {
+    let ordem = 0;
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
+        const jaPassou = entry.boundingClientRect.bottom < 0;
+        if (!entry.isIntersecting && !jaPassou) return;
+        entry.target.style.setProperty('--atraso', `${Math.min(ordem++, 6) * 0.07}s`);
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
     });
-}, { threshold: 0.12 });
+}, { rootMargin: '0px 0px -8% 0px' });
 
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-document.querySelectorAll('.cultos, .hero, .ministerios-container, .galeria, .galeria-grid, .galeria-item, .depoimentos-container, .eventos, .eventos-grid, .eventos-container, .cta-container')
-    .forEach(container => {
-        container.querySelectorAll('.reveal').forEach((el, i) => {
-            el.style.transitionDelay = `${i * 0.12}s`;
-        });
-    });
 
 // Aviso rápido (toast)
 
@@ -48,8 +46,9 @@ async function copiarTexto(texto, mensagemOk) {
 
 // Menu Hamburguer
 
+const header = document.querySelector('header');
 const mobileMenu = document.querySelector('.mobile-menu');
-const nav = document.querySelector('nav');
+const nav = document.querySelector('header nav');
 
 if (mobileMenu && nav) {
     const alternarMenu = (aberto) => {
@@ -60,21 +59,81 @@ if (mobileMenu && nav) {
     };
 
     mobileMenu.addEventListener('click', () => alternarMenu());
-    mobileMenu.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            alternarMenu();
-        }
-    });
     nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => alternarMenu(false)));
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') alternarMenu(false);
+        if (e.key === 'Escape' && nav.classList.contains('ativo')) {
+            alternarMenu(false);
+            mobileMenu.focus();
+        }
+    });
+    // Tocar fora do header fecha o menu
+    document.addEventListener('click', (e) => {
+        if (nav.classList.contains('ativo') && !header.contains(e.target)) alternarMenu(false);
     });
 }
 
-// Cabeçalho fixo, barra de progresso e botão "voltar ao topo"
+// Link ativo no menu: a pílula de vidro desliza até o link da seção que está sendo lida
 
-const header = document.querySelector('header');
+const linksMenu = [...document.querySelectorAll('header nav a[href*="#"]')];
+// Só na home os links apontam para seções da própria página (nas outras, getElementById não acha nada)
+const paresMenu = linksMenu
+    .map(link => ({ link, secao: document.getElementById(link.hash.slice(1)) }))
+    .filter(par => par.secao);
+
+const indicador = document.createElement('span');
+indicador.className = 'nav-indicador';
+indicador.setAttribute('aria-hidden', 'true');
+if (nav) nav.prepend(indicador);
+
+let linkAtivo = null;
+
+function moverIndicador() {
+    const alvo = linkAtivo || (nav && nav.querySelector('a[aria-current="page"]'));
+    if (!alvo || getComputedStyle(indicador).display === 'none') {
+        indicador.classList.remove('visivel');
+        return;
+    }
+    const jaVisivel = indicador.classList.contains('visivel');
+    // Quando aparece pela primeira vez, surge já no lugar em vez de deslizar do canto
+    if (!jaVisivel) indicador.style.transition = 'none';
+    indicador.style.setProperty('--x', `${alvo.offsetLeft}px`);
+    indicador.style.setProperty('--y', `${alvo.offsetTop}px`);
+    indicador.style.setProperty('--w', `${alvo.offsetWidth}px`);
+    indicador.style.setProperty('--h', `${alvo.offsetHeight}px`);
+    if (!jaVisivel) {
+        indicador.getBoundingClientRect(); // aplica a posição antes de religar a transição
+        indicador.style.transition = '';
+    }
+    indicador.classList.add('visivel');
+}
+
+// Ativo = a última seção do menu cujo topo já passou de 40% da tela. Assim o link
+// continua aceso enquanto você lê as seções que vêm depois dela.
+function atualizarLinkAtivo() {
+    const linha = window.innerHeight * 0.4;
+    let novo = null;
+    paresMenu.forEach(({ link, secao }) => {
+        if (!secao.hidden && secao.getBoundingClientRect().top <= linha) novo = link;
+    });
+    if (novo === linkAtivo) return;
+    linkAtivo = novo;
+    linksMenu.forEach(a => a.classList.toggle('link-ativo', a === novo));
+    moverIndicador();
+}
+
+// Header que se adapta ao fundo: quando uma seção escura passa por trás, o vidro
+// escurece e o texto fica branco (como as barras do iOS)
+
+const SECOES_ESCURAS = '.hero, .brand, .galeria, .depoimentos, .domingo, footer, .pag-galeria-hero, .fundacao-hero';
+
+function atualizarTemaHeader() {
+    const caixa = header.getBoundingClientRect();
+    const atras = document.elementsFromPoint(caixa.left + caixa.width / 2, caixa.top + caixa.height / 2)
+        .find(el => !header.contains(el));
+    header.classList.toggle('sobre-escuro', Boolean(atras && atras.closest(SECOES_ESCURAS)));
+}
+
+// Cabeçalho, barra de progresso e botão "voltar ao topo"
 
 const barraProgresso = document.createElement('div');
 barraProgresso.className = 'barra-progresso';
@@ -95,33 +154,27 @@ function aoRolar() {
     const rolado = window.scrollY;
     const total = document.documentElement.scrollHeight - window.innerHeight;
     barraProgresso.style.width = total > 0 ? `${(rolado / total) * 100}%` : '0%';
-    if (header) header.classList.toggle('rolou', rolado > 40);
+    if (header) {
+        header.classList.toggle('rolou', rolado > 40);
+        atualizarTemaHeader();
+    }
     botaoTopo.classList.toggle('visivel', rolado > 600);
+    atualizarLinkAtivo();
 }
-window.addEventListener('scroll', () => {
+function agendarRolagem() {
     if (!rolagemAgendada) {
         rolagemAgendada = true;
         requestAnimationFrame(aoRolar);
     }
-}, { passive: true });
-aoRolar();
-
-// Link ativo no menu conforme a seção visível
-
-const linksMenu = [...document.querySelectorAll('header nav a[href*="#"]')];
-const secoesMenu = linksMenu
-    .map(a => document.getElementById(a.hash.slice(1)))
-    .filter(Boolean);
-
-if (secoesMenu.length && document.getElementById(linksMenu[0].hash.slice(1))) {
-    const spy = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-            linksMenu.forEach(a => a.classList.toggle('link-ativo', a.hash === `#${entry.target.id}`));
-        });
-    }, { rootMargin: '-40% 0px -55% 0px' });
-    secoesMenu.forEach(secao => spy.observe(secao));
 }
+window.addEventListener('scroll', agendarRolagem, { passive: true });
+window.addEventListener('resize', () => {
+    moverIndicador();
+    agendarRolagem();
+});
+aoRolar();
+moverIndicador();
+document.fonts.ready.then(moverIndicador);
 
 // Próximo culto (usa os data-attributes dos cards da programação)
 
@@ -298,11 +351,9 @@ async function gerarImagemVersiculo(versiculo) {
     canvas.height = A;
     const ctx = canvas.getContext('2d');
 
+    const FONTE_SISTEMA = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     try {
-        await Promise.all([
-            document.fonts.load('italic 400 56px "Playfair Display"'),
-            document.fonts.load('600 40px "Montserrat"')
-        ]);
+        await document.fonts.load('italic 400 56px "Playfair Display"');
     } catch { /* usa fonte padrão */ }
 
     const fundo = ctx.createLinearGradient(0, 0, 0, A);
@@ -313,7 +364,7 @@ async function gerarImagemVersiculo(versiculo) {
 
     ctx.textAlign = 'center';
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.font = '500 34px "Montserrat", sans-serif';
+    ctx.font = `500 34px ${FONTE_SISTEMA}`;
     ctx.fillText('PALAVRA PARA HOJE', L / 2, 330);
 
     // Quebra o texto em linhas e reduz a fonte até caber
@@ -346,7 +397,7 @@ async function gerarImagemVersiculo(versiculo) {
     });
 
     ctx.fillStyle = '#f2b8b5';
-    ctx.font = '600 44px "Montserrat", sans-serif';
+    ctx.font = `600 44px ${FONTE_SISTEMA}`;
     ctx.fillText(`— ${versiculo.ref}`, L / 2, y + 40);
 
     try {
@@ -358,7 +409,7 @@ async function gerarImagemVersiculo(versiculo) {
     } catch { /* sem logo */ }
 
     ctx.fillStyle = 'rgba(255,255,255,0.75)';
-    ctx.font = '400 32px "Montserrat", sans-serif';
+    ctx.font = `400 32px ${FONTE_SISTEMA}`;
     ctx.fillText('IEJB · iejb.com.br', L / 2, 1720);
 
     return new Promise((resolve, reject) => canvas.toBlob(b => (b ? resolve(b) : reject(new Error('canvas'))), 'image/png'));
@@ -395,6 +446,11 @@ async function gerarImagemVersiculo(versiculo) {
         const img = imagens[atual];
         foto.src = img.currentSrc || img.src;
         foto.alt = img.alt;
+        foto.classList.remove('trocando');
+        if (!overlay.hidden) {
+            void foto.offsetWidth; // força o navegador a reiniciar a animação de troca
+            foto.classList.add('trocando');
+        }
         [atual + 1, atual - 1].forEach(n => {
             new Image().src = imagens[(n + imagens.length) % imagens.length].src;
         });
@@ -474,22 +530,30 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // Guarda o texto original de cada parágrafo e limpa o conteúdo visual
+    // Guarda o texto original de cada parágrafo. A cópia .texto-molde fica transparente
+    // (reserva o tamanho do card e é a que o leitor de tela lê inteira); a animação
+    // digita por cima, numa cópia visual que os leitores ignoram (aria-hidden)
     paragrafos.forEach(p => {
         p.dataset.textoCompleto = p.textContent.trim();
-        p.setAttribute('aria-label', p.dataset.textoCompleto);
-        p.textContent = '';
+        const leitor = document.createElement('span');
+        leitor.className = 'texto-molde';
+        leitor.textContent = p.dataset.textoCompleto;
+        const visual = document.createElement('span');
+        visual.className = 'digitando';
+        visual.setAttribute('aria-hidden', 'true');
+        p.replaceChildren(leitor, visual);
     });
 
     // Função que faz o efeito de digitar
     function digitarTexto(elemento) {
         const texto = elemento.dataset.textoCompleto;
+        const visual = elemento.querySelector('.digitando');
         let i = 0;
-        elemento.textContent = ''; // Garante que está limpo
+        visual.textContent = ''; // Garante que está limpo
 
         function tipo() {
             if (i < texto.length) {
-                elemento.textContent += texto.charAt(i);
+                visual.textContent += texto.charAt(i);
                 i++;
                 setTimeout(tipo, 40); // Velocidade da digitação (em milissegundos)
             } else {
