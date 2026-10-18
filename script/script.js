@@ -60,12 +60,6 @@ if (mobileMenu && nav) {
     };
 
     mobileMenu.addEventListener('click', () => alternarMenu());
-    mobileMenu.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            alternarMenu();
-        }
-    });
     nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => alternarMenu(false)));
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') alternarMenu(false);
@@ -474,22 +468,29 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // Guarda o texto original de cada parágrafo e limpa o conteúdo visual
+    // Guarda o texto original de cada parágrafo. Leitores de tela leem a cópia escondida
+    // (.sr-only) inteira; a animação digita numa cópia visual que eles ignoram (aria-hidden)
     paragrafos.forEach(p => {
         p.dataset.textoCompleto = p.textContent.trim();
-        p.setAttribute('aria-label', p.dataset.textoCompleto);
-        p.textContent = '';
+        const leitor = document.createElement('span');
+        leitor.className = 'sr-only';
+        leitor.textContent = p.dataset.textoCompleto;
+        const visual = document.createElement('span');
+        visual.className = 'digitando';
+        visual.setAttribute('aria-hidden', 'true');
+        p.replaceChildren(leitor, visual);
     });
 
     // Função que faz o efeito de digitar
     function digitarTexto(elemento) {
         const texto = elemento.dataset.textoCompleto;
+        const visual = elemento.querySelector('.digitando');
         let i = 0;
-        elemento.textContent = ''; // Garante que está limpo
+        visual.textContent = ''; // Garante que está limpo
 
         function tipo() {
             if (i < texto.length) {
-                elemento.textContent += texto.charAt(i);
+                visual.textContent += texto.charAt(i);
                 i++;
                 setTimeout(tipo, 40); // Velocidade da digitação (em milissegundos)
             } else {

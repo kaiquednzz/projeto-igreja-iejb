@@ -15,8 +15,8 @@
     <link rel="manifest" href="../manifest.webmanifest">
     <meta name="theme-color" content="#8F0D0B">
     <link rel="apple-touch-icon" href="../images/icone-192.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
     <link rel="shortcut icon" href="../images/favicon-96x96.png" type="image/x-icon">
     <script src="../script/script.js" defer></script>
 </head>
@@ -25,9 +25,9 @@
     <header>
         <div class="logo"><a href="../index.html">
             <img src="../images/logo-iejb-pequeno.png" alt="IEJB Logo">
-                <h1>UMA <br> IGREJA <br> FAMILIA</h1></a>
+                <span class="logo-texto">UMA <br> IGREJA <br> FAMÍLIA</span></a>
         </div>
-        <nav>
+        <nav id="menu-principal" aria-label="Principal">
             <ul>
                 <li><a href="../index.html#quem-somos">SOBRE</a></li>
                 <li><a href="../index.html#programacao">CULTOS</a></li>
@@ -39,11 +39,11 @@
         </nav>
         <p><a href="../index.html#localizacao">VISITAR →</a></p>
 
-        <div class="mobile-menu">
+        <button type="button" class="mobile-menu" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-principal">
             <span></span>
             <span></span>
             <span></span>
-        </div>
+        </button>
     </header>
 
     <main>
@@ -94,7 +94,7 @@
                 <div class="logo"><a href="../index.html">
                         <img src="../images/logo-iejb-pequeno.png"
                             alt="Logo da IEJB - Igreja Evangélica do Jardim Brasil em Araçariguama">
-                        <h1>UMA <br> IGREJA <br> FAMILIA</h1>
+                        <span class="logo-texto">UMA <br> IGREJA <br> FAMÍLIA</span>
                     </a>
                 </div>
                 <div class="media-icons">
