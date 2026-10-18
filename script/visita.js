@@ -547,3 +547,15 @@ const dadosEventos = [];
         requestAnimationFrame(() => aviso.classList.add('visivel'));
     }, 2000);
 })();
+
+
+
+// @@FEATURE-CONVITE@@ (convite e plano de visita entram logo abaixo)
+
+
+
+// @@FEATURE-STORIES@@ ("Veja como é" entra logo abaixo)
+
+
+
+// @@FEATURE-LOCAL@@ (agenda semanal e links de eventos entram logo abaixo)
