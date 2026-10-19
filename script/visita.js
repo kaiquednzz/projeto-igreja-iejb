@@ -590,6 +590,8 @@ const dadosEventos = [];
         const proximo = document.getElementById('proximo-culto');
         if (celular() || naLocalizacao || !proximoPronto(proximo)) return;
         if (Date.now() - inicio < 20000 || profundidade < 0.6) return;
+        // Quem já tem visita marcada ou chegou por um convite já vê o card no hero
+        if (document.querySelector('.hero-visita')) return;
 
         clearInterval(verificar);
         try { sessionStorage.setItem('iejb-convite', '1'); } catch { /* modo privado */ }
@@ -608,9 +610,6 @@ const dadosEventos = [];
     }, 2000);
 })();
 
-
-
-// @@FEATURE-CONVITE@@ (convite e plano de visita entram logo abaixo)
 
 // Convide alguém, convite recebido e "Eu vou!" (plano de visita lembrado)
 // O convite viaja no link (?convite=1&de=Nome&culto=slug) e vira um card de vidro no hero.
@@ -1094,7 +1093,8 @@ let criarBotaoEuVou = null;
         } catch { /* sem logo */ }
         escrever('IEJB · iejb.com.br', 1720, { tamanho: 32, cor: 'rgba(255, 255, 255, 0.75)' });
 
-        return new Promise((resolve, reject) => canvas.toBlob(b => (b ? resolve(b) : reject(new Error('canvas'))), 'image/png'));
+        // JPEG: o degradê em PNG passava de 1,8 MB, pesado para mandar pelo WhatsApp
+        return new Promise((resolve, reject) => canvas.toBlob(b => (b ? resolve(b) : reject(new Error('canvas'))), 'image/jpeg', 0.9));
     }
 
     function baixarArquivo(blob, nome) {
@@ -1179,7 +1179,7 @@ let criarBotaoEuVou = null;
             const { nome, inicio, url, texto } = montarConvite();
             try {
                 const blob = await gerarImagemConvite(escolhido, inicio, nome);
-                const arquivo = new File([blob], 'convite-iejb.png', { type: 'image/png' });
+                const arquivo = new File([blob], 'convite-iejb.jpg', { type: 'image/jpeg' });
                 let compartilhou = false;
                 if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
                     try {
@@ -1207,9 +1207,6 @@ let criarBotaoEuVou = null;
     })();
 })();
 
-
-
-// @@FEATURE-STORIES@@ ("Veja como é" entra logo abaixo)
 
 // "Veja como é um culto": os passos da seção #domingo em tela cheia, no formato dos
 // Stories. Título e texto vêm de cada <li> (h4 e p) e a foto do data-foto; o último
@@ -1678,9 +1675,6 @@ let criarBotaoEuVou = null;
     botao.hidden = false;
 })();
 
-
-
-// @@FEATURE-LOCAL@@ (agenda semanal e links de eventos entram logo abaixo)
 
 // Agenda semanal: um .ics só, com um evento que se repete toda semana para cada culto
 

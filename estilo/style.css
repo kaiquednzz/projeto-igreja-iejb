@@ -2437,7 +2437,7 @@ abbr[title] {
 }
 
 .localizacao-acoes :is(a, button) {
-    min-height: 40px;
+    min-height: 44px;
     padding: 9px 18px;
     font-size: 15px;
 }
@@ -2618,8 +2618,6 @@ footer .footer-copyright {
         margin-top: -12px;
     }
 }
-
-/* @@FEATURE-CONVITE@@ (estilos do convite e do plano de visita entram logo abaixo) */
 
 /* ===== Convite recebido e visita marcada (card no hero) =====
    Vidro escuro sobre a foto, como o chip do próximo culto. O visita.js põe o card
@@ -2971,9 +2969,6 @@ footer .footer-copyright {
     }
 }
 
-
-
-/* @@FEATURE-STORIES@@ (estilos do "Veja como é" entram logo abaixo) */
 
 /* ===== "Veja como é um culto": os passos do domingo no formato Stories =====
    No celular ocupa a tela toda; no computador vira um cartão 9:16 no centro, com
@@ -3585,9 +3580,6 @@ html.stories-aberto {
 }
 
 
-
-/* @@FEATURE-LOCAL@@ (estilos de fachada, agenda semanal e evento em destaque entram logo abaixo) */
-
 /* "É aqui": foto da fachada. No celular fica entre o mapa e os cartões de endereço
    e horários; no computador, lado a lado com eles (os cartões empilham à direita) */
 .localizacao .localizacao-chegada {
@@ -3738,7 +3730,6 @@ html.stories-aberto {
     max-width: 100%;
     white-space: normal;
 }
-
 
 
 /* ===== Elementos flutuantes ===== */

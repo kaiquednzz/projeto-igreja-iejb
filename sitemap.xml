@@ -3,10 +3,11 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
     <url>
         <loc>https://iejb.com.br/</loc>
-        <lastmod>2026-10-18</lastmod>
+        <lastmod>2026-10-19</lastmod>
         <priority>1.0</priority>
         <image:image><image:loc>https://iejb.com.br/images/iejb-principal.webp</image:loc></image:image>
         <image:image><image:loc>https://iejb.com.br/images/iejb-sobre.webp</image:loc></image:image>
+        <image:image><image:loc>https://iejb.com.br/images/fachada-iejb.webp</image:loc></image:image>
         <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao04.webp</image:loc></image:image>
         <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao10.webp</image:loc></image:image>
         <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao16.webp</image:loc></image:image>
@@ -24,7 +25,7 @@
     </url>
     <url>
         <loc>https://iejb.com.br/pages/galeria.html</loc>
-        <lastmod>2026-10-18</lastmod>
+        <lastmod>2026-10-19</lastmod>
         <priority>0.7</priority>
         <image:image><image:loc>https://iejb.com.br/images/pag-galeria/cantata-22/cantata22-01.webp</image:loc></image:image>
         <image:image><image:loc>https://iejb.com.br/images/pag-galeria/cantata-23-pascoa/cantata23pascoa-02.webp</image:loc></image:image>
@@ -78,12 +79,12 @@
     </url>
     <url>
         <loc>https://iejb.com.br/pages/termos.html</loc>
-        <lastmod>2026-10-18</lastmod>
+        <lastmod>2026-10-19</lastmod>
         <priority>0.2</priority>
     </url>
     <url>
         <loc>https://iejb.com.br/pages/privacidade.html</loc>
-        <lastmod>2026-10-18</lastmod>
+        <lastmod>2026-10-19</lastmod>
         <priority>0.2</priority>
     </url>
 </urlset>

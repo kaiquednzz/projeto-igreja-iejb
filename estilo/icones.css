@@ -66,7 +66,10 @@
 .fa-arrow-up { --fa: "\f062"; }
 .fa-book-bible { --fa: "\f647"; }
 .fa-book-open { --fa: "\f518"; }
+.fa-calendar-check { --fa: "\f274"; }
 .fa-calendar-plus { --fa: "\f271"; }
+.fa-calendar-xmark { --fa: "\f273"; }
+.fa-check { --fa: "\f00c"; }
 .fa-chevron-left { --fa: "\f053"; }
 .fa-chevron-right { --fa: "\f054"; }
 .fa-chevron-up { --fa: "\f077"; }
@@ -83,11 +86,15 @@
 .fa-instagram { --fa: "\f16d"; }
 .fa-location-crosshairs { --fa: "\f601"; }
 .fa-location-dot { --fa: "\f3c5"; }
+.fa-pause { --fa: "\f04c"; }
 .fa-people-arrows { --fa: "\e068"; }
 .fa-people-roof { --fa: "\e537"; }
+.fa-play { --fa: "\f04b"; }
 .fa-rotate-left { --fa: "\f2ea"; }
 .fa-route { --fa: "\f4d7"; }
 .fa-share-nodes { --fa: "\f1e0"; }
+.fa-star { --fa: "\f005"; }
+.fa-uber { --fa: "\f402"; }
 .fa-waze { --fa: "\f83f"; }
 .fa-whatsapp { --fa: "\f232"; }
 .fa-xmark { --fa: "\f00d"; }
