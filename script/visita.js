@@ -36,24 +36,42 @@ function escaparICS(texto) {
 const FUSO_ICS = ['BEGIN:VTIMEZONE', 'TZID:America/Sao_Paulo', 'BEGIN:STANDARD', 'DTSTART:19700101T000000',
     'TZOFFSETFROM:-0300', 'TZOFFSETTO:-0300', 'TZNAME:-03', 'END:STANDARD', 'END:VTIMEZONE'];
 
-function baixarICS({ titulo, inicio, duracaoMin = 120, diaInteiro = false, descricao = '', local = LOCAL_IEJB }) {
+// O padrão do .ics pede linhas de até 75 bytes: as maiores são "dobradas" (quebra + espaço).
+// Conta bytes e não letras, porque "á" e "ç" ocupam 2 bytes em UTF-8
+const codificadorUTF8 = new TextEncoder();
+function dobrarLinhaICS(linha) {
+    const partes = [];
+    let atual = '';
+    let bytes = 0;
+    for (const letra of linha) {
+        const tamanho = codificadorUTF8.encode(letra).length;
+        // As partes seguintes começam com o espaço, então cabem 74 bytes
+        if (bytes + tamanho > (partes.length ? 74 : 75)) {
+            partes.push(atual);
+            atual = '';
+            bytes = 0;
+        }
+        atual += letra;
+        bytes += tamanho;
+    }
+    partes.push(atual);
+    return partes.join('\r\n ');
+}
+
+// Linhas de um VEVENT. "repetir" vira a RRULE (ex.: 'FREQ=WEEKLY')
+function eventoICS({ uid, titulo, inicio, duracaoMin = 120, diaInteiro = false, descricao = '', local = LOCAL_IEJB, repetir = '' }) {
     const fim = new Date(inicio.getTime() + duracaoMin * 60000);
     const fimDia = new Date(inicio);
     fimDia.setDate(fimDia.getDate() + 1);
     const agoraUTC = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
 
-    const linhas = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//IEJB//Site//PT',
-        'CALSCALE:GREGORIAN',
-        ...FUSO_ICS,
+    return [
         'BEGIN:VEVENT',
-        // UID estável: baixar o mesmo lembrete duas vezes atualiza o evento em vez de duplicar
-        `UID:${formatoICS(inicio, true)}-${paraSlug(titulo)}@iejb.com.br`,
+        `UID:${uid}`,
         `DTSTAMP:${agoraUTC}`,
         diaInteiro ? `DTSTART;VALUE=DATE:${formatoICS(inicio, true)}` : `DTSTART;TZID=America/Sao_Paulo:${formatoICS(inicio)}`,
         diaInteiro ? `DTEND;VALUE=DATE:${formatoICS(fimDia, true)}` : `DTEND;TZID=America/Sao_Paulo:${formatoICS(fim)}`,
+        ...(repetir ? [`RRULE:${repetir}`] : []),
         `SUMMARY:${escaparICS(titulo)}`,
         `LOCATION:${escaparICS(local)}`,
         `DESCRIPTION:${escaparICS(descricao || 'IEJB - Igreja Evangélica do Jardim Brasil. https://iejb.com.br')}`,
@@ -62,19 +80,38 @@ function baixarICS({ titulo, inicio, duracaoMin = 120, diaInteiro = false, descr
         `DESCRIPTION:${escaparICS(titulo)}`,
         diaInteiro ? 'TRIGGER:-PT15H' : 'TRIGGER:-PT2H',
         'END:VALARM',
-        'END:VEVENT',
+        'END:VEVENT'
+    ];
+}
+
+// Junta os VEVENTs (listas de linhas do eventoICS) num arquivo .ics, baixa e avisa
+function salvarICS(eventos, nomeArquivo, mensagem) {
+    const linhas = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//IEJB//Site//PT',
+        'CALSCALE:GREGORIAN',
+        ...FUSO_ICS,
+        ...eventos.flat(),
         'END:VCALENDAR'
     ];
 
-    const blob = new Blob([linhas.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+    const blob = new Blob([linhas.map(dobrarLinhaICS).join('\r\n') + '\r\n'], { type: 'text/calendar;charset=utf-8' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'iejb-lembrete.ics';
+    link.download = nomeArquivo;
     document.body.appendChild(link);
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-    mostrarToast('Lembrete baixado! Abra o arquivo para salvar no calendário.');
+    mostrarToast(mensagem);
+}
+
+function baixarICS({ titulo, inicio, duracaoMin = 120, diaInteiro = false, descricao = '', local = LOCAL_IEJB }) {
+    // UID estável: baixar o mesmo lembrete duas vezes atualiza o evento em vez de duplicar
+    const uid = `${formatoICS(inicio, true)}-${paraSlug(titulo)}@iejb.com.br`;
+    salvarICS([eventoICS({ uid, titulo, inicio, duracaoMin, diaInteiro, descricao, local })],
+        'iejb-lembrete.ics', 'Lembrete baixado! Abra o arquivo para salvar no calendário.');
 }
 
 function textoDataLonga(d) {
@@ -98,6 +135,22 @@ const dadosEventos = [];
 (function melhorarEventos() {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
+
+    // Link próprio de cada card (#evento-AAAA-MM-DD-nome). Os que já passaram também
+    // ganham id: assim quem abre um link antigo fica sabendo que o evento aconteceu
+    const idsUsados = new Set();
+    document.querySelectorAll('.eventos-grid[data-data]').forEach(el => {
+        if (!el.id) {
+            const textos = el.querySelector('.textos');
+            const nome = paraSlug(textos?.querySelector('h4')?.textContent || textos?.querySelector('.evento-categoria')?.textContent);
+            const base = ['evento', el.dataset.data, nome].filter(Boolean).join('-');
+            let id = base;
+            // Dois eventos com a mesma data e o mesmo nome: o segundo vira ...-2
+            for (let n = 2; idsUsados.has(id) || document.getElementById(id); n++) id = `${base}-${n}`;
+            el.id = id;
+        }
+        idsUsados.add(el.id);
+    });
 
     document.querySelectorAll('.eventos-grid[data-data]:not([hidden])').forEach(el => {
         const [a, m, d] = el.dataset.data.split('-').map(Number);
@@ -132,20 +185,24 @@ const dadosEventos = [];
         el.querySelector('.horario-localizacao')?.appendChild(acoes);
 
         const textoData = `${textoDataLonga(dia)}${hora ? ` às ${formatarHora(`${hora[1]}:${hora[2] || '00'}`)}` : ''}`;
+        // Endereço público do card: abre a home já rolada até ele (abrirEventoDoLink)
+        const link = `https://iejb.com.br/#${el.id}`;
         acoes.querySelector('[data-acao="calendario"]').addEventListener('click', () => {
             baixarICS({ titulo: titulo, inicio, diaInteiro: !hora, duracaoMin: 120, descricao, local });
         });
         acoes.querySelector('[data-acao="compartilhar"]').addEventListener('click', async () => {
-            const texto = `${titulo}\n${textoData}\n${local}\n\nIEJB · https://iejb.com.br/#eventos`;
+            const convite = `${titulo}\n${textoData}\n${local}\n\nIEJB`;
             if (navigator.share) {
-                try { await navigator.share({ title: titulo, text: texto }); } catch { /* cancelado */ }
+                // O link vai só no campo url: o Chrome do Android junta texto e url numa
+                // mensagem só, e no WhatsApp ele apareceria duas vezes
+                try { await navigator.share({ title: titulo, text: convite, url: link }); } catch { /* cancelado */ }
             } else {
-                copiarTexto(texto, 'Convite copiado!');
+                copiarTexto(`${convite} · ${link}`, 'Convite copiado!');
             }
         });
 
         dadosEventos.push({
-            titulo, descricao, inicio, comHora: Boolean(hora), externo,
+            titulo, descricao, inicio, comHora: Boolean(hora), externo, url: link,
             localNome: el.dataset.localNome, localCidade: el.dataset.localCidade,
             imagem: el.dataset.imagem ? new URL(el.dataset.imagem, location.href).href : null
         });
@@ -172,6 +229,7 @@ const dadosEventos = [];
             '@type': 'Event',
             name: e.titulo,
             description: e.descricao,
+            url: e.url,
             startDate: iso(e.inicio, e.comHora),
             eventStatus: 'https://schema.org/EventScheduled',
             eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
@@ -559,3 +617,88 @@ const dadosEventos = [];
 
 
 // @@FEATURE-LOCAL@@ (agenda semanal e links de eventos entram logo abaixo)
+
+// Agenda semanal: um .ics só, com um evento que se repete toda semana para cada culto
+
+(function agendaSemanal() {
+    const bloco = document.getElementById('agenda-semanal');
+    const botao = document.getElementById('agenda-semanal-botao');
+    if (!bloco || !botao || !cardsCultos.length) return;
+
+    botao.addEventListener('click', () => {
+        const usados = new Set();
+        const eventos = cardsCultos.map(card => {
+            const nome = card.dataset.nome;
+            // UID estável por culto: baixar de novo atualiza a agenda em vez de duplicar.
+            // Sem o "culto" repetido (culto-da-familia, e não culto-culto-da-familia)
+            let uid = `culto-${paraSlug(nome).replace(/^culto-/, '')}`;
+            // Dois cultos com o mesmo nome em dias ou horários diferentes não podem dividir o UID
+            if (usados.has(uid)) uid += `-${paraSlug(NOMES_DIAS[card.dataset.dia])}-${card.dataset.hora.replace(':', '')}`;
+            usados.add(uid);
+            return eventoICS({
+                uid: `${uid}@iejb.com.br`,
+                titulo: `${nome} - IEJB`,
+                inicio: proximoInicio(card),
+                // Mesma descrição do lembrete de um culto só (baixarICSDoCulto)
+                descricao: `${nome} na IEJB. Venha como você é! https://iejb.com.br`,
+                repetir: 'FREQ=WEEKLY'
+            });
+        });
+        salvarICS(eventos, 'iejb-cultos.ics', 'Agenda baixada! Abra o arquivo para salvar os cultos no calendário.');
+    });
+
+    bloco.hidden = false;
+})();
+
+// Link direto para um evento (#evento-...): os ids nascem no melhorarEventos, então o
+// navegador não rola sozinho ao abrir a página. Quando tudo carrega, rola até o card e
+// destaca por alguns segundos. Evento que já passou (ou não existe): avisa e mostra a agenda.
+
+(function abrirEventoDoLink() {
+    const secao = document.getElementById('eventos');
+    if (!secao) return;
+    const comportamento = reduzirMovimento ? 'auto' : 'smooth';
+    let timerDestaque;
+
+    function irParaEvento() {
+        let id;
+        try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+        if (!id.startsWith('evento-')) return;
+
+        const card = document.getElementById(id);
+        if (!card || !card.matches('.eventos-grid') || card.closest('[hidden]')) {
+            mostrarToast('Esse evento já aconteceu. Veja os próximos na agenda.');
+            secao.scrollIntoView({ behavior: comportamento, block: 'start' });
+            return;
+        }
+
+        // Leitor de tela: o foco vai para o nome do evento, como num link âncora comum.
+        // Antes de rolar: em navegador sem preventScroll, o foco pularia por cima da rolagem suave
+        const nome = card.querySelector('.textos h4');
+        if (nome) {
+            nome.tabIndex = -1;
+            nome.focus({ preventScroll: true });
+        }
+        // Centralizado quando cabe; card mais alto que a tela (celular pequeno) para logo abaixo do header
+        const cabe = card.offsetHeight < window.innerHeight - 140;
+        card.scrollIntoView({ behavior: comportamento, block: cabe ? 'center' : 'start' });
+
+        document.querySelectorAll('.evento-destaque').forEach(c => c.classList.remove('evento-destaque'));
+        clearTimeout(timerDestaque);
+        card.classList.add('evento-destaque');
+        timerDestaque = setTimeout(() => card.classList.remove('evento-destaque'), 4000);
+    }
+
+    window.addEventListener('hashchange', irParaEvento);
+    if (!location.hash.startsWith('#evento-')) return;
+
+    // Espera as imagens e as fontes (a altura da página para de mudar), no máximo 3s
+    const carregou = new Promise(pronto => {
+        if (document.readyState === 'complete') pronto();
+        else window.addEventListener('load', pronto, { once: true });
+    });
+    Promise.race([
+        carregou.then(() => document.fonts?.ready),
+        new Promise(pronto => setTimeout(pronto, 3000))
+    ]).then(() => requestAnimationFrame(irParaEvento));
+})();

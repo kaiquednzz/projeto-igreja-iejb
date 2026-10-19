@@ -273,6 +273,12 @@
                         <p>A adoração continua na semana: venha adorar a Jesus nas terças-feiras conosco.</p>
                     </div>
                 </div>
+                <!-- Agenda semanal: o visita.js monta um .ics com todos os cultos acima e revela o bloco.
+                     O "2 horas antes" acompanha o alarme do baixarICS -->
+                <div class="agenda-semanal reveal" id="agenda-semanal" hidden>
+                    <button type="button" class="botao-secundario" id="agenda-semanal-botao"><i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>Colocar os cultos na minha agenda</button>
+                    <p>Os cultos se repetem toda semana no seu calendário, com um lembrete 2 horas antes.</p>
+                </div>
             </section>
 
             <section id="planeje" class="planeje" hidden>
@@ -633,19 +639,28 @@
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3660.8746924174843!2d-47.07071295527709!3d-23.42888942462941!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94cf13f87c149757%3A0x322a0dbdcc2396f!2sR.%20Cear%C3%A1%2C%20128%2C%20Ara%C3%A7ariguama%20-%20SP%2C%2018147-000!5e0!3m2!1spt-BR!2sbr!4v1776214008074!5m2!1spt-BR!2sbr"
                         title="Localização da IEJB - Igreja Evangélica em Araçariguama, SP" allowfullscreen=""
                         loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    <div class="textos">
-                        <div class="endereco">
-                            <h4>Endereço</h4>
-                            <address>Rua Ceará, 128 - Jardim Brasil<br>Araçariguama - SP, 18147-000<br>Próximo ao Araçarizão</address>
-                        </div>
-                        <div class="cidade">
-                            <h4>Horários</h4>
-                            <p>Domingo: <abbr title="Escola Bíblica Dominical">EBD</abbr> às 9h e Culto da Família às 18h<br>Terça-feira: Culto de Oração às 19h30</p>
+                    <!-- Foto da fachada ao lado do endereço (no celular, entre o mapa e os cartões) -->
+                    <div class="localizacao-chegada">
+                        <figure class="fachada">
+                            <img loading="lazy" decoding="async" src="./images/fachada-iejb.webp"
+                                alt="Fachada da IEJB vista da rua" width="1536" height="1024" srcset="./images/fachada-iejb-400.webp 400w, ./images/fachada-iejb-800.webp 800w, ./images/fachada-iejb.webp 1536w" sizes="(max-width: 719px) calc(100vw - 60px), (max-width: 899px) calc(54vw - 40px), 450px">
+                            <figcaption><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span><strong>É aqui:</strong> procure o portão branco com a placa “Igreja Evangélica do Jardim Brasil”.</span></figcaption>
+                        </figure>
+                        <div class="textos">
+                            <div class="endereco">
+                                <h4>Endereço</h4>
+                                <address>Rua Ceará, 128 - Jardim Brasil<br>Araçariguama - SP, 18147-000<br>Próximo ao Araçarizão</address>
+                            </div>
+                            <div class="cidade">
+                                <h4>Horários</h4>
+                                <p>Domingo: <abbr title="Escola Bíblica Dominical">EBD</abbr> às 9h e Culto da Família às 18h<br>Terça-feira: Culto de Oração às 19h30</p>
+                            </div>
                         </div>
                     </div>
                     <a href="https://maps.app.goo.gl/t8zvQi2DQzQXud8M9" target="_blank" rel="noopener noreferrer">Abrir no Google Maps <span aria-hidden="true">→</span></a>
                     <div class="localizacao-acoes">
                         <a href="https://waze.com/ul?ll=-23.42888942,-47.07071296&navigate=yes" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-waze" aria-hidden="true"></i>Abrir no Waze</a>
+                        <a href="https://m.uber.com/ul/?action=setPickup&amp;pickup=my_location&amp;dropoff[latitude]=-23.42888942&amp;dropoff[longitude]=-47.07071296&amp;dropoff[nickname]=IEJB&amp;dropoff[formatted_address]=Rua%20Cear%C3%A1%2C%20128%20-%20Jardim%20Brasil%2C%20Ara%C3%A7ariguama%20-%20SP%2C%2018147-000" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-uber" aria-hidden="true"></i>Pedir um Uber</a>
                         <button type="button" id="btn-distancia"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>Qual a distância?</button>
                         <button type="button" id="copiar-endereco" data-endereco="Rua Ceará, 128 - Jardim Brasil, Araçariguama - SP, 18147-000"><i class="fa-regular fa-copy" aria-hidden="true"></i>Copiar endereço</button>
                     </div>

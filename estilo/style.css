@@ -2629,6 +2629,157 @@ footer .footer-copyright {
 
 /* @@FEATURE-LOCAL@@ (estilos de fachada, agenda semanal e evento em destaque entram logo abaixo) */
 
+/* "É aqui": foto da fachada. No celular fica entre o mapa e os cartões de endereço
+   e horários; no computador, lado a lado com eles (os cartões empilham à direita) */
+.localizacao .localizacao-chegada {
+    display: grid;
+    gap: 12px;
+    padding-top: 12px;
+}
+
+.localizacao .localizacao-chegada .textos {
+    padding: 0;
+}
+
+.fachada img {
+    display: block;
+    width: 100%;
+    /* Mesmo arredondado do mapa logo acima */
+    border-radius: 26px;
+    background-color: var(--secondary);
+}
+
+.fachada figcaption {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 12px 10px 4px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--texto-2);
+    text-wrap: pretty;
+}
+
+.fachada figcaption i {
+    flex-shrink: 0;
+    margin: 0;
+    color: var(--principal-brighter);
+}
+
+.fachada figcaption strong {
+    font-style: normal;
+    font-weight: 700;
+    color: var(--principal);
+}
+
+@media (min-width: 720px) {
+    .localizacao .localizacao-chegada {
+        grid-template-columns: 1.15fr 1fr;
+    }
+
+    /* Os dois cartões dividem a altura da foto e centralizam o texto */
+    .localizacao .localizacao-chegada .textos {
+        grid-template-columns: 1fr;
+        grid-auto-rows: 1fr;
+    }
+
+    .localizacao .localizacao-chegada .textos > div {
+        justify-content: center;
+    }
+}
+
+/* Agenda semanal: botão logo abaixo dos cards dos cultos */
+.programacao .agenda-semanal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    max-width: 100%;
+    margin-top: clamp(28px, 4vw, 40px);
+    text-align: center;
+}
+
+/* Em telas de 320px o texto não cabe numa linha só: deixa quebrar */
+.agenda-semanal .botao-secundario {
+    max-width: 100%;
+    white-space: normal;
+    text-wrap: balance;
+}
+
+/* Quando quebra em duas linhas, o ícone acompanha o texto centralizado em vez de ficar sozinho no canto */
+@media (max-width: 380px) {
+    .agenda-semanal .botao-secundario {
+        display: block;
+        text-align: center;
+    }
+
+    .agenda-semanal .botao-secundario i {
+        margin-right: 0.5em;
+    }
+}
+
+.agenda-semanal p {
+    max-width: 420px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--texto-2);
+    text-wrap: balance;
+}
+
+/* Evento aberto por link direto (#evento-...): anel vermelho suave por alguns
+   segundos, como o destaque dos ministérios. Só box-shadow, que o card já anima */
+.eventos .eventos-container .eventos-grid.evento-destaque {
+    box-shadow: 0 0 0 4px rgba(191, 38, 43, 0.6), var(--brilho), var(--sombra-3);
+}
+
+/* No alto contraste as sombras somem: o destaque vira contorno */
+@media (forced-colors: active) {
+    .eventos .eventos-container .eventos-grid.evento-destaque {
+        outline: 4px solid Highlight;
+        outline-offset: 2px;
+    }
+}
+
+/* Página /avaliar (atalho do QR code): só aparece se o redirecionamento demorar */
+.avaliar {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 48px 24px;
+    background: var(--aurora), var(--fundo-rosado);
+    text-align: center;
+}
+
+.avaliar img {
+    width: 30px;
+    filter: var(--logo-vermelho);
+}
+
+.avaliar h1 {
+    max-width: 560px;
+    font-family: var(--fonte-titulo);
+    font-size: clamp(28px, 6vw, 40px);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: var(--principal);
+    text-wrap: balance;
+}
+
+.avaliar p {
+    max-width: 420px;
+    font-size: 17px;
+    color: var(--texto-2);
+}
+
+.avaliar .botao-principal {
+    max-width: 100%;
+    white-space: normal;
+}
+
 
 
 /* ===== Elementos flutuantes ===== */
