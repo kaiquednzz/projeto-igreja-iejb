@@ -3356,7 +3356,9 @@ html.stories-aberto {
 /* Áreas de toque: metade esquerda volta, metade direita avança */
 .stories-toque {
     position: absolute;
-    top: 0;
+    /* Começa abaixo da barra do topo: as zonas não ficam por baixo dos botões
+       Pausar/Fechar (alvos sobrepostos confundem quem toca com o dedo grosso) */
+    top: calc(max(10px, env(safe-area-inset-top)) + 64px);
     bottom: 0;
     z-index: 2;
     width: 50%;
