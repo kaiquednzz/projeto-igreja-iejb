@@ -89,7 +89,14 @@
 
 html {
     scroll-behavior: smooth;
+    /* Âncoras e o foco do Tab param abaixo do header fixo, não escondidos atrás dele */
+    scroll-padding-top: 88px;
     -webkit-text-size-adjust: 100%;
+}
+
+/* No celular a barra "Como chegar" cobre o rodapé da tela */
+html:has(body.barra-ativa) {
+    scroll-padding-bottom: 96px;
 }
 
 html,
@@ -119,6 +126,12 @@ iframe {
     max-width: 100%;
 }
 
+/* As <img> têm width/height no HTML (o navegador reserva o espaço antes de baixar
+   e a página não pula). Quando o CSS muda só a largura, a altura acompanha */
+img {
+    height: auto;
+}
+
 :where(button) {
     font: inherit;
     color: inherit;
@@ -135,10 +148,6 @@ strong {
 
 ::selection {
     background-color: rgba(191, 38, 43, 0.18);
-}
-
-section[id] {
-    scroll-margin-top: 88px;
 }
 
 /* ===== Utilitários ===== */
@@ -160,12 +169,61 @@ section[id] {
     border: 0;
 }
 
+/* Anel de foco do teclado: vermelho da marca nos fundos claros e branco nos
+   escuros (o laranja antigo sumia no rosado e não passava no contraste 3:1) */
+:root {
+    --foco: var(--principal);
+}
+
+.hero,
+.brand,
+.galeria,
+.depoimentos,
+.domingo,
+footer,
+.pag-galeria-hero,
+.fundacao-hero,
+header.sobre-escuro,
+.lightbox,
+.barra-visita {
+    --foco: #fff;
+}
+
 a:focus-visible,
 button:focus-visible,
 summary:focus-visible,
-[role="button"]:focus-visible {
-    outline: 3px solid #e8a33d;
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+    outline: 3px solid var(--foco);
     outline-offset: 3px;
+}
+
+/* Elementos que só recebem foco pelo script (pergunta do quiz, versículo) não
+   precisam do anel: o leitor de tela anuncia e quem enxerga já vê a mudança */
+[tabindex="-1"]:focus {
+    outline: none;
+}
+
+/* Atalho do teclado: aparece só quando recebe foco (primeiro Tab da página) */
+.pular {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1200;
+    padding: 12px 20px;
+    border-radius: var(--raio-capsula);
+    background-color: var(--principal);
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: var(--sombra-2);
+    translate: 0 -150%;
+    transition: translate 0.3s var(--ease-ios);
+}
+
+.pular:focus-visible {
+    --foco: var(--principal);
+    translate: none;
 }
 
 /* Reveal: o script.js adiciona .visible quando o elemento entra na tela.
@@ -173,7 +231,7 @@ summary:focus-visible,
    hover de cada card, e usa translate (e não transform) pelo mesmo motivo.
    Regra de ouro: só "folhas" levam .reveal. Um .reveal dentro de outro soma
    os movimentos e multiplica a opacidade, e o efeito fica arrastado. */
-.reveal {
+.js .reveal:not(.visible) {
     opacity: 0;
 }
 
@@ -211,10 +269,15 @@ summary:focus-visible,
     }
 }
 
-/* Sem JavaScript o IntersectionObserver não roda: mostra tudo em vez de deixar invisível */
+/* Sem JavaScript: o .reveal já aparece (a classe .js não existe) e some o que
+   depende de script para funcionar */
 @media (scripting: none) {
-    .reveal {
-        opacity: 1;
+    .mobile-menu,
+    .proximo-culto,
+    #versiculo,
+    #btn-distancia,
+    #copiar-endereco {
+        display: none;
     }
 }
 
@@ -231,7 +294,8 @@ summary:focus-visible,
     .versiculo-botao, .versiculo-acoes a, .versiculo-acoes button,
     .eventos-grid .botao a, .evento-acoes button,
     .planeje-acoes a, .planeje-acoes button, .quiz-acoes a, .quiz-acoes button,
-    .convite-acoes a, .barra-visita a) {
+    .convite-acoes a, .barra-visita a, .erro-acoes a,
+    .botao-principal, .botao-secundario, .botao-vidro) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -257,7 +321,8 @@ summary:focus-visible,
     .versiculo-botao, .versiculo-acoes a, .versiculo-acoes button,
     .eventos-grid .botao a, .evento-acoes button,
     .planeje-acoes a, .planeje-acoes button, .quiz-acoes a, .quiz-acoes button,
-    .convite-acoes a, .barra-visita a) i {
+    .convite-acoes a, .barra-visita a, .erro-acoes a,
+    .botao-principal, .botao-secundario, .botao-vidro) i {
     margin: 0;
 }
 
@@ -266,7 +331,8 @@ summary:focus-visible,
     .versiculo-botao, .versiculo-acoes a, .versiculo-acoes button,
     .eventos-grid .botao a, .evento-acoes button,
     .planeje-acoes a, .planeje-acoes button, .quiz-acoes a, .quiz-acoes button,
-    .convite-acoes a, .barra-visita a):active {
+    .convite-acoes a, .barra-visita a, .erro-acoes a,
+    .botao-principal, .botao-secundario, .botao-vidro):active {
     transform: scale(0.95);
     transition-duration: 0.12s;
 }
@@ -279,7 +345,8 @@ summary:focus-visible,
 /* Principal: vermelho preenchido */
 :is(.btn-sou-novo, header p a, .cta a:not(.botao-email), .pag-galeria-cta a,
     .localizacao-container > a, .versiculo-botao, .eventos-grid .botao a,
-    .planeje-acoes button, .quiz-acoes a, .convite-acoes a:first-child, .barra-visita a) {
+    .planeje-acoes button, .quiz-acoes a, .convite-acoes a:first-child, .barra-visita a, .erro-acoes a:first-child,
+    .botao-principal) {
     color: white;
     background-color: var(--principal-brighter);
     background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
@@ -288,7 +355,8 @@ summary:focus-visible,
 
 :is(.btn-sou-novo, header p a, .cta a:not(.botao-email), .pag-galeria-cta a,
     .localizacao-container > a, .versiculo-botao, .eventos-grid .botao a,
-    .planeje-acoes button, .quiz-acoes a, .convite-acoes a:first-child, .barra-visita a):hover {
+    .planeje-acoes button, .quiz-acoes a, .convite-acoes a:first-child, .barra-visita a, .erro-acoes a:first-child,
+    .botao-principal):hover {
     background-color: #cc2f35;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 10px 26px rgba(191, 38, 43, 0.42);
 }
@@ -296,19 +364,19 @@ summary:focus-visible,
 /* Secundário: vermelho clarinho, texto vermelho */
 :is(.cta .botao-email, .localizacao-acoes a, .localizacao-acoes button,
     .versiculo-acoes a, .versiculo-acoes button, .evento-acoes button,
-    .planeje-acoes a, .quiz-acoes button, .convite-acoes a + a) {
-    color: var(--principal-brighter);
+    .planeje-acoes a, .quiz-acoes button, .convite-acoes a + a, .erro-acoes a + a, .botao-secundario) {
+    color: var(--principal);
     background-color: rgba(191, 38, 43, 0.1);
 }
 
 :is(.cta .botao-email, .localizacao-acoes a, .localizacao-acoes button,
     .versiculo-acoes a, .versiculo-acoes button, .evento-acoes button,
-    .planeje-acoes a, .quiz-acoes button, .convite-acoes a + a):hover {
+    .planeje-acoes a, .quiz-acoes button, .convite-acoes a + a, .erro-acoes a + a, .botao-secundario):hover {
     background-color: rgba(191, 38, 43, 0.16);
 }
 
 /* Vidro: sobre foto ou fundo escuro */
-:is(.btn-ver-cultos, .btn-galeria) {
+:is(.btn-ver-cultos, .btn-galeria, .botao-vidro) {
     color: white;
     background-color: rgba(255, 255, 255, 0.14);
     border: 1px solid rgba(255, 255, 255, 0.24);
@@ -317,7 +385,7 @@ summary:focus-visible,
     backdrop-filter: blur(20px) saturate(160%);
 }
 
-:is(.btn-ver-cultos, .btn-galeria):hover {
+:is(.btn-ver-cultos, .btn-galeria, .botao-vidro):hover {
     background-color: rgba(255, 255, 255, 0.24);
 }
 
@@ -337,7 +405,8 @@ summary:focus-visible,
 .eventos-vazio,
 .linha-tempo li > div,
 .quem-somos .textos ul li,
-.cta .textos ul li {
+.cta .textos ul li,
+.cartao-vidro {
     background-color: rgba(255, 255, 255, 0.68);
     background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.15));
     border: 1px solid var(--vidro-borda);
@@ -709,6 +778,12 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
         linear-gradient(90deg, rgba(10, 0, 0, 0.55), transparent 75%);
 }
 
+@media (max-width: 700px) and (orientation: portrait) {
+    .hero::before {
+        background-image: url(../images/iejb-principal-retrato.webp);
+    }
+}
+
 @keyframes heroZoom {
     from {
         scale: 1.12;
@@ -721,6 +796,23 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 
 .hero .textos {
     max-width: 680px;
+}
+
+/* Entrada do texto do hero: só desliza (sem opacity 0 nem blur), assim o
+   título já conta como pintado para o LCP desde o primeiro quadro */
+.hero .textos,
+.hero .buttons {
+    animation: heroSobe 1s var(--ease-out) both;
+}
+
+.hero .buttons {
+    animation-delay: 0.12s;
+}
+
+@keyframes heroSobe {
+    from {
+        translate: 0 28px;
+    }
 }
 
 .hero h2 {
@@ -741,7 +833,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     -webkit-text-fill-color: transparent;
 }
 
-.hero h3 {
+.hero .hero-sub {
     max-width: 540px;
     margin-top: 18px;
     font-size: clamp(17px, 1.6vw, 21px);
@@ -782,6 +874,14 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     font-weight: 500;
 }
 
+.proximo-culto.aguardando {
+    visibility: hidden;
+}
+
+.proximo-culto {
+    position: relative;
+}
+
 .proximo-culto::before {
     content: '';
     flex-shrink: 0;
@@ -789,13 +889,33 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     height: 8px;
     border-radius: 50%;
     background-color: #34c759;
-    animation: pulsa 1.8s infinite;
+}
+
+/* A onda verde é um círculo à parte que cresce e some: scale e opacity rodam
+   na GPU, enquanto animar box-shadow repintaria o chip a cada quadro */
+.proximo-culto::after {
+    content: '';
+    position: absolute;
+    left: 13px;
+    top: calc(50% - 4px);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(52, 199, 89, 0.7);
+    animation: pulsa 1.8s ease-out infinite;
 }
 
 @keyframes pulsa {
-    0% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7); }
-    70% { box-shadow: 0 0 0 9px rgba(52, 199, 89, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+    from {
+        scale: 1;
+        opacity: 1;
+    }
+
+    70%,
+    to {
+        scale: 3.2;
+        opacity: 0;
+    }
 }
 
 /* ===== Versículo da marca ===== */
@@ -875,7 +995,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 /* Rótulo pequeno acima do título (estilo "eyebrow" da Apple) */
 :is(.versiculo, .historia, .programacao, .planeje, .galeria, .ministerios, .quiz,
     .depoimentos, .eventos, .domingo, .duvidas, .localizacao) > h2,
-.quem-somos .textos h3,
+.quem-somos .rotulo,
 .quiz-rotulo,
 .pagina-legal .label {
     margin-bottom: 10px;
@@ -900,6 +1020,16 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     color: var(--principal);
     text-align: center;
     text-wrap: balance;
+}
+
+.secao-intro {
+    max-width: 620px;
+    margin: calc(clamp(32px, 4vw, 52px) * -0.55) auto clamp(32px, 4vw, 48px);
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--texto-2);
+    text-align: center;
+    text-wrap: pretty;
 }
 
 :is(.galeria, .depoimentos, .domingo) > h2 {
@@ -936,7 +1066,12 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     padding: 14px 28px;
     font-size: 17px;
     white-space: normal;
-    animation: respira 2.6s ease-in-out infinite;
+}
+
+/* Respira 3 vezes quando o card aparece na tela e para: chama a atenção de
+   quem chegou ali sem ficar repintando o botão para sempre */
+.versiculo-card.visible .versiculo-botao {
+    animation: respira 2.6s ease-in-out 0.8s 3;
 }
 
 /* Um halo que "respira" em volta do botão (sem mexer no tamanho, para o toque continuar fluido) */
@@ -1043,7 +1178,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     padding: var(--espaco-secao) clamp(20px, 5vw, 72px);
 }
 
-.quem-somos .textos h3 {
+.quem-somos .rotulo {
     text-align: left;
 }
 
@@ -1056,7 +1191,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     text-wrap: balance;
 }
 
-.quem-somos .textos > p {
+.quem-somos .textos > p:not(.rotulo) {
     margin: 20px 0 32px;
     font-size: 18px;
     line-height: 1.65;
@@ -1078,7 +1213,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     border-radius: var(--raio-m);
 }
 
-.quem-somos .textos ul li h4,
+.quem-somos .textos ul li h3,
 .cta .textos ul li h4 {
     display: flex;
     align-items: center;
@@ -1089,7 +1224,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 }
 
 /* Ícone num "squircle" com degradê, como os ícones de app do iOS */
-.quem-somos .textos ul li h4 i,
+.quem-somos .textos ul li h3 i,
 .cta .textos ul li h4 i {
     flex-shrink: 0;
     width: 34px;
@@ -1135,7 +1270,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     text-align: center;
 }
 
-.historia-anos span {
+#historia-anos {
     margin-right: 6px;
     font-family: var(--fonte-titulo);
     font-size: clamp(56px, 7vw, 80px);
@@ -1348,14 +1483,15 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     color: white;
 }
 
-.programacao .cultos .cultos-grid h4 {
+.programacao .cultos .cultos-grid .culto-dia {
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--principal-brighter);
 }
 
-.programacao .cultos .cultos-grid h5 {
+.programacao .cultos .cultos-grid h4 {
     margin-top: 6px;
     font-family: var(--fonte-titulo);
     font-size: 30px;
@@ -1365,7 +1501,12 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     color: var(--texto);
 }
 
-.programacao .cultos .cultos-grid h6 {
+/* "EBD" tem o nome por extenso no title; sem o pontilhado padrão do navegador */
+abbr[title] {
+    text-decoration: none;
+}
+
+.programacao .cultos .cultos-grid .culto-hora {
     display: inline-flex;
     align-items: center;
     margin-top: 12px;
@@ -1378,15 +1519,11 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     font-variant-numeric: tabular-nums;
 }
 
-.programacao .cultos .cultos-grid h6 i {
+.programacao .cultos .cultos-grid .culto-hora i {
     margin-right: 6px;
 }
 
-.programacao .cultos .cultos-grid hr {
-    display: none;
-}
-
-.programacao .cultos .cultos-grid p {
+.programacao .cultos .cultos-grid p:last-child {
     margin-top: 16px;
     font-size: 15px;
     line-height: 1.55;
@@ -1619,6 +1756,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 
 .quiz-respostas button::after {
     content: '›';
+    content: '›' / '';
     flex-shrink: 0;
     font-size: 24px;
     line-height: 1;
@@ -1844,6 +1982,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 
 .depoimentos .depoimentos-container .depoimentos-grid::before {
     content: '“';
+    content: '“' / '';
     position: absolute;
     top: 10px;
     left: 22px;
@@ -1856,7 +1995,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 
 /* O texto inteiro fica invisível por baixo (reserva o espaço e é o que o leitor
    de tela lê) e a digitação acontece por cima, na mesma célula do grid */
-.depoimentos .depoimentos-container .depoimentos-grid p {
+.depoimentos .depoimentos-container .depoimentos-grid p:not(.autor) {
     display: grid;
     font-size: 17px;
     line-height: 1.6;
@@ -1883,7 +2022,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     50% { opacity: 0; }
 }
 
-.depoimentos .depoimentos-container .depoimentos-grid h4 {
+.depoimentos .depoimentos-container .depoimentos-grid .autor {
     margin-top: 18px;
     font-size: 15px;
     font-weight: 600;
@@ -1930,12 +2069,13 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 .eventos .eventos-container .eventos-grid .data {
     position: relative;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 14px;
 }
 
 /* Dia num quadradinho igual ao ícone do Calendário do iPhone */
-.eventos .eventos-container .eventos-grid .data h4 {
+.eventos .eventos-container .eventos-grid .data-dia {
     flex-shrink: 0;
     width: 60px;
     height: 64px;
@@ -1957,14 +2097,15 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     flex-direction: column;
 }
 
-.eventos .eventos-container .eventos-grid .data .dia h5 {
+.eventos .eventos-container .eventos-grid .data-mes {
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.1em;
+    text-transform: uppercase;
     color: var(--principal-brighter);
 }
 
-.eventos .eventos-container .eventos-grid .data .dia h6 {
+.eventos .eventos-container .eventos-grid .data-semana {
     font-size: 15px;
     font-weight: 500;
     color: var(--texto-2);
@@ -1991,7 +2132,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     margin: 18px 0 16px;
 }
 
-.eventos .eventos-container .eventos-grid .textos h4 {
+.eventos .eventos-container .eventos-grid .evento-categoria {
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -1999,7 +2140,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     color: var(--principal-brighter);
 }
 
-.eventos .eventos-container .eventos-grid .textos h3 {
+.eventos .eventos-container .eventos-grid .textos h4 {
     margin: 4px 0 8px;
     font-family: var(--fonte-titulo);
     font-size: 28px;
@@ -2007,14 +2148,10 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     color: var(--texto);
 }
 
-.eventos .eventos-container .eventos-grid .textos p {
+.eventos .eventos-container .eventos-grid .textos p:not(.evento-categoria) {
     font-size: 16px;
     line-height: 1.55;
     color: var(--texto-2);
-}
-
-.eventos .eventos-container .eventos-grid .textos hr {
-    display: none;
 }
 
 .eventos .eventos-container .eventos-grid .horario-localizacao {
@@ -2035,10 +2172,6 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     flex-direction: column;
     gap: 4px;
     min-width: 0;
-}
-
-.eventos .eventos-container .eventos-grid .horario-localizacao address {
-    font-style: normal;
 }
 
 .eventos .eventos-container .eventos-grid .horario-localizacao .horario i {
@@ -2169,6 +2302,10 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     box-shadow: var(--brilho), var(--sombra-3);
 }
 
+.duvidas summary:focus-visible {
+    outline-offset: -3px;
+}
+
 .duvidas summary {
     list-style: none;
     display: flex;
@@ -2189,6 +2326,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 
 .duvidas summary::after {
     content: '+';
+    content: '+' / '';
     flex-shrink: 0;
     width: 28px;
     height: 28px;
@@ -2259,7 +2397,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     padding: 12px 0 0;
 }
 
-.localizacao .textos address {
+.localizacao .textos > div {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -2274,10 +2412,12 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--principal-brighter);
 }
 
-.localizacao .textos p {
+.localizacao .textos :is(p, address) {
+    font-style: normal;
     font-size: 15px;
     line-height: 1.55;
     color: var(--texto-2);
@@ -2297,7 +2437,7 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
 }
 
 .localizacao-acoes :is(a, button) {
-    min-height: 40px;
+    min-height: 44px;
     padding: 9px 18px;
     font-size: 15px;
 }
@@ -2363,6 +2503,18 @@ footer .footer-social .logo .logo-texto {
     color: white;
 }
 
+footer .footer-endereco,
+footer .footer-cultos {
+    font-size: 14px;
+    font-style: normal;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+footer .footer-cultos {
+    margin-top: -12px;
+}
+
 footer .footer-social .media-icons {
     display: flex;
     gap: 10px;
@@ -2419,7 +2571,7 @@ footer .footer-copyright {
     margin: 48px auto 0;
     padding-top: 22px;
     border-top: 1px solid rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.66);
     font-size: 13px;
     text-align: center;
 }
@@ -2429,11 +2581,23 @@ footer .footer-copyright {
         grid-template-columns: repeat(3, 1fr);
     }
 
+    /* Logo e redes nas pontas, endereço e horários no meio */
     footer .footer-social {
         grid-column: 1 / -1;
-        flex-direction: row;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
         align-items: center;
-        justify-content: space-between;
+        gap: 4px 28px;
+    }
+
+    footer .footer-social .logo,
+    footer .footer-social .media-icons {
+        grid-row: span 2;
+    }
+
+    footer .footer-cultos {
+        grid-column: 2;
+        margin-top: 0;
     }
 }
 
@@ -2444,10 +2608,1131 @@ footer .footer-copyright {
     }
 
     footer .footer-social {
+        display: flex;
         flex-direction: column;
         align-items: flex-start;
+        gap: 20px;
+    }
+
+    footer .footer-cultos {
+        margin-top: -12px;
     }
 }
+
+/* ===== Convite recebido e visita marcada (card no hero) =====
+   Vidro escuro sobre a foto, como o chip do próximo culto. O visita.js põe o card
+   logo depois do chip e troca o conteúdo conforme o convite ou o plano de visita. */
+
+/* O card ocupa o lugar do chip do próximo culto (ele já diz o culto e a hora), para os
+   botões do hero continuarem na primeira tela. O chip só some da vista: a barra do
+   celular e o aviso gentil continuam lendo o texto dele. */
+.hero .textos:has(.hero-visita) .proximo-culto {
+    display: none;
+}
+
+.hero-visita {
+    position: relative;
+    max-width: 640px;
+    margin-top: 22px;
+    padding: 16px 18px 18px;
+    border-radius: 24px;
+    background-color: rgba(255, 255, 255, 0.13);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: var(--brilho-escuro), 0 16px 40px rgba(0, 0, 0, 0.25);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    overflow-wrap: anywhere;
+    animation: aparece 0.7s var(--mola) both;
+}
+
+/* Na abertura da página, entra depois do texto do hero */
+.hero-visita.entrada {
+    animation-delay: 0.35s;
+}
+
+/* Contagem regressiva: cápsula com o ponto verde do próximo culto, no fim do texto */
+.hero-visita-selo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 2px;
+    padding: 1px 10px 1px 8px;
+    border-radius: var(--raio-capsula);
+    background-color: rgba(52, 199, 89, 0.24);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    vertical-align: 1px;
+}
+
+.hero-visita-selo::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #34c759;
+}
+
+.hero-visita-titulo {
+    font-family: var(--fonte-titulo);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-wrap: balance;
+}
+
+/* O X fica no canto: o título não passa por baixo dele */
+.hero-visita.com-fechar .hero-visita-titulo {
+    padding-right: 34px;
+}
+
+.hero-visita-texto {
+    margin-top: 4px;
+    font-size: 15px;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.84);
+    text-wrap: pretty;
+}
+
+.hero-visita-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.hero-visita-acoes :is(a, button) {
+    padding: 10px 15px;
+    font-size: 15px;
+}
+
+/* Alvo de toque de 44px com um círculo menor desenhado dentro */
+.hero-visita-fechar {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    color: white;
+    cursor: pointer;
+}
+
+.hero-visita-fechar i {
+    width: 30px;
+    height: 30px;
+    margin: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.14);
+    font-size: 14px;
+    transition: background-color 0.2s ease, transform 0.5s var(--mola);
+}
+
+.hero-visita-fechar:hover i {
+    background-color: rgba(255, 255, 255, 0.26);
+}
+
+.hero-visita-fechar:active i {
+    transform: scale(0.88);
+    transition-duration: 0.12s;
+}
+
+/* "Eu vou!" confirmado: o check entra com a mola */
+.botao-eu-vou[data-confirmado="true"] i {
+    animation: aparece 0.5s var(--mola) both;
+}
+
+/* Tela baixa de notebook: o título encolhe um pouco para o card caber */
+@media (min-width: 701px) and (max-height: 780px) {
+    .hero:has(.hero-visita) h2 {
+        font-size: clamp(42px, 5vw, 64px);
+    }
+}
+
+@media (max-width: 700px) {
+    .hero-visita {
+        margin-top: 18px;
+        padding: 14px 14px 14px 16px;
+        border-radius: 22px;
+    }
+
+    .hero-visita-titulo {
+        font-size: 19px;
+    }
+
+    .hero-visita-texto {
+        font-size: 14px;
+    }
+
+    .hero-visita-acoes {
+        margin-top: 12px;
+    }
+
+    /* Cada linha de botões ocupa a largura toda, como as ações de um alerta do iOS */
+    .hero-visita-acoes :is(a, button) {
+        flex: 1 1 auto;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+}
+
+/* Celular estreito: "Seguir no Instagram" vira "Instagram" e "Marcar outra visita" vira
+   "Marcar visita" (só na tela: o trecho continua no nome lido pelo leitor de tela) */
+@media (max-width: 380px) {
+    .hero-visita-opcional {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+}
+
+/* Sem os ícones, dois botões cabem lado a lado */
+@media (max-width: 360px) {
+    .hero-visita-acoes i {
+        display: none;
+    }
+}
+
+/* Celular baixinho: o subtítulo sai e o título encolhe um pouco para o card caber */
+@media (max-width: 700px) and (max-height: 760px) {
+    .hero .textos:has(.hero-visita) .hero-sub {
+        display: none;
+    }
+
+    .hero:has(.hero-visita) h2 {
+        font-size: 36px;
+    }
+}
+
+/* ===== Convide alguém ===== */
+
+.convidar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--espaco-secao) 20px;
+    background: var(--aurora), var(--fundo-rosado);
+}
+
+/* Mesmo rótulo e título das outras seções */
+.convidar > h2 {
+    margin-bottom: 10px;
+    font-family: var(--fonte-texto);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--principal-brighter);
+    text-align: center;
+}
+
+.convidar > h3 {
+    max-width: 900px;
+    margin-bottom: clamp(32px, 4vw, 52px);
+    font-family: var(--fonte-titulo);
+    font-size: clamp(32px, 4.6vw, 52px);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--principal);
+    text-align: center;
+    text-wrap: balance;
+}
+
+.convidar-card {
+    width: 100%;
+    max-width: min(760px, 100%);
+    min-width: 0;
+    display: grid;
+    gap: 26px;
+    padding: clamp(22px, 3.5vw, 36px);
+    border-radius: 32px;
+}
+
+.convidar-campo label,
+.convidar-passo legend {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--texto);
+}
+
+.convidar-campo label span {
+    font-weight: 400;
+    color: var(--texto-2);
+}
+
+/* Campo no estilo dos campos do iOS. 17px: abaixo de 16px o iPhone dá zoom ao focar */
+.convidar-campo input {
+    width: 100%;
+    max-width: 360px;
+    min-height: 48px;
+    padding: 12px 16px;
+    border: 1px solid rgba(143, 13, 11, 0.16);
+    border-radius: var(--raio-s);
+    background-color: rgba(255, 255, 255, 0.85);
+    box-shadow: inset 0 1px 2px rgba(58, 10, 9, 0.06);
+    font: inherit;
+    font-size: 17px;
+    color: var(--texto);
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.convidar-campo input:hover {
+    border-color: rgba(143, 13, 11, 0.32);
+}
+
+.convidar-campo input:focus {
+    background-color: white;
+}
+
+.convidar-campo input:focus-visible {
+    outline: 3px solid var(--foco);
+    outline-offset: 2px;
+}
+
+.convidar-ajuda {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--texto-2);
+}
+
+.convidar-passo {
+    min-width: 0;
+    border: none;
+}
+
+.convidar-previa figcaption {
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--texto-2);
+}
+
+/* Prévia como um balão de mensagem */
+.convidar-balao {
+    max-width: 480px;
+    padding: 12px 16px 14px;
+    border-radius: 22px 22px 22px 8px;
+    background-color: white;
+    border: 1px solid rgba(143, 13, 11, 0.08);
+    box-shadow: var(--sombra-1);
+    font-size: 16px;
+    line-height: 1.45;
+    color: var(--texto);
+    overflow-wrap: anywhere;
+}
+
+.convidar-link {
+    display: block;
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--principal-brighter);
+    text-decoration: underline;
+    text-decoration-color: rgba(191, 38, 43, 0.35);
+    text-underline-offset: 2px;
+}
+
+.convidar-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.convidar-acoes :is(a, button) {
+    white-space: normal;
+}
+
+.convidar-acoes [aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: progress;
+}
+
+@media (max-width: 560px) {
+    .convidar-acoes :is(a, button) {
+        flex: 1 1 auto;
+        padding: 12px 16px;
+        font-size: 15px;
+    }
+}
+
+
+/* ===== "Veja como é um culto": os passos do domingo no formato Stories =====
+   No celular ocupa a tela toda; no computador vira um cartão 9:16 no centro, com
+   as setas ao lado. visita.js monta tudo e troca as classes .pausado, .segurando,
+   .arrastando e .fechando no <dialog>. */
+
+/* Botão no fim da seção #domingo (nasce hidden; o JS mostra) */
+.domingo-stories {
+    margin-top: clamp(32px, 4vw, 44px);
+    padding: 8px 22px 8px 8px;
+}
+
+/* O play num círculo vermelho, como o anel de quem tem Stories novos */
+.domingo-stories i {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    /* o triângulo do play parece torto se ficar no centro exato */
+    padding-left: 2px;
+    border-radius: 50%;
+    background-image: linear-gradient(145deg, #d13a40, var(--principal));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 4px 10px rgba(0, 0, 0, 0.2);
+    font-size: 12px;
+}
+
+html.stories-aberto {
+    overflow: hidden;
+}
+
+.stories {
+    --stories-duracao: 6s;
+    --foco: #fff;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    background: transparent;
+    color: white;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* Só com [open]: sem isso o display venceria o display: none do <dialog> fechado */
+.stories[open] {
+    display: grid;
+    place-items: center;
+}
+
+/* Valores fixos: em navegadores antigos o ::backdrop não herda as variáveis do :root */
+.stories::backdrop {
+    background-color: rgba(12, 2, 2, 0.78);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    backdrop-filter: blur(24px) saturate(140%);
+    animation: storiesFundo 0.3s ease backwards;
+}
+
+.stories.fechando::backdrop {
+    animation: storiesFundoSai 0.24s ease-in forwards;
+}
+
+.stories-palco {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--aurora-escura), var(--principal-escuro);
+    /* Os gestos (tocar, segurar, arrastar) ficam com o script: sem zoom de dois
+       toques nem "puxar para atualizar" */
+    touch-action: none;
+    translate: 0 var(--arrasto, 0px);
+    transition: translate 0.5s var(--mola);
+    animation: storiesAbre 0.5s var(--mola) backwards;
+}
+
+.stories.arrastando .stories-palco {
+    transition: none;
+}
+
+.stories.fechando .stories-palco {
+    animation: storiesFecha 0.24s var(--ease-ios) forwards;
+}
+
+/* Saiu puxando para baixo: continua descendo */
+.stories.fechando.arrastado .stories-palco {
+    animation-name: storiesDesce;
+}
+
+.stories-palco:focus {
+    outline: none;
+}
+
+/* Barras de progresso: uma por passo. O preenchimento é um scaleX (roda na GPU) */
+.stories-barras {
+    position: absolute;
+    top: max(10px, env(safe-area-inset-top));
+    left: 10px;
+    right: 10px;
+    z-index: 4;
+    display: flex;
+    gap: 4px;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.stories-barra {
+    flex: 1;
+    height: 3px;
+    overflow: hidden;
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.35);
+}
+
+.stories-barra span {
+    display: block;
+    height: 100%;
+    background-color: white;
+    transform: scaleX(0);
+    transform-origin: left center;
+}
+
+.stories-barra.vista span {
+    transform: none;
+}
+
+.stories-barra.atual span {
+    animation: storiesProgresso var(--stories-duracao) linear forwards;
+}
+
+.stories.pausado .stories-barra.atual span,
+.stories.pausado .stories-foto img {
+    animation-play-state: paused;
+}
+
+/* Topo: perfil da igreja, pausar e fechar */
+.stories-topo {
+    position: absolute;
+    top: calc(max(10px, env(safe-area-inset-top)) + 10px);
+    left: 12px;
+    right: 6px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    /* O vão entre o nome e os botões continua sendo área de toque do passo */
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.stories-autor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    margin-right: auto;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+
+.stories-autor img {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9);
+}
+
+.stories-autor > span {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.2;
+}
+
+.stories-autor-nome {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.stories-autor-tema {
+    overflow: hidden;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.stories-botao {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: none;
+    border-radius: 50%;
+    background-color: transparent;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    pointer-events: auto;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35));
+    transition: background-color 0.2s ease, transform 0.5s var(--mola);
+}
+
+.stories-botao:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+}
+
+.stories-botao:active {
+    transform: scale(0.9);
+    transition-duration: 0.12s;
+}
+
+.stories-botao i {
+    margin: 0;
+}
+
+/* Cartões. O container não forma camada própria (sem z-index), então a legenda
+   (z-index 3) fica acima das áreas de toque (2) e a foto (0) abaixo delas */
+.stories-slides {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+}
+
+.stories-slide {
+    position: absolute;
+    inset: 0;
+}
+
+.stories-foto {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    animation: storiesSurge 0.45s ease backwards;
+}
+
+/* Zoom lento (Ken Burns), que congela junto com a barra quando pausa */
+.stories-foto img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transform-origin: 50% 35%;
+    pointer-events: none;
+    animation: storiesZoom calc(var(--stories-duracao) + 3s) linear both;
+}
+
+/* Escurece em cima (barras e botões) e embaixo (texto) */
+.stories-foto::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0) 42%, rgba(20, 2, 2, 0.62) 66%, rgba(20, 2, 2, 0.92) 100%);
+}
+
+.stories-legenda {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    padding: 24px 24px calc(36px + env(safe-area-inset-bottom));
+    /* Toques no texto passam para as áreas de anterior/próximo que estão por baixo */
+    pointer-events: none;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+    transition: opacity 0.25s ease;
+    animation: storiesTexto 0.6s var(--ease-out) 0.1s backwards;
+}
+
+.stories-icone {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 16px;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: var(--brilho-escuro);
+    font-size: 20px;
+}
+
+.stories-icone i {
+    margin: 0;
+}
+
+.stories-legenda h2 {
+    margin-bottom: 10px;
+    font-family: var(--fonte-titulo);
+    font-size: clamp(30px, 8.6vw, 38px);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+}
+
+.stories-passo p {
+    max-width: 34ch;
+    font-size: clamp(16px, 4.4vw, 18px);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.88);
+    text-wrap: pretty;
+}
+
+/* Último cartão: convite para o próximo culto, sobre a foto desfocada da igreja */
+.stories-fundo-convite {
+    background: url(../images/cantata22-wide-desfocada.webp) center / cover no-repeat;
+}
+
+.stories-fundo-convite::after {
+    background: linear-gradient(180deg, rgba(20, 2, 2, 0.6), rgba(40, 3, 2, 0.9));
+}
+
+.stories-convite {
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 88px;
+    text-align: center;
+}
+
+.stories-logo {
+    width: auto;
+    height: 84px;
+    margin-bottom: 18px;
+    filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.3));
+}
+
+.stories-convite h2 {
+    font-size: clamp(38px, 11vw, 46px);
+}
+
+/* O relógio vai junto com o texto (não numa coluna à parte), para as duas linhas
+   ficarem centradas quando o texto quebra */
+.stories-quando {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 8px 16px;
+    border-radius: var(--raio-m);
+    background-color: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: var(--brilho-escuro);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.35;
+    text-shadow: none;
+    text-wrap: balance;
+}
+
+.stories-quando i {
+    margin-right: 6px;
+}
+
+.stories-acoes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 300px;
+    margin-top: 28px;
+    pointer-events: auto;
+    text-shadow: none;
+}
+
+.stories-acoes a {
+    min-height: 50px;
+    font-size: 17px;
+}
+
+/* Áreas de toque: metade esquerda volta, metade direita avança */
+.stories-toque {
+    position: absolute;
+    /* Começa abaixo da barra do topo: as zonas não ficam por baixo dos botões
+       Pausar/Fechar (alvos sobrepostos confundem quem toca com o dedo grosso) */
+    top: calc(max(10px, env(safe-area-inset-top)) + 64px);
+    bottom: 0;
+    z-index: 2;
+    width: 50%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.stories-anterior {
+    left: 0;
+}
+
+.stories-proximo {
+    right: 0;
+}
+
+/* A seta de cada área. No celular só aparece com o foco do teclado (o anel fica
+   nela, e não num retângulo de meia tela passando por cima do texto) */
+.stories-toque i {
+    position: absolute;
+    top: calc(50% - 22px);
+    width: 44px;
+    height: 44px;
+    display: none;
+    place-items: center;
+    margin: 0;
+    border-radius: 50%;
+    background-color: rgba(20, 2, 2, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: var(--brilho-escuro);
+    color: white;
+    font-size: 16px;
+    transition: background-color 0.2s ease, opacity 0.25s ease, transform 0.5s var(--mola);
+}
+
+.stories-anterior i {
+    left: 12px;
+}
+
+.stories-proximo i {
+    right: 12px;
+}
+
+.stories-toque:focus-visible {
+    outline: none;
+}
+
+.stories-toque:focus-visible i {
+    display: grid;
+    outline: 3px solid var(--foco);
+    outline-offset: 3px;
+}
+
+/* Segurando o dedo: some tudo para ver só a foto */
+.stories.segurando :is(.stories-barras, .stories-topo, .stories-legenda, .stories-toque i) {
+    opacity: 0;
+}
+
+/* Telas baixas (celular deitado): menos espaço em volta do convite */
+@media (max-height: 560px) {
+    .stories-logo {
+        display: none;
+    }
+
+    .stories-convite {
+        padding-top: 64px;
+    }
+
+    .stories-acoes {
+        margin-top: 18px;
+    }
+}
+
+/* Computador: cartão 9:16 no centro, com as setas do lado de fora */
+@media (min-width: 700px) and (min-height: 600px) {
+    .stories-palco {
+        width: auto;
+        height: min(88vh, 900px);
+        height: min(88dvh, 900px);
+        aspect-ratio: 9 / 16;
+        border-radius: var(--raio-l);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+    }
+
+    .stories-barras {
+        top: 12px;
+        left: 12px;
+        right: 12px;
+    }
+
+    .stories-topo {
+        top: 22px;
+    }
+
+    .stories-legenda h2 {
+        font-size: 34px;
+    }
+
+    .stories-convite h2 {
+        font-size: 42px;
+    }
+
+    .stories-passo p {
+        font-size: 17px;
+    }
+
+    .stories-toque i {
+        display: grid;
+        background-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .stories-anterior i {
+        left: -72px;
+    }
+
+    .stories-proximo i {
+        right: -72px;
+    }
+
+    .stories-toque:hover i,
+    .stories-toque:focus-visible i {
+        background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .stories-toque:active i {
+        transform: scale(0.9);
+        transition-duration: 0.12s;
+    }
+
+    /* No primeiro passo não há para onde voltar (a área ainda recomeça o passo);
+       com o foco do teclado ela aparece, porque é onde o anel está */
+    .stories.no-inicio .stories-anterior:not(:focus-visible) i {
+        opacity: 0;
+    }
+}
+
+@keyframes storiesProgresso {
+    from {
+        transform: scaleX(0);
+    }
+
+    to {
+        transform: scaleX(1);
+    }
+}
+
+@keyframes storiesZoom {
+    from {
+        scale: 1;
+    }
+
+    to {
+        scale: 1.12;
+    }
+}
+
+@keyframes storiesFundo {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes storiesFundoSai {
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes storiesAbre {
+    from {
+        opacity: 0;
+        scale: 0.92;
+    }
+}
+
+@keyframes storiesFecha {
+    to {
+        opacity: 0;
+        scale: 0.94;
+    }
+}
+
+@keyframes storiesDesce {
+    to {
+        opacity: 0;
+        translate: 0 60%;
+    }
+}
+
+@keyframes storiesSurge {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes storiesTexto {
+    from {
+        opacity: 0;
+        translate: 0 18px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stories-foto img {
+        animation: none;
+    }
+
+    /* A barra não é enfeite: mostra quanto falta para o passo trocar (só anda se a
+       pessoa apertar "Continuar"). Sem isto, a regra global de movimento reduzido
+       encurtaria a animação para 0,01ms e os passos pulariam na hora */
+    .stories .stories-barra.atual span {
+        animation-duration: var(--stories-duracao) !important;
+    }
+}
+
+@media (forced-colors: active) {
+    .stories-barras {
+        forced-color-adjust: none;
+    }
+}
+
+
+/* "É aqui": foto da fachada. No celular fica entre o mapa e os cartões de endereço
+   e horários; no computador, lado a lado com eles (os cartões empilham à direita) */
+.localizacao .localizacao-chegada {
+    display: grid;
+    gap: 12px;
+    padding-top: 12px;
+}
+
+.localizacao .localizacao-chegada .textos {
+    padding: 0;
+}
+
+.fachada img {
+    display: block;
+    width: 100%;
+    /* Mesmo arredondado do mapa logo acima */
+    border-radius: 26px;
+    background-color: var(--secondary);
+}
+
+.fachada figcaption {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 12px 10px 4px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--texto-2);
+    text-wrap: pretty;
+}
+
+.fachada figcaption i {
+    flex-shrink: 0;
+    margin: 0;
+    color: var(--principal-brighter);
+}
+
+.fachada figcaption strong {
+    font-style: normal;
+    font-weight: 700;
+    color: var(--principal);
+}
+
+@media (min-width: 720px) {
+    .localizacao .localizacao-chegada {
+        grid-template-columns: 1.15fr 1fr;
+    }
+
+    /* Os dois cartões dividem a altura da foto e centralizam o texto */
+    .localizacao .localizacao-chegada .textos {
+        grid-template-columns: 1fr;
+        grid-auto-rows: 1fr;
+    }
+
+    .localizacao .localizacao-chegada .textos > div {
+        justify-content: center;
+    }
+}
+
+/* Agenda semanal: botão logo abaixo dos cards dos cultos */
+.programacao .agenda-semanal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    max-width: 100%;
+    margin-top: clamp(28px, 4vw, 40px);
+    text-align: center;
+}
+
+/* Em telas de 320px o texto não cabe numa linha só: deixa quebrar */
+.agenda-semanal .botao-secundario {
+    max-width: 100%;
+    white-space: normal;
+    text-wrap: balance;
+}
+
+/* Quando quebra em duas linhas, o ícone acompanha o texto centralizado em vez de ficar sozinho no canto */
+@media (max-width: 380px) {
+    .agenda-semanal .botao-secundario {
+        display: block;
+        text-align: center;
+    }
+
+    .agenda-semanal .botao-secundario i {
+        margin-right: 0.5em;
+    }
+}
+
+.agenda-semanal p {
+    max-width: 420px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--texto-2);
+    text-wrap: balance;
+}
+
+/* Evento aberto por link direto (#evento-...): anel vermelho suave por alguns
+   segundos, como o destaque dos ministérios. Só box-shadow, que o card já anima */
+.eventos .eventos-container .eventos-grid.evento-destaque {
+    box-shadow: 0 0 0 4px rgba(191, 38, 43, 0.6), var(--brilho), var(--sombra-3);
+}
+
+/* No alto contraste as sombras somem: o destaque vira contorno */
+@media (forced-colors: active) {
+    .eventos .eventos-container .eventos-grid.evento-destaque {
+        outline: 4px solid Highlight;
+        outline-offset: 2px;
+    }
+}
+
+/* Página /avaliar (atalho do QR code): só aparece se o redirecionamento demorar */
+.avaliar {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 48px 24px;
+    background: var(--aurora), var(--fundo-rosado);
+    text-align: center;
+}
+
+.avaliar img {
+    width: 30px;
+    filter: var(--logo-vermelho);
+}
+
+.avaliar h1 {
+    max-width: 560px;
+    font-family: var(--fonte-titulo);
+    font-size: clamp(28px, 6vw, 40px);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: var(--principal);
+    text-wrap: balance;
+}
+
+.avaliar p {
+    max-width: 420px;
+    font-size: 17px;
+    color: var(--texto-2);
+}
+
+.avaliar .botao-principal {
+    max-width: 100%;
+    white-space: normal;
+}
+
 
 /* ===== Elementos flutuantes ===== */
 
@@ -2624,9 +3909,14 @@ footer .footer-copyright {
     body.barra-ativa .botao-topo {
         bottom: 144px;
     }
+
+    /* O fim do rodapé não pode ficar escondido atrás da barra */
+    body:has(.barra-visita) footer {
+        padding-bottom: calc(28px + 76px);
+    }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
     .botao-topo {
         right: 20px;
         bottom: 80px;
@@ -2715,6 +4005,12 @@ footer .footer-copyright {
 
 .lightbox-alvo {
     cursor: zoom-in;
+}
+
+/* As fotos ficam dentro de caixas com overflow: hidden, que cortariam o anel
+   de foco por fora: desenha por dentro */
+.lightbox-alvo:focus-visible {
+    outline-offset: -4px;
 }
 
 .lightbox {
@@ -2814,7 +4110,7 @@ footer .footer-copyright {
     top: calc(50% - 23px);
 }
 
-body.lightbox-aberto {
+html.lightbox-aberto {
     overflow: hidden;
 }
 
@@ -2847,9 +4143,7 @@ body.lightbox-aberto {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(rgba(20, 2, 2, 0.6), rgba(40, 3, 2, 0.85)), url(../images/cantata22-wide.webp) center / cover no-repeat;
-    filter: blur(3px);
-    scale: 1.1;
+    background: linear-gradient(rgba(20, 2, 2, 0.6), rgba(40, 3, 2, 0.85)), url(../images/cantata22-wide-desfocada.webp) center / cover no-repeat;
     animation: heroZoom 2.4s var(--ease-out) both;
 }
 
@@ -3021,18 +4315,50 @@ body.lightbox-aberto {
     color: var(--principal);
 }
 
+.pagina-legal .breadcrumb ol {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+}
+
+.pagina-legal .breadcrumb li + li::before {
+    content: '›';
+    content: '›' / '';
+    margin-right: 8px;
+    opacity: 0.5;
+}
+
 .pagina-legal .breadcrumb a {
     color: inherit;
     font-weight: 600;
     text-decoration: none;
 }
 
-.pagina-legal .breadcrumb span {
-    opacity: 0.5;
-}
-
 .pagina-legal .label {
     text-align: left;
+}
+
+/* Página 404 (usa o mesmo miolo das páginas legais) */
+.erro-404 {
+    min-height: 70vh;
+}
+
+.erro-404 > p:not(.label) {
+    margin-top: 16px;
+    font-size: 18px;
+    color: var(--texto-2);
+}
+
+.erro-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+}
+
+.pagina-legal .erro-acoes a {
+    text-decoration: none;
 }
 
 .pagina-legal h1 {
@@ -3159,6 +4485,40 @@ body.lightbox-aberto {
     to {
         transform: translateX(0);
         opacity: 1;
+    }
+}
+
+/* ===== Alto contraste e impressão ===== */
+
+@media (forced-colors: active) {
+    .depoimentos-grid .digitando {
+        display: none;
+    }
+
+    .depoimentos-grid .texto-molde {
+        color: CanvasText;
+    }
+}
+
+@media print {
+    .reveal {
+        opacity: 1 !important;
+        animation: none !important;
+    }
+
+    header,
+    .pular,
+    .barra-progresso,
+    .botao-topo,
+    .botao-instagram,
+    .barra-visita,
+    .convite,
+    .toast {
+        display: none !important;
+    }
+
+    .hero {
+        min-height: auto;
     }
 }
 

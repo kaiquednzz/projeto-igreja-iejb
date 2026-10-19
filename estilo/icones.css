@@ -1,0 +1,100 @@
+/* Gerado por ferramentas/gerar-icones.py — não edite à mão.
+   Ícones: Font Awesome Free 6.7.2 (https://fontawesome.com) — ícones CC BY 4.0,
+   fontes SIL OFL 1.1, código MIT. Licença completa em estilo/fontes/LICENSE-fontawesome.txt */
+
+@font-face {
+    font-family: 'IEJB Icones';
+    font-style: normal;
+    font-weight: 900;
+    font-display: block;
+    src: url(fontes/iejb-icones-solid.woff2) format('woff2');
+}
+
+@font-face {
+    font-family: 'IEJB Icones';
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url(fontes/iejb-icones-regular.woff2) format('woff2');
+}
+
+@font-face {
+    font-family: 'IEJB Icones Marcas';
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url(fontes/iejb-icones-brands.woff2) format('woff2');
+}
+
+.fa-solid,
+.fa-regular,
+.fa-brands {
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    line-height: 1;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.fa-solid,
+.fa-regular {
+    font-family: 'IEJB Icones';
+}
+
+.fa-solid {
+    font-weight: 900;
+}
+
+.fa-regular {
+    font-weight: 400;
+}
+
+.fa-brands {
+    font-family: 'IEJB Icones Marcas';
+    font-weight: 400;
+}
+
+.fa-solid::before,
+.fa-regular::before,
+.fa-brands::before {
+    content: var(--fa);
+}
+
+.fa-arrow-down { --fa: "\f063"; }
+.fa-arrow-up { --fa: "\f062"; }
+.fa-book-bible { --fa: "\f647"; }
+.fa-book-open { --fa: "\f518"; }
+.fa-calendar-check { --fa: "\f274"; }
+.fa-calendar-plus { --fa: "\f271"; }
+.fa-calendar-xmark { --fa: "\f273"; }
+.fa-check { --fa: "\f00c"; }
+.fa-chevron-left { --fa: "\f053"; }
+.fa-chevron-right { --fa: "\f054"; }
+.fa-chevron-up { --fa: "\f077"; }
+.fa-clock { --fa: "\f017"; }
+.fa-copy { --fa: "\f0c5"; }
+.fa-dove { --fa: "\f4ba"; }
+.fa-envelope { --fa: "\f0e0"; }
+.fa-fire { --fa: "\f06d"; }
+.fa-google { --fa: "\f1a0"; }
+.fa-hands-holding-child { --fa: "\e4fa"; }
+.fa-hands-praying { --fa: "\f684"; }
+.fa-handshake { --fa: "\f2b5"; }
+.fa-image { --fa: "\f03e"; }
+.fa-instagram { --fa: "\f16d"; }
+.fa-location-crosshairs { --fa: "\f601"; }
+.fa-location-dot { --fa: "\f3c5"; }
+.fa-pause { --fa: "\f04c"; }
+.fa-people-arrows { --fa: "\e068"; }
+.fa-people-roof { --fa: "\e537"; }
+.fa-play { --fa: "\f04b"; }
+.fa-rotate-left { --fa: "\f2ea"; }
+.fa-route { --fa: "\f4d7"; }
+.fa-share-nodes { --fa: "\f1e0"; }
+.fa-star { --fa: "\f005"; }
+.fa-uber { --fa: "\f402"; }
+.fa-waze { --fa: "\f83f"; }
+.fa-whatsapp { --fa: "\f232"; }
+.fa-xmark { --fa: "\f00d"; }

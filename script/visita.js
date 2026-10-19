@@ -1,11 +1,25 @@
 // Recursos da página inicial para levar o visitante à igreja.
-// Depende de script.js (mostrarToast, copiarTexto, proximaOcorrencia, formatarHora, reduzirMovimento).
+// Depende de script.js (mostrarToast, copiarTexto, proximaOcorrencia, proximoInicio, formatarHora,
+// reduzirMovimento, temObserver).
 
 const LOCAL_IEJB = 'IEJB - Rua Ceará, 128, Jardim Brasil, Araçariguama - SP';
 const COORDENADAS_IEJB = { lat: -23.42888942, lng: -47.07071296 };
 const NOMES_DIAS = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
 
+const ENDERECO_IEJB = {
+    '@type': 'PostalAddress',
+    streetAddress: 'Rua Ceará, 128 - Jardim Brasil',
+    addressLocality: 'Araçariguama',
+    addressRegion: 'SP',
+    postalCode: '18147-000',
+    addressCountry: 'BR'
+};
+
 const doisDigitos = (n) => String(n).padStart(2, '0');
+// Texto do HTML sem as quebras e espaços de indentação
+const limparTexto = (t) => (t || '').replace(/\s+/g, ' ').trim();
+const paraSlug = (t) => limparTexto(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 // Calendário (.ics)
 
@@ -18,43 +32,86 @@ function escaparICS(texto) {
     return texto.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
 }
 
-function baixarICS({ titulo, inicio, duracaoMin = 120, diaInteiro = false, descricao = '' }) {
+// Os horários do site são de Brasília. Com o TZID, quem estiver em outro fuso recebe o horário certo.
+const FUSO_ICS = ['BEGIN:VTIMEZONE', 'TZID:America/Sao_Paulo', 'BEGIN:STANDARD', 'DTSTART:19700101T000000',
+    'TZOFFSETFROM:-0300', 'TZOFFSETTO:-0300', 'TZNAME:-03', 'END:STANDARD', 'END:VTIMEZONE'];
+
+// O padrão do .ics pede linhas de até 75 bytes: as maiores são "dobradas" (quebra + espaço).
+// Conta bytes e não letras, porque "á" e "ç" ocupam 2 bytes em UTF-8
+const codificadorUTF8 = new TextEncoder();
+function dobrarLinhaICS(linha) {
+    const partes = [];
+    let atual = '';
+    let bytes = 0;
+    for (const letra of linha) {
+        const tamanho = codificadorUTF8.encode(letra).length;
+        // As partes seguintes começam com o espaço, então cabem 74 bytes
+        if (bytes + tamanho > (partes.length ? 74 : 75)) {
+            partes.push(atual);
+            atual = '';
+            bytes = 0;
+        }
+        atual += letra;
+        bytes += tamanho;
+    }
+    partes.push(atual);
+    return partes.join('\r\n ');
+}
+
+// Linhas de um VEVENT. "repetir" vira a RRULE (ex.: 'FREQ=WEEKLY')
+function eventoICS({ uid, titulo, inicio, duracaoMin = 120, diaInteiro = false, descricao = '', local = LOCAL_IEJB, repetir = '' }) {
     const fim = new Date(inicio.getTime() + duracaoMin * 60000);
     const fimDia = new Date(inicio);
     fimDia.setDate(fimDia.getDate() + 1);
     const agoraUTC = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
 
-    const linhas = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//IEJB//Site//PT',
-        'CALSCALE:GREGORIAN',
+    return [
         'BEGIN:VEVENT',
-        `UID:${Date.now()}-${Math.floor(Math.random() * 1e6)}@iejb.com.br`,
+        `UID:${uid}`,
         `DTSTAMP:${agoraUTC}`,
-        diaInteiro ? `DTSTART;VALUE=DATE:${formatoICS(inicio, true)}` : `DTSTART:${formatoICS(inicio)}`,
-        diaInteiro ? `DTEND;VALUE=DATE:${formatoICS(fimDia, true)}` : `DTEND:${formatoICS(fim)}`,
+        diaInteiro ? `DTSTART;VALUE=DATE:${formatoICS(inicio, true)}` : `DTSTART;TZID=America/Sao_Paulo:${formatoICS(inicio)}`,
+        diaInteiro ? `DTEND;VALUE=DATE:${formatoICS(fimDia, true)}` : `DTEND;TZID=America/Sao_Paulo:${formatoICS(fim)}`,
+        ...(repetir ? [`RRULE:${repetir}`] : []),
         `SUMMARY:${escaparICS(titulo)}`,
-        `LOCATION:${escaparICS(LOCAL_IEJB)}`,
+        `LOCATION:${escaparICS(local)}`,
         `DESCRIPTION:${escaparICS(descricao || 'IEJB - Igreja Evangélica do Jardim Brasil. https://iejb.com.br')}`,
         'BEGIN:VALARM',
         'ACTION:DISPLAY',
         `DESCRIPTION:${escaparICS(titulo)}`,
         diaInteiro ? 'TRIGGER:-PT15H' : 'TRIGGER:-PT2H',
         'END:VALARM',
-        'END:VEVENT',
+        'END:VEVENT'
+    ];
+}
+
+// Junta os VEVENTs (listas de linhas do eventoICS) num arquivo .ics, baixa e avisa
+function salvarICS(eventos, nomeArquivo, mensagem) {
+    const linhas = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//IEJB//Site//PT',
+        'CALSCALE:GREGORIAN',
+        ...FUSO_ICS,
+        ...eventos.flat(),
         'END:VCALENDAR'
     ];
 
-    const blob = new Blob([linhas.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+    const blob = new Blob([linhas.map(dobrarLinhaICS).join('\r\n') + '\r\n'], { type: 'text/calendar;charset=utf-8' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'iejb-lembrete.ics';
+    link.download = nomeArquivo;
     document.body.appendChild(link);
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-    mostrarToast('Lembrete baixado! Abra o arquivo para salvar no calendário.');
+    mostrarToast(mensagem);
+}
+
+function baixarICS({ titulo, inicio, duracaoMin = 120, diaInteiro = false, descricao = '', local = LOCAL_IEJB }) {
+    // UID estável: baixar o mesmo lembrete duas vezes atualiza o evento em vez de duplicar
+    const uid = `${formatoICS(inicio, true)}-${paraSlug(titulo)}@iejb.com.br`;
+    salvarICS([eventoICS({ uid, titulo, inicio, duracaoMin, diaInteiro, descricao, local })],
+        'iejb-lembrete.ics', 'Lembrete baixado! Abra o arquivo para salvar no calendário.');
 }
 
 function textoDataLonga(d) {
@@ -66,7 +123,7 @@ const cardsCultos = [...document.querySelectorAll('.cultos-grid[data-dia]')];
 function baixarICSDoCulto(card) {
     baixarICS({
         titulo: `${card.dataset.nome} - IEJB`,
-        inicio: proximaOcorrencia(card),
+        inicio: proximoInicio(card),
         descricao: `${card.dataset.nome} na IEJB. Venha como você é! https://iejb.com.br`
     });
 }
@@ -79,15 +136,33 @@ const dadosEventos = [];
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
 
+    // Link próprio de cada card (#evento-AAAA-MM-DD-nome). Os que já passaram também
+    // ganham id: assim quem abre um link antigo fica sabendo que o evento aconteceu
+    const idsUsados = new Set();
+    document.querySelectorAll('.eventos-grid[data-data]').forEach(el => {
+        if (!el.id) {
+            const textos = el.querySelector('.textos');
+            const nome = paraSlug(textos?.querySelector('h4')?.textContent || textos?.querySelector('.evento-categoria')?.textContent);
+            const base = ['evento', el.dataset.data, nome].filter(Boolean).join('-');
+            let id = base;
+            // Dois eventos com a mesma data e o mesmo nome: o segundo vira ...-2
+            for (let n = 2; idsUsados.has(id) || document.getElementById(id); n++) id = `${base}-${n}`;
+            el.id = id;
+        }
+        idsUsados.add(el.id);
+    });
+
     document.querySelectorAll('.eventos-grid[data-data]:not([hidden])').forEach(el => {
         const [a, m, d] = el.dataset.data.split('-').map(Number);
         const dia = new Date(a, m - 1, d);
         const textos = el.querySelector('.textos');
-        const titulo = [textos.querySelector('h4'), textos.querySelector('h3')]
-            .map(n => n && n.textContent.trim()).filter(Boolean).join(' - ');
-        const descricao = textos.querySelector('p')?.textContent.trim() || '';
-        const horarioTxt = el.querySelector('.horario p')?.textContent.trim() || '';
-        const local = el.querySelector('.horario address, .horario p:nth-of-type(2)')?.textContent.trim() || LOCAL_IEJB;
+        const nomeEvento = limparTexto(textos.querySelector('h4')?.textContent);
+        const titulo = [limparTexto(textos.querySelector('.evento-categoria')?.textContent), nomeEvento].filter(Boolean).join(' - ');
+        const descricao = limparTexto(textos.querySelector('p:not(.evento-categoria)')?.textContent);
+        const horarioTxt = limparTexto(el.querySelector('.horario p')?.textContent);
+        // Evento fora da igreja: data-local-nome e data-local-cidade no card
+        const externo = Boolean(el.dataset.localNome);
+        const local = externo ? `${el.dataset.localNome} - ${el.dataset.localCidade}` : LOCAL_IEJB;
         const hora = horarioTxt.match(/(\d{1,2})h(\d{2})?/);
         const inicio = new Date(a, m - 1, d, hora ? Number(hora[1]) : 0, hora ? Number(hora[2] || 0) : 0);
 
@@ -102,24 +177,35 @@ const dadosEventos = [];
         // Ações
         const acoes = document.createElement('div');
         acoes.className = 'evento-acoes';
-        acoes.innerHTML = '<button type="button" data-acao="calendario"><i class="fa-regular fa-calendar-plus"></i>Lembrar</button>' +
-            '<button type="button" data-acao="compartilhar"><i class="fa-solid fa-share-nodes"></i>Compartilhar</button>';
+        acoes.innerHTML = '<button type="button" data-acao="calendario"><i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>Lembrar</button>' +
+            '<button type="button" data-acao="compartilhar"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i>Compartilhar</button>';
+        // Quatro botões "Lembrar" iguais confundem o leitor de tela: o nome inclui o evento
+        acoes.querySelector('[data-acao="calendario"]').setAttribute('aria-label', `Lembrar: ${nomeEvento}`);
+        acoes.querySelector('[data-acao="compartilhar"]').setAttribute('aria-label', `Compartilhar: ${nomeEvento}`);
         el.querySelector('.horario-localizacao')?.appendChild(acoes);
 
         const textoData = `${textoDataLonga(dia)}${hora ? ` às ${formatarHora(`${hora[1]}:${hora[2] || '00'}`)}` : ''}`;
+        // Endereço público do card: abre a home já rolada até ele (abrirEventoDoLink)
+        const link = `https://iejb.com.br/#${el.id}`;
         acoes.querySelector('[data-acao="calendario"]').addEventListener('click', () => {
-            baixarICS({ titulo: titulo, inicio, diaInteiro: !hora, duracaoMin: 120, descricao });
+            baixarICS({ titulo: titulo, inicio, diaInteiro: !hora, duracaoMin: 120, descricao, local });
         });
         acoes.querySelector('[data-acao="compartilhar"]').addEventListener('click', async () => {
-            const texto = `${titulo}\n${textoData}\n${local}\n\nIEJB · https://iejb.com.br/#eventos`;
+            const convite = `${titulo}\n${textoData}\n${local}\n\nIEJB`;
             if (navigator.share) {
-                try { await navigator.share({ title: titulo, text: texto }); } catch { /* cancelado */ }
+                // O link vai só no campo url: o Chrome do Android junta texto e url numa
+                // mensagem só, e no WhatsApp ele apareceria duas vezes
+                try { await navigator.share({ title: titulo, text: convite, url: link }); } catch { /* cancelado */ }
             } else {
-                copiarTexto(texto, 'Convite copiado!');
+                copiarTexto(`${convite} · ${link}`, 'Convite copiado!');
             }
         });
 
-        dadosEventos.push({ titulo, descricao, inicio, comHora: Boolean(hora), local });
+        dadosEventos.push({
+            titulo, descricao, inicio, comHora: Boolean(hora), externo, url: link,
+            localNome: el.dataset.localNome, localCidade: el.dataset.localCidade,
+            imagem: el.dataset.imagem ? new URL(el.dataset.imagem, location.href).href : null
+        });
     });
 })();
 
@@ -143,22 +229,22 @@ const dadosEventos = [];
             '@type': 'Event',
             name: e.titulo,
             description: e.descricao,
+            url: e.url,
             startDate: iso(e.inicio, e.comHora),
             eventStatus: 'https://schema.org/EventScheduled',
             eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-            location: {
-                '@type': 'Place',
-                name: e.local,
-                address: { '@type': 'PostalAddress', addressLocality: 'Araçariguama', addressRegion: 'SP', addressCountry: 'BR' }
-            },
-            organizer: { '@type': 'Organization', name: 'IEJB', url: 'https://iejb.com.br' }
+            location: e.externo
+                ? { '@type': 'Place', name: e.localNome, address: { '@type': 'PostalAddress', addressLocality: e.localCidade, addressRegion: 'SP', addressCountry: 'BR' } }
+                : { '@type': 'Place', name: 'IEJB - Igreja Evangélica do Jardim Brasil', address: ENDERECO_IEJB },
+            ...(e.imagem ? { image: [e.imagem] } : {}),
+            organizer: { '@type': 'Organization', '@id': 'https://iejb.com.br/#igreja', name: 'IEJB - Igreja Evangélica do Jardim Brasil', url: 'https://iejb.com.br/' }
         })));
     }
 
     const perguntas = [...document.querySelectorAll('.duvidas details')].map(d => ({
         '@type': 'Question',
-        name: d.querySelector('summary').textContent.trim(),
-        acceptedAnswer: { '@type': 'Answer', text: d.querySelector('p').textContent.trim() }
+        name: limparTexto(d.querySelector('summary').textContent),
+        acceptedAnswer: { '@type': 'Answer', text: limparTexto(d.querySelector('p').textContent) }
     }));
     if (perguntas.length) {
         inserir({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: perguntas });
@@ -198,11 +284,10 @@ const dadosEventos = [];
     const atualizar = () => {
         if (estado.quem === null || estado.quando === null) return;
         const card = cardsCultos[estado.quando];
-        const inicio = proximaOcorrencia(card);
+        const inicio = proximoInicio(card);
         const hora = formatarHora(card.dataset.hora);
         const ministerio = ministerioDe[estado.quem];
 
-        resultado.innerHTML = '';
         const titulo = document.createElement('h4');
         titulo.textContent = 'Seu plano de visita';
         const sugestao = document.createElement('p');
@@ -214,32 +299,42 @@ const dadosEventos = [];
         dica.textContent = dicas[estado.quem];
         const local = document.createElement('p');
         local.className = 'planeje-local';
-        local.innerHTML = '<i class="fa-solid fa-location-dot"></i>Rua Ceará, 128 — Jardim Brasil, Araçariguama';
+        local.innerHTML = '<i class="fa-solid fa-location-dot" aria-hidden="true"></i>Rua Ceará, 128 - Jardim Brasil, Araçariguama';
 
         const acoes = document.createElement('div');
         acoes.className = 'planeje-acoes';
         const cal = document.createElement('button');
         cal.type = 'button';
-        cal.innerHTML = '<i class="fa-regular fa-calendar-plus"></i>Adicionar ao calendário';
+        cal.innerHTML = '<i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>Adicionar ao calendário';
         cal.addEventListener('click', () => baixarICSDoCulto(card));
         const rota = document.createElement('a');
         rota.href = `https://www.google.com/maps/dir/?api=1&destination=${COORDENADAS_IEJB.lat},${COORDENADAS_IEJB.lng}`;
         rota.target = '_blank';
         rota.rel = 'noopener noreferrer';
-        rota.innerHTML = '<i class="fa-solid fa-route"></i>Como chegar';
+        rota.innerHTML = '<i class="fa-solid fa-route" aria-hidden="true"></i>Como chegar';
         acoes.append(cal, rota);
+        // "Eu vou!" vem primeiro: guarda o plano e mostra o lembrete no topo (fim do arquivo)
+        if (criarBotaoEuVou) acoes.prepend(criarBotaoEuVou(card));
         if (ministerio) {
             const link = document.createElement('a');
             link.href = `#ministerio-${ministerio}`;
-            link.innerHTML = '<i class="fa-solid fa-arrow-down"></i>Ver o ministério';
+            link.innerHTML = '<i class="fa-solid fa-arrow-down" aria-hidden="true"></i>Ver o ministério';
             acoes.append(link);
         }
 
-        resultado.append(titulo, sugestao, dica, local, acoes);
-        resultado.hidden = false;
-        if (!resultado.dataset.visto) {
-            resultado.dataset.visto = '1';
-            resultado.scrollIntoView({ behavior: reduzirMovimento ? 'auto' : 'smooth', block: 'nearest' });
+        const preencher = () => {
+            resultado.replaceChildren(titulo, sugestao, dica, local, acoes);
+            if (!resultado.dataset.visto) {
+                resultado.dataset.visto = '1';
+                resultado.scrollIntoView({ behavior: reduzirMovimento ? 'auto' : 'smooth', block: 'nearest' });
+            }
+        };
+        // A região viva (aria-live) precisa estar visível antes do texto mudar para ser anunciada
+        if (resultado.hidden) {
+            resultado.hidden = false;
+            requestAnimationFrame(preencher);
+        } else {
+            preencher();
         }
     };
 
@@ -297,10 +392,23 @@ const dadosEventos = [];
 
     let passo = 0;
     let pontos = {};
+    let historico = []; // pontos de cada resposta, na ordem, para desempatar
 
-    const reiniciar = () => { passo = 0; pontos = {}; desenhar(); };
+    const reiniciar = () => { passo = 0; pontos = {}; historico = []; desenhar(true); };
 
-    function desenhar() {
+    // Em empate, vence o ministério que pesou mais na resposta mais recente
+    function escolherVencedor(ordem) {
+        const maximo = Math.max(...ordem.map(m => pontos[m] || 0));
+        let empatados = ordem.filter(m => (pontos[m] || 0) === maximo);
+        for (let i = historico.length - 1; i >= 0 && empatados.length > 1; i--) {
+            const maior = Math.max(...empatados.map(m => historico[i][m] || 0));
+            if (maior > 0) empatados = empatados.filter(m => (historico[i][m] || 0) === maior);
+        }
+        return empatados[0];
+    }
+
+    // focar: depois de uma resposta, o foco vai para o novo título (o botão clicado sumiu)
+    function desenhar(focar = false) {
         caixa.innerHTML = '';
         if (passo < perguntas.length) {
             const { texto, respostas } = perguntas[passo];
@@ -311,6 +419,8 @@ const dadosEventos = [];
             progresso.innerHTML = `<span>Pergunta ${passo + 1} de ${perguntas.length}</span><div><i style="--de:${antes}%; width:${(passo / perguntas.length) * 100}%"></i></div>`;
             const pergunta = document.createElement('h4');
             pergunta.textContent = texto;
+            pergunta.tabIndex = -1;
+            pergunta.setAttribute('aria-label', `Pergunta ${passo + 1} de ${perguntas.length}: ${texto}`);
             const lista = document.createElement('div');
             lista.className = 'quiz-respostas';
             respostas.forEach(([rotulo, valores]) => {
@@ -319,17 +429,19 @@ const dadosEventos = [];
                 b.textContent = rotulo;
                 b.addEventListener('click', () => {
                     Object.entries(valores).forEach(([k, v]) => { pontos[k] = (pontos[k] || 0) + v; });
+                    historico.push(valores);
                     passo++;
-                    desenhar();
+                    desenhar(true);
                 });
                 lista.appendChild(b);
             });
             caixa.append(progresso, pergunta, lista);
+            if (focar) pergunta.focus({ preventScroll: true });
             return;
         }
 
         const ordem = [...document.querySelectorAll('[data-ministerio]')].map(c => c.dataset.ministerio);
-        const vencedor = ordem.reduce((melhor, atual) => ((pontos[atual] || 0) > (pontos[melhor] || 0) ? atual : melhor), ordem[0]);
+        const vencedor = escolherVencedor(ordem);
         const card = document.getElementById(`ministerio-${vencedor}`);
 
         const rotulo = document.createElement('p');
@@ -338,6 +450,7 @@ const dadosEventos = [];
         const nome = document.createElement('h4');
         nome.className = 'quiz-resultado-nome';
         nome.textContent = card.querySelector('.textos h4').textContent;
+        nome.tabIndex = -1;
         const descricao = document.createElement('p');
         descricao.textContent = card.querySelector('.textos p').textContent;
 
@@ -345,7 +458,7 @@ const dadosEventos = [];
         acoes.className = 'quiz-acoes';
         const ver = document.createElement('a');
         ver.href = `#ministerio-${vencedor}`;
-        ver.innerHTML = '<i class="fa-solid fa-arrow-up"></i>Ver o ministério';
+        ver.innerHTML = '<i class="fa-solid fa-arrow-up" aria-hidden="true"></i>Ver o ministério';
         ver.addEventListener('click', () => {
             card.classList.add('destaque');
             setTimeout(() => card.classList.remove('destaque'), 2500);
@@ -354,15 +467,16 @@ const dadosEventos = [];
         falar.href = 'https://www.instagram.com/iejbrasil/';
         falar.target = '_blank';
         falar.rel = 'noopener noreferrer';
-        falar.innerHTML = '<i class="fa-brands fa-instagram"></i>Quero participar';
+        falar.innerHTML = '<i class="fa-brands fa-instagram" aria-hidden="true"></i>Quero participar';
         const refazer = document.createElement('button');
         refazer.type = 'button';
         refazer.className = 'quiz-refazer';
-        refazer.innerHTML = '<i class="fa-solid fa-rotate-left"></i>Refazer';
+        refazer.innerHTML = '<i class="fa-solid fa-rotate-left" aria-hidden="true"></i>Refazer';
         refazer.addEventListener('click', reiniciar);
         acoes.append(ver, falar, refazer);
 
         caixa.append(rotulo, nome, descricao, acoes);
+        if (focar) nome.focus({ preventScroll: true });
     }
 
     desenhar();
@@ -385,9 +499,17 @@ const dadosEventos = [];
         return 6371 * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
     };
 
+    let buscando = false;
+    const terminar = () => {
+        buscando = false;
+        botao.removeAttribute('aria-disabled');
+    };
+
     botao.addEventListener('click', () => {
-        botao.disabled = true;
-        saida.hidden = false;
+        if (buscando) return;
+        // aria-disabled em vez de disabled: um botão desabilitado perde o foco do teclado
+        buscando = true;
+        botao.setAttribute('aria-disabled', 'true');
         saida.textContent = 'Buscando a sua localização...';
         navigator.geolocation.getCurrentPosition((pos) => {
             const origem = { lat: pos.coords.latitude, lng: pos.coords.longitude };
@@ -396,15 +518,17 @@ const dadosEventos = [];
             saida.innerHTML = '';
             saida.append(`Você está a ${distancia} da IEJB, em linha reta. `);
             const rota = document.createElement('a');
-            rota.href = `https://www.google.com/maps/dir/?api=1&origin=${origem.lat},${origem.lng}&destination=${COORDENADAS_IEJB.lat},${COORDENADAS_IEJB.lng}`;
+            // Sem "origin": o Google Maps usa a localização atual sozinho, e as coordenadas
+            // da pessoa não precisam ir no link
+            rota.href = `https://www.google.com/maps/dir/?api=1&destination=${COORDENADAS_IEJB.lat},${COORDENADAS_IEJB.lng}`;
             rota.target = '_blank';
             rota.rel = 'noopener noreferrer';
-            rota.textContent = 'Traçar rota →';
+            rota.innerHTML = 'Traçar rota <span aria-hidden="true">→</span>';
             saida.appendChild(rota);
-            botao.disabled = false;
+            terminar();
         }, () => {
             saida.textContent = 'Não foi possível pegar a sua localização. Use os botões do Google Maps ou do Waze acima.';
-            botao.disabled = false;
+            terminar();
         }, { timeout: 10000, maximumAge: 300000 });
     });
 })();
@@ -418,10 +542,13 @@ const dadosEventos = [];
     const localizacao = document.getElementById('localizacao');
     if (!barra || !hero) return;
 
-    const celular = () => window.matchMedia('(max-width: 700px)').matches;
+    const telaDeCelular = window.matchMedia('(max-width: 700px)');
+    const celular = () => telaDeCelular.matches;
+    let alturaHero = hero.offsetHeight;
     let naLocalizacao = false;
+    const proximoPronto = (el) => el && !el.classList.contains('aguardando');
 
-    if (localizacao) {
+    if (localizacao && temObserver) {
         new IntersectionObserver((entries) => {
             naLocalizacao = entries[0].isIntersecting;
             atualizarBarra();
@@ -430,15 +557,25 @@ const dadosEventos = [];
 
     function atualizarBarra() {
         const proximo = document.getElementById('proximo-culto');
-        const passouDoHero = window.scrollY > hero.offsetHeight - 100;
-        const mostrar = celular() && passouDoHero && !naLocalizacao && proximo && !proximo.hidden;
+        const passouDoHero = window.scrollY > alturaHero - 100;
+        const mostrar = Boolean(celular() && passouDoHero && !naLocalizacao && proximoPronto(proximo));
         if (mostrar) textoBarra.textContent = proximo.textContent;
-        barra.classList.toggle('visivel', Boolean(mostrar));
-        document.body.classList.toggle('barra-ativa', Boolean(mostrar));
+        barra.classList.toggle('visivel', mostrar);
+        // Fora da tela, a barra não pode receber o foco do Tab nem ser lida
+        barra.inert = !mostrar;
+        document.body.classList.toggle('barra-ativa', mostrar);
     }
 
-    window.addEventListener('scroll', atualizarBarra, { passive: true });
-    window.addEventListener('resize', atualizarBarra);
+    let agendada = false;
+    window.addEventListener('scroll', () => {
+        if (agendada) return;
+        agendada = true;
+        requestAnimationFrame(() => { agendada = false; atualizarBarra(); });
+    }, { passive: true });
+    window.addEventListener('resize', () => {
+        alturaHero = hero.offsetHeight;
+        atualizarBarra();
+    });
     atualizarBarra();
 
     // Aviso gentil (uma vez por sessão): só no computador, depois de ler boa parte da página
@@ -451,8 +588,10 @@ const dadosEventos = [];
         const total = document.documentElement.scrollHeight - window.innerHeight;
         const profundidade = total > 0 ? window.scrollY / total : 0;
         const proximo = document.getElementById('proximo-culto');
-        if (celular() || naLocalizacao || !proximo || proximo.hidden) return;
+        if (celular() || naLocalizacao || !proximoPronto(proximo)) return;
         if (Date.now() - inicio < 20000 || profundidade < 0.6) return;
+        // Quem já tem visita marcada ou chegou por um convite já vê o card no hero
+        if (document.querySelector('.hero-visita')) return;
 
         clearInterval(verificar);
         try { sessionStorage.setItem('iejb-convite', '1'); } catch { /* modo privado */ }
@@ -460,7 +599,7 @@ const dadosEventos = [];
         const aviso = document.createElement('aside');
         aviso.className = 'convite';
         aviso.setAttribute('aria-label', 'Convite para visitar a IEJB');
-        aviso.innerHTML = '<button type="button" class="convite-fechar" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>' +
+        aviso.innerHTML = '<button type="button" class="convite-fechar" aria-label="Fechar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>' +
             '<p class="convite-titulo">Quer nos visitar?</p><p class="convite-texto"></p>' +
             '<div class="convite-acoes"><a href="#planeje">Planejar visita</a><a href="#localizacao">Como chegar</a></div>';
         aviso.querySelector('.convite-texto').textContent = proximo.textContent;
@@ -469,4 +608,1155 @@ const dadosEventos = [];
         document.body.appendChild(aviso);
         requestAnimationFrame(() => aviso.classList.add('visivel'));
     }, 2000);
+})();
+
+
+// Convide alguém, convite recebido e "Eu vou!" (plano de visita lembrado)
+// O convite viaja no link (?convite=1&de=Nome&culto=slug) e vira um card de vidro no hero.
+// "Eu vou!" guarda o plano só neste navegador e o mesmo card acompanha a visita: antes do dia,
+// no dia e depois dela. O plano tem prioridade sobre o convite: nunca aparecem dois cards.
+// Usa também DURACAO_CULTO_MS do script.js.
+
+// O Planeje sua visita usa para pôr o "Eu vou!" no resultado (continua null se não há cultos)
+let criarBotaoEuVou = null;
+
+(function conviteEPlanoDeVisita() {
+    if (!cardsCultos.length) return;
+
+    const CHAVE_PLANO = 'iejb-visita';
+    // 'iejb-convite' (sem o "-recebido") já é usado pelo aviso gentil
+    const CHAVE_CONVITE = 'iejb-convite-recebido';
+    const DIAS_PARA_PERGUNTAR = 10;
+    const DIA_MS = 86400000;
+    const ROTA = `https://www.google.com/maps/dir/?api=1&destination=${COORDENADAS_IEJB.lat},${COORDENADAS_IEJB.lng}`;
+    const ENDERECO = `${ENDERECO_IEJB.streetAddress}, ${ENDERECO_IEJB.addressLocality} - ${ENDERECO_IEJB.addressRegion}, ${ENDERECO_IEJB.postalCode}`;
+    const LOGO = new URL('../images/logo-iejb-pequeno.png', document.currentScript?.src || location.href).href;
+
+    // localStorage/sessionStorage podem falhar (modo privado, cookies bloqueados) sem quebrar nada
+    const lerGuardado = (tipo, chave) => {
+        try { return JSON.parse(window[tipo].getItem(chave)); } catch { return null; }
+    };
+    const guardar = (tipo, chave, valor) => {
+        try { window[tipo].setItem(chave, JSON.stringify(valor)); } catch { /* modo privado */ }
+    };
+    const esquecer = (tipo, chave) => {
+        try { window[tipo].removeItem(chave); } catch { /* modo privado */ }
+    };
+
+    const maiuscula = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+    const horaDo = (card) => formatarHora(card.dataset.hora);
+    // Espaço que não quebra: "às" e a hora ficam sempre na mesma linha
+    const quandoLongo = (card, inicio) => `${textoDataLonga(inicio)} às\u00a0${horaDo(card)}`;
+    const diasEntre = (de, ate) => Math.round((new Date(ate).setHours(0, 0, 0, 0) - new Date(de).setHours(0, 0, 0, 0)) / DIA_MS);
+
+    function quandoCurto(card, inicio, agora = new Date()) {
+        const dias = diasEntre(agora, inicio);
+        return `${dias === 0 ? 'hoje' : dias === 1 ? 'amanhã' : NOMES_DIAS[inicio.getDay()]} às ${horaDo(card)}`;
+    }
+
+    // Nome de quem convida (digitado aqui ou vindo do link): só letras (com acento), espaço,
+    // apóstrofo, hífen e ponto, com os espaços colapsados e no máximo 30 caracteres
+    function limparNome(texto) {
+        const nome = String(texto ?? '').normalize('NFC').replace(/[\u2018\u2019]/g, "'")
+            .replace(/[^\p{L}\s'.-]/gu, '').replace(/\s+/g, ' ').trim();
+        const curto = [...nome].slice(0, 30).join('').trim();
+        return /\p{L}/u.test(curto) ? curto : '';
+    }
+
+    const cultoPorNome = (nome) => cardsCultos.find(c => c.dataset.nome === nome) || null;
+    const cultoPorSlug = (slug) => {
+        const procurado = paraSlug(String(slug ?? ''));
+        return (procurado && cardsCultos.find(c => paraSlug(c.dataset.nome) === procurado)) || null;
+    };
+    const proximoCulto = (agora = new Date()) => cardsCultos
+        .map(card => ({ card, inicio: proximoInicio(card, agora) }))
+        .sort((a, b) => a.inicio - b.inicio)[0].card;
+
+    // "o Culto da Família", "a EBD": o gênero vem da primeira palavra do nome por extenso
+    // (o title do <abbr> do card, quando houver: "Escola Bíblica Dominical")
+    function artigo(card) {
+        const porExtenso = card.querySelector('abbr[title]')?.title || card.dataset.nome;
+        const primeira = limparTexto(porExtenso).split(' ')[0].toLowerCase();
+        return /(a|ção|dade|gem)$/.test(primeira) ? 'a' : 'o';
+    }
+
+    function linkDoConvite(card, nome) {
+        const url = new URL('https://iejb.com.br/');
+        url.searchParams.set('convite', '1');
+        if (nome) url.searchParams.set('de', nome);
+        url.searchParams.set('culto', paraSlug(card.dataset.nome));
+        return url.href;
+    }
+
+    // Plano guardado: { culto: data-nome, inicio: ISO, salvoEm: ISO }. Qualquer coisa estranha
+    // (culto que saiu do site, data inválida, horário que não bate mais com o card) é descartada
+    function validarPlano(dados) {
+        if (!dados || typeof dados !== 'object') return null;
+        const card = typeof dados.culto === 'string' ? cultoPorNome(dados.culto) : null;
+        const inicio = new Date(typeof dados.inicio === 'string' ? dados.inicio : NaN);
+        const salvoEm = new Date(typeof dados.salvoEm === 'string' ? dados.salvoEm : NaN);
+        if (!card || Number.isNaN(inicio.getTime()) || Number.isNaN(salvoEm.getTime())) return null;
+        const hora = `${doisDigitos(inicio.getHours())}:${doisDigitos(inicio.getMinutes())}`;
+        if (inicio.getDay() !== Number(card.dataset.dia) || hora !== card.dataset.hora) return null;
+        // O "Eu vou!" marca sempre a próxima vez do culto, no máximo uma semana depois
+        const antecedencia = inicio - salvoEm;
+        if (antecedencia <= 0 || antecedencia > 8 * DIA_MS) return null;
+        return { card, inicio, salvoEm };
+    }
+
+    function validarConvite(dados) {
+        if (!dados || typeof dados !== 'object') return null;
+        return {
+            de: limparNome(typeof dados.de === 'string' ? dados.de : ''),
+            card: typeof dados.culto === 'string' ? cultoPorNome(dados.culto) : null
+        };
+    }
+
+    // Convite que chegou pelo link: fica guardado na sessão (recarregar mantém o card) e sai
+    // da barra de endereço, para o nome não ir junto se a pessoa compartilhar a página
+    function conviteDaURL() {
+        const params = new URLSearchParams(location.search);
+        if (params.get('convite') !== '1') return null;
+        const convite = { de: limparNome(params.get('de')), card: cultoPorSlug(params.get('culto')) };
+        // Culto desconhecido fica vazio: o card mostra o próximo culto que começa
+        guardar('sessionStorage', CHAVE_CONVITE, { de: convite.de, culto: convite.card ? convite.card.dataset.nome : '' });
+        ['convite', 'de', 'culto'].forEach(p => params.delete(p));
+        const busca = params.toString();
+        history.replaceState(history.state, '', `${location.pathname}${busca ? `?${busca}` : ''}${location.hash}`);
+        return convite;
+    }
+
+    let plano = validarPlano(lerGuardado('localStorage', CHAVE_PLANO));
+    if (!plano) esquecer('localStorage', CHAVE_PLANO);
+    let convite = conviteDaURL() || validarConvite(lerGuardado('sessionStorage', CHAVE_CONVITE));
+
+    // Antes do dia, no dia (até o culto acabar) e depois, por até 10 dias (aí o plano some)
+    function estadoDoPlano(agora) {
+        if (agora.getTime() < plano.inicio.getTime() + DURACAO_CULTO_MS) {
+            const dias = diasEntre(agora, plano.inicio);
+            return dias > 0 ? { fase: 'antes', dias } : { fase: 'hoje', comecou: agora >= plano.inicio };
+        }
+        return diasEntre(plano.inicio, agora) <= DIAS_PARA_PERGUNTAR ? { fase: 'depois' } : null;
+    }
+
+    function icone(classes) {
+        const i = document.createElement('i');
+        i.className = classes;
+        i.setAttribute('aria-hidden', 'true');
+        return i;
+    }
+
+    function criarLink(texto, href, classe, classesIcone, novaAba = false) {
+        const a = document.createElement('a');
+        a.className = classe;
+        a.href = href;
+        if (novaAba) {
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+        }
+        a.append(icone(classesIcone), texto);
+        return a;
+    }
+
+    // Rótulo com um trecho que some da vista no celular estreito (o leitor de tela continua lendo)
+    function rotuloEncurtavel(antes, opcional, depois) {
+        const rotulo = document.createElement('span');
+        const extra = document.createElement('span');
+        extra.className = 'hero-visita-opcional';
+        extra.textContent = opcional;
+        rotulo.append(antes, extra, depois);
+        return rotulo;
+    }
+
+    function criarBotao(texto, classe, classesIcone, aoClicar) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = classe;
+        b.append(icone(classesIcone), texto);
+        b.addEventListener('click', aoClicar);
+        return b;
+    }
+
+    // "Eu vou!": confirmado quando o plano guardado é a próxima vez desse culto
+    function pintarEuVou(botao) {
+        const card = cultoPorNome(botao.dataset.culto);
+        const confirmado = Boolean(card && plano && plano.card === card
+            && plano.inicio.getTime() === proximoInicio(card).getTime());
+        // Só mexe no texto quando muda: o botão do Planeje fica dentro de uma região viva
+        if (botao.dataset.confirmado === String(confirmado)) return;
+        botao.dataset.confirmado = String(confirmado);
+        botao.replaceChildren(icone(confirmado ? 'fa-solid fa-check' : 'fa-regular fa-calendar-check'),
+            confirmado ? 'Visita marcada' : 'Eu vou!');
+    }
+
+    const sincronizarEuVou = () => document.querySelectorAll('.botao-eu-vou').forEach(pintarEuVou);
+
+    criarBotaoEuVou = (card, classe = '') => {
+        const botao = document.createElement('button');
+        botao.type = 'button';
+        botao.className = `botao-eu-vou ${classe}`.trim();
+        botao.dataset.culto = card.dataset.nome;
+        botao.addEventListener('click', () => {
+            if (plano && botao.dataset.confirmado === 'true') {
+                mostrarToast(`Sua visita já está marcada para ${quandoCurto(card, plano.inicio)}.`);
+            } else {
+                marcarVisita(card);
+            }
+        });
+        pintarEuVou(botao);
+        return botao;
+    };
+
+    function marcarVisita(card) {
+        const agora = new Date();
+        plano = { card, inicio: proximoInicio(card, agora), salvoEm: agora };
+        guardar('localStorage', CHAVE_PLANO, { culto: card.dataset.nome, inicio: plano.inicio.toISOString(), salvoEm: agora.toISOString() });
+        // Quem marcou a visita já respondeu ao convite
+        convite = null;
+        esquecer('sessionStorage', CHAVE_CONVITE);
+        // Longe do topo o card muda sem ninguém ver: o aviso é o que conta
+        atualizarCartao();
+        sincronizarEuVou();
+        mostrarToast(`Visita marcada! Te esperamos ${quandoCurto(card, plano.inicio, agora)}.`);
+    }
+
+    function esquecerPlano() {
+        plano = null;
+        esquecer('localStorage', CHAVE_PLANO);
+        atualizarCartao();
+        sincronizarEuVou();
+    }
+
+    // Card no hero (logo depois do chip do próximo culto)
+
+    let cartao = null;
+
+    function montarCartao({ rotulo, chave, selo, titulo, texto, acoes, aoFechar }) {
+        const el = document.createElement('div');
+        el.className = 'hero-visita';
+        el.setAttribute('role', 'region');
+        el.setAttribute('aria-label', rotulo);
+        el.dataset.chave = chave;
+        const t = document.createElement('p');
+        t.className = 'hero-visita-titulo';
+        t.tabIndex = -1;
+        t.textContent = titulo;
+        const p = document.createElement('p');
+        p.className = 'hero-visita-texto';
+        p.textContent = texto;
+        // A contagem vai na mesma linha do texto, numa cápsula (o ponto final é só para o leitor de tela)
+        if (selo) {
+            const pausa = document.createElement('span');
+            pausa.className = 'sr-only';
+            pausa.textContent = '.';
+            const s = document.createElement('span');
+            s.className = 'hero-visita-selo';
+            s.textContent = selo;
+            p.append(pausa, ' ', s);
+        }
+        const caixa = document.createElement('div');
+        caixa.className = 'hero-visita-acoes';
+        caixa.append(...acoes());
+        el.append(t, p, caixa);
+        if (aoFechar) {
+            const fechar = criarBotao('', 'hero-visita-fechar', 'fa-solid fa-xmark', aoFechar);
+            fechar.setAttribute('aria-label', 'Fechar');
+            el.classList.add('com-fechar');
+            el.append(fechar);
+        }
+        return el;
+    }
+
+    function conteudoDoConvite(agora) {
+        const card = convite.card || proximoCulto(agora);
+        const inicio = proximoInicio(card, agora);
+        const para = `${artigo(card)} ${card.dataset.nome}`;
+        return {
+            rotulo: 'Seu convite',
+            chave: `convite|${card.dataset.nome}|${inicio.getTime()}|${convite.de}`,
+            titulo: convite.de ? `${convite.de} te convidou para ${para}` : `Você foi convidado(a) para ${para}`,
+            texto: maiuscula(quandoLongo(card, inicio)),
+            acoes: () => [
+                criarBotaoEuVou(card, 'botao-principal'),
+                criarLink('Como chegar', '#localizacao', 'botao-vidro', 'fa-solid fa-location-dot')
+            ],
+            aoFechar: () => {
+                convite = null;
+                esquecer('sessionStorage', CHAVE_CONVITE);
+                atualizarCartao();
+            }
+        };
+    }
+
+    function conteudoDoPlano(estado) {
+        const { card, inicio } = plano;
+        const nome = card.dataset.nome;
+        const chave = `plano|${nome}|${inicio.getTime()}|${estado.fase}|${estado.dias ?? ''}|${estado.comecou ?? ''}`;
+
+        if (estado.fase === 'antes') {
+            return {
+                rotulo: 'Sua visita',
+                chave,
+                selo: estado.dias === 1 ? 'É amanhã' : `Faltam ${estado.dias} dias`,
+                titulo: 'Sua visita está marcada',
+                texto: `${nome}, ${quandoLongo(card, inicio)}`,
+                acoes: () => [
+                    criarBotao('Adicionar ao calendário', 'botao-principal', 'fa-regular fa-calendar-plus', () => baixarICS({
+                        titulo: `${nome} - IEJB`,
+                        inicio,
+                        descricao: `${nome} na IEJB. Venha como você é! https://iejb.com.br`
+                    })),
+                    criarLink('Como chegar', '#localizacao', 'botao-vidro', 'fa-solid fa-location-dot'),
+                    criarBotao('Desmarcar', 'botao-vidro', 'fa-regular fa-calendar-xmark', () => {
+                        esquecerPlano();
+                        mostrarToast('Visita desmarcada.');
+                    })
+                ]
+            };
+        }
+
+        if (estado.fase === 'hoje') {
+            return {
+                rotulo: 'Sua visita',
+                chave,
+                titulo: 'Hoje é o dia!',
+                texto: estado.comecou
+                    ? `${maiuscula(artigo(card))} ${nome} já começou. Te esperamos!`
+                    : `Te esperamos às ${horaDo(card)} n${artigo(card)} ${nome}.`,
+                acoes: () => [
+                    criarLink('Como chegar', ROTA, 'botao-principal', 'fa-solid fa-route', true),
+                    criarBotao('Copiar endereço', 'botao-vidro', 'fa-regular fa-copy', () => copiarTexto(ENDERECO, 'Endereço copiado!'))
+                ]
+            };
+        }
+
+        // Depois: o pedido de avaliação vai para todo mundo, sem filtrar quem gostou (regra do Google)
+        return {
+            rotulo: 'Sua visita',
+            chave,
+            titulo: 'E aí, como foi a sua visita?',
+            texto: 'Se puder, conte como foi no Google: isso ajuda outras pessoas a conhecerem a IEJB.',
+            acoes: () => [
+                criarLink('Avaliar no Google', 'https://g.page/r/CdfJHd47s_IREAE/review', 'botao-principal', 'fa-solid fa-star', true),
+                criarLink(rotuloEncurtavel('', 'Seguir no ', 'Instagram'), 'https://www.instagram.com/iejbrasil/', 'botao-vidro', 'fa-brands fa-instagram', true),
+                criarLink(rotuloEncurtavel('Marcar ', 'outra ', 'visita'), '#planeje', 'botao-vidro', 'fa-regular fa-calendar-plus')
+            ],
+            aoFechar: esquecerPlano
+        };
+    }
+
+    // Monta, troca ou tira o card. Se o foco estava nele, vai para o card novo (ou para o
+    // primeiro botão do hero, quando o card some), em vez de cair no começo da página.
+    function atualizarCartao() {
+        const ancora = document.querySelector('.hero .textos #proximo-culto');
+        if (!ancora) return;
+        const agora = new Date();
+        let conteudo = null;
+        if (plano) {
+            const estado = estadoDoPlano(agora);
+            if (estado) {
+                conteudo = conteudoDoPlano(estado);
+            } else {
+                // Mais de 10 dias depois da visita: o plano some sem aviso
+                plano = null;
+                esquecer('localStorage', CHAVE_PLANO);
+            }
+        }
+        if (!conteudo && convite) conteudo = conteudoDoConvite(agora);
+        if (conteudo && cartao && cartao.dataset.chave === conteudo.chave) return;
+
+        const tinhaFoco = Boolean(cartao && cartao.contains(document.activeElement));
+        const novo = conteudo ? montarCartao(conteudo) : null;
+        if (novo && !cartao && !tinhaFoco) novo.classList.add('entrada');
+        if (cartao && novo) cartao.replaceWith(novo);
+        else if (novo) ancora.after(novo);
+        else if (cartao) cartao.remove();
+        cartao = novo;
+
+        if (!tinhaFoco) return;
+        if (cartao) cartao.querySelector('.hero-visita-titulo').focus({ preventScroll: true });
+        else document.querySelector('.hero .buttons a')?.focus({ preventScroll: true });
+    }
+
+    atualizarCartao();
+    // A página pode ficar aberta de um dia para o outro: o card e os botões acompanham
+    setInterval(() => {
+        atualizarCartao();
+        sincronizarEuVou();
+    }, 60000);
+
+    // Imagem para os Stories (1080x1920), no estilo da imagem do versículo
+
+    function quebrarLinhas(ctx, texto, largura) {
+        const linhas = [];
+        let atual = '';
+        texto.split(' ').forEach(palavra => {
+            const teste = atual ? `${atual} ${palavra}` : palavra;
+            if (ctx.measureText(teste).width > largura && atual) {
+                linhas.push(atual);
+                atual = palavra;
+            } else {
+                atual = teste;
+            }
+        });
+        linhas.push(atual);
+        return linhas;
+    }
+
+    async function gerarImagemConvite(card, inicio, nome) {
+        const L = 1080, A = 1920, MEIO = L / 2, LARGURA = L - 200;
+        const canvas = document.createElement('canvas');
+        canvas.width = L;
+        canvas.height = A;
+        const ctx = canvas.getContext('2d');
+        const SISTEMA = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        const PLAYFAIR = '"Playfair Display", Georgia, serif';
+        try {
+            await Promise.all([document.fonts.load(`700 140px ${PLAYFAIR}`), document.fonts.load(`italic 700 110px ${PLAYFAIR}`)]);
+        } catch { /* usa a fonte reserva */ }
+
+        // Degradê vinho da imagem do versículo, com um brilho em cada canto
+        const fundo = ctx.createLinearGradient(0, 0, 0, A);
+        fundo.addColorStop(0, '#8F0D0B');
+        fundo.addColorStop(1, '#3a0504');
+        ctx.fillStyle = fundo;
+        ctx.fillRect(0, 0, L, A);
+        [[0, 0, '191, 38, 43', 0.5], [L, A, '232, 150, 70', 0.16]].forEach(([x, y, rgb, forca]) => {
+            const brilho = ctx.createRadialGradient(x, y, 0, x, y, 1100);
+            brilho.addColorStop(0, `rgba(${rgb}, ${forca})`);
+            brilho.addColorStop(1, `rgba(${rgb}, 0)`);
+            ctx.fillStyle = brilho;
+            ctx.fillRect(0, 0, L, A);
+        });
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        // Escreve centralizado, diminuindo a fonte até caber na largura
+        const escrever = (texto, y, { tamanho, peso = 400, estilo = '', familia = SISTEMA, cor = '#fff' }) => {
+            let t = tamanho;
+            do {
+                ctx.font = `${estilo} ${peso} ${t}px ${familia}`;
+                t -= 2;
+            } while (ctx.measureText(texto).width > LARGURA && t > 24);
+            ctx.fillStyle = cor;
+            ctx.fillText(texto, MEIO, y);
+        };
+
+        // Nome do culto em até duas linhas, diminuindo a fonte até caber
+        let tamanho = 150;
+        let linhas;
+        do {
+            ctx.font = `700 ${tamanho}px ${PLAYFAIR}`;
+            linhas = quebrarLinhas(ctx, card.dataset.nome, LARGURA);
+            tamanho -= 6;
+        } while ((linhas.length > 2 || linhas.some(l => ctx.measureText(l).width > LARGURA)) && tamanho > 60);
+        tamanho += 6;
+        const alturaNome = tamanho * 1.12;
+
+        // Bloco central entre as áreas que o Instagram cobre (topo e rodapé dos Stories)
+        const altura = 40 + 70 + linhas.length * alturaNome + 60 + 64 + 130 + 140 + 104 + (nome ? 150 : 0);
+        let y = 300 + Math.max(0, (1160 - altura) / 2);
+        const linha = (h) => {
+            const meio = y + h / 2;
+            y += h;
+            return meio;
+        };
+
+        ctx.letterSpacing = '6px';
+        escrever('VOCÊ ESTÁ CONVIDADO(A)', linha(40), { tamanho: 34, peso: 600, cor: 'rgba(255, 255, 255, 0.72)' });
+        ctx.letterSpacing = '0px';
+        y += 70;
+        ctx.font = `700 ${tamanho}px ${PLAYFAIR}`;
+        ctx.fillStyle = '#fff';
+        linhas.forEach(l => ctx.fillText(l, MEIO, linha(alturaNome)));
+        y += 60;
+        escrever(maiuscula(textoDataLonga(inicio)), linha(64), { tamanho: 56, peso: 500, cor: 'rgba(255, 255, 255, 0.92)' });
+        escrever(`às ${horaDo(card)}`, linha(130), { tamanho: 112, peso: 700, estilo: 'italic', familia: PLAYFAIR, cor: '#f2b8b5' });
+        y += 69;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.fillRect(MEIO - 60, y, 120, 2);
+        y += 71;
+        escrever(ENDERECO_IEJB.streetAddress.replace(' - ', ' · '), linha(52), { tamanho: 40, cor: 'rgba(255, 255, 255, 0.78)' });
+        escrever(`${ENDERECO_IEJB.addressLocality} - ${ENDERECO_IEJB.addressRegion}`, linha(52), { tamanho: 40, cor: 'rgba(255, 255, 255, 0.78)' });
+        if (nome) {
+            y += 80;
+            escrever(`Convite de ${nome}`, linha(70), { tamanho: 58, estilo: 'italic', familia: PLAYFAIR });
+        }
+
+        try {
+            const logo = new Image();
+            logo.src = LOGO;
+            await logo.decode();
+            const h = 150;
+            const w = (logo.width * h) / logo.height;
+            ctx.drawImage(logo, MEIO - w / 2, 1490, w, h);
+        } catch { /* sem logo */ }
+        escrever('IEJB · iejb.com.br', 1720, { tamanho: 32, cor: 'rgba(255, 255, 255, 0.75)' });
+
+        // JPEG: o degradê em PNG passava de 1,8 MB, pesado para mandar pelo WhatsApp
+        return new Promise((resolve, reject) => canvas.toBlob(b => (b ? resolve(b) : reject(new Error('canvas'))), 'image/jpeg', 0.9));
+    }
+
+    function baixarArquivo(blob, nome) {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = nome;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    }
+
+    // Convide alguém (seção #convidar, para quem já frequenta)
+
+    (function convideAlguem() {
+        const secao = document.getElementById('convidar');
+        const campoNome = document.getElementById('convidar-nome');
+        const grupo = document.getElementById('convidar-cultos');
+        const mensagem = document.getElementById('convidar-mensagem');
+        const linkVisivel = document.getElementById('convidar-link');
+        const whatsapp = document.getElementById('convidar-whatsapp');
+        const compartilhar = document.getElementById('convidar-compartilhar');
+        const imagem = document.getElementById('convidar-imagem');
+        if (!secao || !campoNome || !grupo || !mensagem || !linkVisivel || !whatsapp || !compartilhar || !imagem) return;
+
+        // Começa no próximo culto: dá para mandar o convite sem escolher nada
+        let escolhido = proximoCulto();
+
+        cardsCultos.forEach(card => {
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = 'chip';
+            chip.setAttribute('aria-pressed', String(card === escolhido));
+            chip.textContent = `${maiuscula(NOMES_DIAS[card.dataset.dia].replace('-feira', ''))} · ${card.dataset.nome} · ${horaDo(card)}`;
+            chip.addEventListener('click', () => {
+                escolhido = card;
+                grupo.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c === chip)));
+                atualizar();
+            });
+            grupo.appendChild(chip);
+        });
+
+        const montarConvite = () => {
+            const nome = limparNome(campoNome.value);
+            const inicio = proximoInicio(escolhido);
+            const url = linkDoConvite(escolhido, nome);
+            const texto = `Oi! Quero te convidar para ${artigo(escolhido)} ${escolhido.dataset.nome} na IEJB, ${quandoLongo(escolhido, inicio)}. Vem comigo?`;
+            return { nome, inicio, url, texto };
+        };
+
+        function atualizar() {
+            const { url, texto } = montarConvite();
+            mensagem.textContent = texto;
+            linkVisivel.textContent = url;
+            whatsapp.href = `https://wa.me/?text=${encodeURIComponent(`${texto} ${url}`)}`;
+        }
+
+        campoNome.addEventListener('input', atualizar);
+        // A data é a da próxima vez do culto: refaz no clique, caso a página tenha ficado aberta
+        whatsapp.addEventListener('click', atualizar);
+
+        if (!navigator.share) compartilhar.replaceChildren(icone('fa-regular fa-copy'), 'Copiar link');
+        compartilhar.addEventListener('click', async () => {
+            const { url, texto } = montarConvite();
+            if (!navigator.share) {
+                copiarTexto(url, 'Link do convite copiado!');
+                return;
+            }
+            try {
+                await navigator.share({ title: 'Convite para a IEJB', text: texto, url });
+            } catch (erro) {
+                if (erro.name !== 'AbortError') copiarTexto(url, 'Link do convite copiado!');
+            }
+        });
+
+        // aria-disabled em vez de disabled: um botão desabilitado perde o foco do teclado
+        let gerando = false;
+        imagem.addEventListener('click', async () => {
+            if (gerando) return;
+            gerando = true;
+            imagem.setAttribute('aria-disabled', 'true');
+            const { nome, inicio, url, texto } = montarConvite();
+            try {
+                const blob = await gerarImagemConvite(escolhido, inicio, nome);
+                const arquivo = new File([blob], 'convite-iejb.jpg', { type: 'image/jpeg' });
+                let compartilhou = false;
+                if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+                    try {
+                        await navigator.share({ files: [arquivo], text: `${texto} ${url}` });
+                        compartilhou = true;
+                    } catch (erro) {
+                        // Cancelou: tudo bem. Outro erro (ex.: o navegador não deixou): baixa a imagem
+                        if (erro.name === 'AbortError') compartilhou = true;
+                    }
+                }
+                if (!compartilhou) {
+                    baixarArquivo(blob, arquivo.name);
+                    mostrarToast('Imagem salva! Agora é só postar nos Stories.');
+                }
+            } catch {
+                mostrarToast('Não foi possível gerar a imagem.');
+            } finally {
+                gerando = false;
+                imagem.removeAttribute('aria-disabled');
+            }
+        });
+
+        atualizar();
+        secao.hidden = false;
+    })();
+})();
+
+
+// "Veja como é um culto": os passos da seção #domingo em tela cheia, no formato dos
+// Stories. Título e texto vêm de cada <li> (h4 e p) e a foto do data-foto; o último
+// cartão convida para o próximo culto. O <dialog> aberto com showModal() já prende o
+// foco, fecha no Esc e deixa o resto da página inerte. O tempo de cada passo é a própria
+// animação da barra de progresso (CSS, --stories-duracao): quando ela termina, o passo
+// avança, e pausar é só congelar a animação (classe .pausado).
+
+(function vejaComoEUmCulto() {
+    const secao = document.getElementById('domingo');
+    const botao = document.getElementById('abrir-stories');
+    if (!secao || !botao) return;
+    // Navegador sem <dialog>: o botão continua escondido e a seção segue como lista
+    if (typeof HTMLDialogElement !== 'function' || typeof HTMLDialogElement.prototype.showModal !== 'function') return;
+
+    const passos = [...secao.querySelectorAll('.domingo-passos > li')].map(li => ({
+        titulo: limparTexto(li.querySelector('h4')?.textContent),
+        texto: limparTexto(li.querySelector('p')?.textContent),
+        foto: li.dataset.foto || '',
+        fotoGrande: li.dataset.fotoGrande || '',
+        alt: limparTexto(li.dataset.fotoAlt),
+        icone: li.querySelector('.domingo-icone i')
+    })).filter(p => p.titulo);
+    if (!passos.length) return;
+
+    const TITULO_CONVITE = 'Te esperamos!';
+    const total = passos.length + 1; // os passos e o convite no fim
+
+    let dialogo, palco, slides, barras, aviso, botaoPausa, toqueProximo;
+    let atual = 0;
+    let aberto = false;
+    let fechando = false;
+    let devolverFoco = true;
+    // O passo fica parado se a pessoa pausou, está segurando o dedo na tela,
+    // a foto ainda está carregando ou a aba está escondida
+    let pausadoPeloUsuario = false;
+    let segurando = false;
+    let carregando = false;
+    let gesto = null;     // toque em andamento: posição inicial e se virou "segurar" ou "arrastar"
+    let fimDoGesto = 0;   // quando acabou o último segurar/arrastar (o clique que vem junto é ignorado)
+    let timerSegurar = 0;
+    let timerFechar = 0;
+    let timerAviso = 0;
+
+    const criarIcone = (classes) => {
+        const i = document.createElement('i');
+        i.className = classes;
+        i.setAttribute('aria-hidden', 'true');
+        return i;
+    };
+
+    const criarBotao = (classe, rotulo, icone) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = classe;
+        b.setAttribute('aria-label', rotulo);
+        b.appendChild(criarIcone(icone));
+        return b;
+    };
+
+    // A foto ocupa a tela toda: em telas de alta densidade (celulares) vai a versão maior
+    const prepararFoto = (img, passo) => {
+        if (passo.fotoGrande) img.srcset = `${passo.foto} 1x, ${passo.fotoGrande} 2x`;
+        img.src = passo.foto;
+        return img;
+    };
+
+    const criarLink = (href, classe, icone, texto) => {
+        const a = document.createElement('a');
+        a.href = href;
+        a.className = classe;
+        a.append(criarIcone(icone), texto);
+        // Fecha na hora (sem animação) para a página destravar antes de rolar até a seção
+        a.addEventListener('click', () => fechar({ animar: false, focarBotao: false }));
+        return a;
+    };
+
+    // Mesmo texto do hero; se ele ainda não estiver pronto, calcula pelos cards dos cultos
+    function textoProximoCulto() {
+        const faixa = document.getElementById('proximo-culto');
+        if (faixa && !faixa.classList.contains('aguardando')) return limparTexto(faixa.textContent);
+        if (!cardsCultos.length) return '';
+        const { card, inicio } = cardsCultos
+            .map(c => ({ card: c, inicio: proximoInicio(c) }))
+            .sort((a, b) => a.inicio - b.inicio)[0];
+        return `Próximo culto: ${textoDataLonga(inicio)} às ${formatarHora(card.dataset.hora)} · ${card.dataset.nome}`;
+    }
+
+    function criarPasso(passo) {
+        const slide = document.createElement('div');
+        slide.className = 'stories-slide';
+        const foto = document.createElement('div');
+        foto.className = 'stories-foto';
+        if (passo.foto) {
+            const img = prepararFoto(document.createElement('img'), passo);
+            img.alt = passo.alt;
+            img.decoding = 'async';
+            img.draggable = false;
+            foto.appendChild(img);
+        }
+
+        const legenda = document.createElement('div');
+        legenda.className = 'stories-legenda stories-passo';
+        if (passo.icone) {
+            const icone = document.createElement('span');
+            icone.className = 'stories-icone';
+            icone.appendChild(passo.icone.cloneNode(true));
+            legenda.appendChild(icone);
+        }
+        const titulo = document.createElement('h2');
+        titulo.textContent = passo.titulo;
+        const texto = document.createElement('p');
+        texto.textContent = passo.texto;
+        legenda.append(titulo, texto);
+
+        slide.append(foto, legenda);
+        return slide;
+    }
+
+    function criarConvite() {
+        const slide = document.createElement('div');
+        slide.className = 'stories-slide';
+        const fundo = document.createElement('div');
+        fundo.className = 'stories-foto stories-fundo-convite';
+        const legenda = document.createElement('div');
+        legenda.className = 'stories-legenda stories-convite';
+
+        const logoHeader = document.querySelector('header .logo img');
+        if (logoHeader) {
+            const logo = document.createElement('img');
+            logo.className = 'stories-logo';
+            logo.src = logoHeader.src;
+            logo.alt = '';
+            logo.width = logoHeader.width;
+            logo.height = logoHeader.height;
+            legenda.appendChild(logo);
+        }
+        const titulo = document.createElement('h2');
+        titulo.textContent = TITULO_CONVITE;
+        legenda.appendChild(titulo);
+
+        const quando = textoProximoCulto();
+        if (quando) {
+            const chip = document.createElement('p');
+            chip.className = 'stories-quando';
+            chip.append(criarIcone('fa-regular fa-clock'), quando);
+            legenda.appendChild(chip);
+        }
+
+        const acoes = document.createElement('div');
+        acoes.className = 'stories-acoes';
+        const planeje = document.getElementById('planeje');
+        if (planeje && !planeje.hidden) {
+            acoes.appendChild(criarLink('#planeje', 'botao-principal', 'fa-regular fa-calendar-check', 'Planejar minha visita'));
+        }
+        if (document.getElementById('localizacao')) {
+            acoes.appendChild(criarLink('#localizacao', 'botao-vidro', 'fa-solid fa-location-dot', 'Como chegar'));
+        }
+        if (acoes.children.length) legenda.appendChild(acoes);
+
+        slide.append(fundo, legenda);
+        return slide;
+    }
+
+    function atualizarPausa() {
+        dialogo.classList.toggle('pausado', pausadoPeloUsuario || segurando || carregando || document.hidden);
+        botaoPausa.setAttribute('aria-label', pausadoPeloUsuario ? 'Continuar' : 'Pausar');
+        botaoPausa.firstElementChild.className = pausadoPeloUsuario ? 'fa-solid fa-play' : 'fa-solid fa-pause';
+    }
+
+    const alternarPausa = () => {
+        pausadoPeloUsuario = !pausadoPeloUsuario;
+        atualizarPausa();
+    };
+
+    function mostrar(i) {
+        const indice = Math.min(Math.max(i, 0), total - 1);
+        const mudou = indice !== atual;
+        atual = indice;
+        const ultimo = atual === total - 1;
+        // Se o foco está num link do cartão que vai sair, ele não pode se perder
+        const focoNoCartao = slides.contains(document.activeElement);
+
+        // Sobras de trocas rápidas saem já; o cartão atual fica por baixo até o novo aparecer
+        slides.querySelectorAll('.stories-slide:not(:last-child)').forEach(s => s.remove());
+        const velho = slides.lastElementChild;
+        velho?.querySelector('.stories-legenda')?.remove();
+        const novo = ultimo ? criarConvite() : criarPasso(passos[atual]);
+        slides.appendChild(novo);
+        const foto = novo.querySelector('.stories-foto');
+        foto.addEventListener('animationend', function surgiu(e) {
+            if (e.target !== foto) return;
+            foto.removeEventListener('animationend', surgiu);
+            velho?.remove();
+        });
+        if (focoNoCartao) palco.focus({ preventScroll: true });
+
+        // A barra de progresso só começa a andar quando a foto chega
+        const img = foto.querySelector('img');
+        carregando = Boolean(img && !img.complete);
+        if (img) {
+            const pronta = () => {
+                if (slides.lastElementChild !== novo) return;
+                carregando = false;
+                atualizarPausa();
+            };
+            img.addEventListener('load', pronta, { once: true });
+            img.addEventListener('error', () => { img.remove(); pronta(); }, { once: true });
+        }
+        const seguinte = passos[atual + 1];
+        if (seguinte?.foto) prepararFoto(new Image(), seguinte);
+
+        [...barras.children].forEach((barra, j) => {
+            barra.classList.toggle('vista', j < atual);
+            barra.classList.remove('atual');
+        });
+        atualizarPausa();
+        void barras.offsetWidth; // recomeça a animação mesmo quando volta para o mesmo passo
+        barras.children[atual].classList.add('atual');
+
+        toqueProximo.setAttribute('aria-label', ultimo ? 'Fechar' : 'Próximo passo');
+        dialogo.classList.toggle('no-inicio', atual === 0);
+        dialogo.classList.toggle('no-fim', ultimo);
+
+        if (mudou) {
+            const texto = `Passo ${atual + 1} de ${total}: ${ultimo ? TITULO_CONVITE : passos[atual].titulo}`;
+            clearTimeout(timerAviso);
+            // Um instante depois: ao abrir, a região viva precisa já estar na tela para ser lida
+            timerAviso = setTimeout(() => { aviso.textContent = texto; }, 120);
+        }
+    }
+
+    // No último cartão, "próximo" fecha, como nos Stories
+    const proximo = () => (atual < total - 1 ? mostrar(atual + 1) : fechar());
+    // No primeiro, "anterior" recomeça o passo
+    const anterior = () => mostrar(atual - 1);
+
+    // Clique que encerra um "segurar" ou "arrastar" não troca de passo
+    // (detail 0 = Enter/Espaço no botão, que sempre vale)
+    const foiGesto = (e) => e.detail !== 0 && performance.now() - fimDoGesto < 600;
+
+    function montar() {
+        dialogo = document.createElement('dialog');
+        dialogo.className = 'stories';
+        dialogo.setAttribute('aria-label', limparTexto(botao.textContent));
+
+        palco = document.createElement('div');
+        palco.className = 'stories-palco';
+        palco.tabIndex = -1;
+
+        barras = document.createElement('div');
+        barras.className = 'stories-barras';
+        barras.setAttribute('aria-hidden', 'true');
+        for (let i = 0; i < total; i++) {
+            const barra = document.createElement('span');
+            barra.className = 'stories-barra';
+            barra.appendChild(document.createElement('span'));
+            barras.appendChild(barra);
+        }
+
+        // Topo: "perfil" da igreja (como nos Stories), pausar e fechar
+        const topo = document.createElement('div');
+        topo.className = 'stories-topo';
+        const autor = document.createElement('div');
+        autor.className = 'stories-autor';
+        autor.setAttribute('aria-hidden', 'true'); // o nome do diálogo já diz isso
+        const icone = document.querySelector('link[rel="apple-touch-icon"]');
+        if (icone) {
+            const avatar = document.createElement('img');
+            avatar.src = icone.href;
+            avatar.alt = '';
+            avatar.width = 32;
+            avatar.height = 32;
+            autor.appendChild(avatar);
+        }
+        const nomes = document.createElement('span');
+        const nome = document.createElement('span');
+        nome.className = 'stories-autor-nome';
+        nome.textContent = 'IEJB';
+        const tema = document.createElement('span');
+        tema.className = 'stories-autor-tema';
+        tema.textContent = limparTexto(secao.querySelector('h2')?.textContent);
+        nomes.append(nome, tema);
+        autor.appendChild(nomes);
+
+        botaoPausa = criarBotao('stories-botao', 'Pausar', 'fa-solid fa-pause');
+        botaoPausa.autofocus = true; // o showModal() leva o foco para cá
+        const botaoFechar = criarBotao('stories-botao', 'Fechar', 'fa-solid fa-xmark');
+        topo.append(autor, botaoPausa, botaoFechar);
+
+        slides = document.createElement('div');
+        slides.className = 'stories-slides';
+
+        // Metade esquerda volta, metade direita avança (no computador, as setas ficam ao lado do cartão)
+        const toqueAnterior = criarBotao('stories-toque stories-anterior', 'Passo anterior', 'fa-solid fa-chevron-left');
+        toqueProximo = criarBotao('stories-toque stories-proximo', 'Próximo passo', 'fa-solid fa-chevron-right');
+
+        aviso = document.createElement('p');
+        aviso.className = 'sr-only';
+        aviso.setAttribute('aria-live', 'polite');
+        aviso.setAttribute('aria-atomic', 'true');
+
+        palco.append(barras, topo, slides, toqueAnterior, toqueProximo, aviso);
+        dialogo.appendChild(palco);
+        document.body.appendChild(dialogo);
+
+        botaoPausa.addEventListener('click', alternarPausa);
+        botaoFechar.addEventListener('click', () => fechar());
+        toqueAnterior.addEventListener('click', (e) => { if (!foiGesto(e)) anterior(); });
+        toqueProximo.addEventListener('click', (e) => { if (!foiGesto(e)) proximo(); });
+
+        // A barra do passo atual chegou ao fim: hora de avançar (o convite final fica parado)
+        barras.addEventListener('animationend', (e) => {
+            if (e.animationName === 'storiesProgresso' && e.target.parentElement === barras.children[atual] && atual < total - 1) {
+                mostrar(atual + 1);
+            }
+        });
+
+        // Esc: fecha com a animação de saída
+        dialogo.addEventListener('cancel', (e) => {
+            e.preventDefault();
+            fechar();
+        });
+        dialogo.addEventListener('close', () => { if (!dialogo.open) limpar(); });
+
+        dialogo.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                proximo();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                anterior();
+            } else if (e.key === ' ' && !e.target.closest('button, a')) {
+                // Num botão ou link, o Espaço continua apertando o que tem foco
+                e.preventDefault();
+                if (!e.repeat) alternarPausa();
+            }
+        });
+
+        // Clique fora do cartão (computador) fecha, se o clique também começou fora
+        let comecouFora = false;
+        dialogo.addEventListener('pointerdown', (e) => { comecouFora = e.target === dialogo; });
+        dialogo.addEventListener('click', (e) => {
+            if (e.target === dialogo && comecouFora) fechar();
+        });
+
+        // Gestos: segurar pausa, arrastar para o lado troca de passo, puxar para baixo fecha
+        palco.addEventListener('pointerdown', (e) => {
+            if (!e.isPrimary || e.button !== 0 || e.target.closest('.stories-topo button, .stories-acoes')) return;
+            gesto = { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, dy: 0, segurou: false, arrastou: false };
+            clearTimeout(timerSegurar);
+            timerSegurar = setTimeout(() => {
+                if (!gesto || gesto.arrastou) return;
+                gesto.segurou = true;
+                segurando = true;
+                dialogo.classList.add('segurando'); // esconde barras e textos para ver a foto
+                atualizarPausa();
+            }, 220);
+        });
+
+        dialogo.addEventListener('pointermove', (e) => {
+            if (!gesto || e.pointerId !== gesto.id) return;
+            gesto.dx = e.clientX - gesto.x;
+            gesto.dy = e.clientY - gesto.y;
+            if (!gesto.arrastou && Math.hypot(gesto.dx, gesto.dy) > 12) {
+                gesto.arrastou = true;
+                clearTimeout(timerSegurar);
+                segurando = true;
+                atualizarPausa();
+            }
+            // Puxando para baixo, o cartão acompanha o dedo
+            if (gesto.arrastou && gesto.dy > 0 && gesto.dy > Math.abs(gesto.dx)) {
+                dialogo.classList.add('arrastando');
+                palco.style.setProperty('--arrasto', `${gesto.dy}px`);
+            }
+        });
+
+        const terminarGesto = (e) => {
+            if (!gesto || e.pointerId !== gesto.id) return;
+            clearTimeout(timerSegurar);
+            const { dx, dy, segurou, arrastou } = gesto;
+            gesto = null;
+            segurando = false;
+            dialogo.classList.remove('segurando', 'arrastando');
+            if (segurou || arrastou) fimDoGesto = performance.now();
+            if (arrastou && e.type === 'pointerup') {
+                if (dy > 110 && dy > Math.abs(dx)) {
+                    fechar({ arrastado: true });
+                    return;
+                }
+                if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+                    if (dx < 0) proximo();
+                    else anterior();
+                }
+            }
+            palco.style.setProperty('--arrasto', '0px'); // volta com a mola (CSS)
+            atualizarPausa();
+        };
+        dialogo.addEventListener('pointerup', terminarGesto);
+        dialogo.addEventListener('pointercancel', terminarGesto);
+        // Segurar o dedo na foto abriria o menu de salvar imagem do celular
+        palco.addEventListener('contextmenu', (e) => e.preventDefault());
+    }
+
+    function abrir() {
+        if (!dialogo) montar();
+        if (aberto) return;
+        aberto = true;
+        fechando = false;
+        devolverFoco = true;
+        // Movimento reduzido: começa parado e a pessoa avança no próprio ritmo
+        pausadoPeloUsuario = reduzirMovimento;
+        segurando = false;
+        gesto = null;
+        document.documentElement.classList.add('stories-aberto');
+        document.addEventListener('visibilitychange', atualizarPausa);
+        dialogo.showModal();
+        atual = -1;
+        mostrar(0);
+    }
+
+    function fechar({ animar = true, arrastado = false, focarBotao = true } = {}) {
+        if (!aberto || fechando) return;
+        devolverFoco = focarBotao;
+        if (!animar || reduzirMovimento) {
+            concluirFechamento();
+            return;
+        }
+        fechando = true;
+        dialogo.classList.toggle('arrastado', arrastado);
+        dialogo.classList.add('fechando');
+        timerFechar = setTimeout(concluirFechamento, 240);
+    }
+
+    function concluirFechamento() {
+        if (dialogo.open) dialogo.close();
+        limpar();
+    }
+
+    // Roda uma vez a cada fechamento, venha de onde vier (botão, Esc, gesto ou link)
+    function limpar() {
+        if (!aberto) return;
+        aberto = false;
+        fechando = false;
+        [timerFechar, timerSegurar, timerAviso].forEach(clearTimeout);
+        document.removeEventListener('visibilitychange', atualizarPausa);
+        document.documentElement.classList.remove('stories-aberto');
+        dialogo.classList.remove('fechando', 'arrastado', 'arrastando', 'segurando', 'pausado');
+        palco.style.setProperty('--arrasto', '0px');
+        slides.replaceChildren(); // para as animações e solta as fotos
+        aviso.textContent = '';
+        gesto = null;
+        segurando = false;
+        carregando = false;
+        if (devolverFoco) botao.focus({ preventScroll: true });
+        // O header escolhe o vidro claro ou escuro pelo que está atrás dele, e isso só é
+        // refeito ao rolar: um "scroll" avisa o script.js para conferir de novo
+        window.dispatchEvent(new Event('scroll'));
+    }
+
+    botao.addEventListener('click', abrir);
+    // Começa a baixar a primeira foto quando a pessoa mira no botão
+    const preCarregar = () => { if (passos[0].foto) prepararFoto(new Image(), passos[0]); };
+    botao.addEventListener('pointerenter', preCarregar, { once: true });
+    botao.addEventListener('focus', preCarregar, { once: true });
+    botao.hidden = false;
+})();
+
+
+// Agenda semanal: um .ics só, com um evento que se repete toda semana para cada culto
+
+(function agendaSemanal() {
+    const bloco = document.getElementById('agenda-semanal');
+    const botao = document.getElementById('agenda-semanal-botao');
+    if (!bloco || !botao || !cardsCultos.length) return;
+
+    botao.addEventListener('click', () => {
+        const usados = new Set();
+        const eventos = cardsCultos.map(card => {
+            const nome = card.dataset.nome;
+            // UID estável por culto: baixar de novo atualiza a agenda em vez de duplicar.
+            // Sem o "culto" repetido (culto-da-familia, e não culto-culto-da-familia)
+            let uid = `culto-${paraSlug(nome).replace(/^culto-/, '')}`;
+            // Dois cultos com o mesmo nome em dias ou horários diferentes não podem dividir o UID
+            if (usados.has(uid)) uid += `-${paraSlug(NOMES_DIAS[card.dataset.dia])}-${card.dataset.hora.replace(':', '')}`;
+            usados.add(uid);
+            return eventoICS({
+                uid: `${uid}@iejb.com.br`,
+                titulo: `${nome} - IEJB`,
+                inicio: proximoInicio(card),
+                // Mesma descrição do lembrete de um culto só (baixarICSDoCulto)
+                descricao: `${nome} na IEJB. Venha como você é! https://iejb.com.br`,
+                repetir: 'FREQ=WEEKLY'
+            });
+        });
+        salvarICS(eventos, 'iejb-cultos.ics', 'Agenda baixada! Abra o arquivo para salvar os cultos no calendário.');
+    });
+
+    bloco.hidden = false;
+})();
+
+// Link direto para um evento (#evento-...): os ids nascem no melhorarEventos, então o
+// navegador não rola sozinho ao abrir a página. Quando tudo carrega, rola até o card e
+// destaca por alguns segundos. Evento que já passou (ou não existe): avisa e mostra a agenda.
+
+(function abrirEventoDoLink() {
+    const secao = document.getElementById('eventos');
+    if (!secao) return;
+    const comportamento = reduzirMovimento ? 'auto' : 'smooth';
+    let timerDestaque;
+
+    function irParaEvento() {
+        let id;
+        try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+        if (!id.startsWith('evento-')) return;
+
+        const card = document.getElementById(id);
+        if (!card || !card.matches('.eventos-grid') || card.closest('[hidden]')) {
+            mostrarToast('Esse evento já aconteceu. Veja os próximos na agenda.');
+            secao.scrollIntoView({ behavior: comportamento, block: 'start' });
+            return;
+        }
+
+        // Leitor de tela: o foco vai para o nome do evento, como num link âncora comum.
+        // Antes de rolar: em navegador sem preventScroll, o foco pularia por cima da rolagem suave
+        const nome = card.querySelector('.textos h4');
+        if (nome) {
+            nome.tabIndex = -1;
+            nome.focus({ preventScroll: true });
+        }
+        // Centralizado quando cabe; card mais alto que a tela (celular pequeno) para logo abaixo do header
+        const cabe = card.offsetHeight < window.innerHeight - 140;
+        card.scrollIntoView({ behavior: comportamento, block: cabe ? 'center' : 'start' });
+
+        document.querySelectorAll('.evento-destaque').forEach(c => c.classList.remove('evento-destaque'));
+        clearTimeout(timerDestaque);
+        card.classList.add('evento-destaque');
+        timerDestaque = setTimeout(() => card.classList.remove('evento-destaque'), 4000);
+    }
+
+    window.addEventListener('hashchange', irParaEvento);
+    if (!location.hash.startsWith('#evento-')) return;
+
+    // Espera as imagens e as fontes (a altura da página para de mudar), no máximo 3s
+    const carregou = new Promise(pronto => {
+        if (document.readyState === 'complete') pronto();
+        else window.addEventListener('load', pronto, { once: true });
+    });
+    Promise.race([
+        carregou.then(() => document.fonts?.ready),
+        new Promise(pronto => setTimeout(pronto, 3000))
+    ]).then(() => requestAnimationFrame(irParaEvento));
 })();

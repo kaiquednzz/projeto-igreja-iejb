@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<!-- Atalho iejb.com.br/avaliar: é o endereço do QR code impresso (e um link curto para mandar
+     no WhatsApp) que leva direto para a avaliação da IEJB no Google. Redireciona de três
+     jeitos: meta refresh, location.replace e, se nenhum funcionar, o link visível.
+     Se o link de avaliação do Google mudar, troque nos três lugares.
+     Os caminhos começam com / (como no 404.html) porque a página fica numa subpasta. -->
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avalie a IEJB no Google | IEJB - Igreja Evangélica do Jardim Brasil</title>
+    <meta name="robots" content="noindex">
+    <meta http-equiv="refresh" content="0; url=https://g.page/r/CdfJHd47s_IREAE/review">
+    <!-- Só depois de ler o <body>: começar a navegar interrompe a leitura da página, e se o
+         celular abrir o app do Google Maps em vez do site, o texto e o link precisam estar aqui -->
+    <script>document.addEventListener('DOMContentLoaded', () => location.replace('https://g.page/r/CdfJHd47s_IREAE/review'));</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/estilo/style.css?v=2">
+    <meta name="theme-color" content="#8F0D0B">
+    <link rel="icon" href="/images/favicon-96x96.png" type="image/png" sizes="96x96">
+    <link rel="apple-touch-icon" href="/images/icone-192.png">
+</head>
+
+<body>
+    <main class="avaliar">
+        <img src="/images/logo-iejb-pequeno.png" width="160" height="365" alt="">
+        <h1>Abrindo a avaliação da IEJB no Google...</h1>
+        <p>Se a página não abrir sozinha, toque no botão abaixo. A sua avaliação ajuda mais pessoas a conhecerem a IEJB.</p>
+        <a class="botao-principal" href="https://g.page/r/CdfJHd47s_IREAE/review">Avaliar a IEJB no Google</a>
+    </main>
+</body>
+
+</html>
