@@ -2975,6 +2975,615 @@ footer .footer-copyright {
 
 /* @@FEATURE-STORIES@@ (estilos do "Veja como é" entram logo abaixo) */
 
+/* ===== "Veja como é um culto": os passos do domingo no formato Stories =====
+   No celular ocupa a tela toda; no computador vira um cartão 9:16 no centro, com
+   as setas ao lado. visita.js monta tudo e troca as classes .pausado, .segurando,
+   .arrastando e .fechando no <dialog>. */
+
+/* Botão no fim da seção #domingo (nasce hidden; o JS mostra) */
+.domingo-stories {
+    margin-top: clamp(32px, 4vw, 44px);
+    padding: 8px 22px 8px 8px;
+}
+
+/* O play num círculo vermelho, como o anel de quem tem Stories novos */
+.domingo-stories i {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    /* o triângulo do play parece torto se ficar no centro exato */
+    padding-left: 2px;
+    border-radius: 50%;
+    background-image: linear-gradient(145deg, #d13a40, var(--principal));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 4px 10px rgba(0, 0, 0, 0.2);
+    font-size: 12px;
+}
+
+html.stories-aberto {
+    overflow: hidden;
+}
+
+.stories {
+    --stories-duracao: 6s;
+    --foco: #fff;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    background: transparent;
+    color: white;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* Só com [open]: sem isso o display venceria o display: none do <dialog> fechado */
+.stories[open] {
+    display: grid;
+    place-items: center;
+}
+
+/* Valores fixos: em navegadores antigos o ::backdrop não herda as variáveis do :root */
+.stories::backdrop {
+    background-color: rgba(12, 2, 2, 0.78);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    backdrop-filter: blur(24px) saturate(140%);
+    animation: storiesFundo 0.3s ease backwards;
+}
+
+.stories.fechando::backdrop {
+    animation: storiesFundoSai 0.24s ease-in forwards;
+}
+
+.stories-palco {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--aurora-escura), var(--principal-escuro);
+    /* Os gestos (tocar, segurar, arrastar) ficam com o script: sem zoom de dois
+       toques nem "puxar para atualizar" */
+    touch-action: none;
+    translate: 0 var(--arrasto, 0px);
+    transition: translate 0.5s var(--mola);
+    animation: storiesAbre 0.5s var(--mola) backwards;
+}
+
+.stories.arrastando .stories-palco {
+    transition: none;
+}
+
+.stories.fechando .stories-palco {
+    animation: storiesFecha 0.24s var(--ease-ios) forwards;
+}
+
+/* Saiu puxando para baixo: continua descendo */
+.stories.fechando.arrastado .stories-palco {
+    animation-name: storiesDesce;
+}
+
+.stories-palco:focus {
+    outline: none;
+}
+
+/* Barras de progresso: uma por passo. O preenchimento é um scaleX (roda na GPU) */
+.stories-barras {
+    position: absolute;
+    top: max(10px, env(safe-area-inset-top));
+    left: 10px;
+    right: 10px;
+    z-index: 4;
+    display: flex;
+    gap: 4px;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.stories-barra {
+    flex: 1;
+    height: 3px;
+    overflow: hidden;
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.35);
+}
+
+.stories-barra span {
+    display: block;
+    height: 100%;
+    background-color: white;
+    transform: scaleX(0);
+    transform-origin: left center;
+}
+
+.stories-barra.vista span {
+    transform: none;
+}
+
+.stories-barra.atual span {
+    animation: storiesProgresso var(--stories-duracao) linear forwards;
+}
+
+.stories.pausado .stories-barra.atual span,
+.stories.pausado .stories-foto img {
+    animation-play-state: paused;
+}
+
+/* Topo: perfil da igreja, pausar e fechar */
+.stories-topo {
+    position: absolute;
+    top: calc(max(10px, env(safe-area-inset-top)) + 10px);
+    left: 12px;
+    right: 6px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    /* O vão entre o nome e os botões continua sendo área de toque do passo */
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.stories-autor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    margin-right: auto;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+
+.stories-autor img {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9);
+}
+
+.stories-autor > span {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.2;
+}
+
+.stories-autor-nome {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.stories-autor-tema {
+    overflow: hidden;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.stories-botao {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: none;
+    border-radius: 50%;
+    background-color: transparent;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    pointer-events: auto;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35));
+    transition: background-color 0.2s ease, transform 0.5s var(--mola);
+}
+
+.stories-botao:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+}
+
+.stories-botao:active {
+    transform: scale(0.9);
+    transition-duration: 0.12s;
+}
+
+.stories-botao i {
+    margin: 0;
+}
+
+/* Cartões. O container não forma camada própria (sem z-index), então a legenda
+   (z-index 3) fica acima das áreas de toque (2) e a foto (0) abaixo delas */
+.stories-slides {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+}
+
+.stories-slide {
+    position: absolute;
+    inset: 0;
+}
+
+.stories-foto {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    animation: storiesSurge 0.45s ease backwards;
+}
+
+/* Zoom lento (Ken Burns), que congela junto com a barra quando pausa */
+.stories-foto img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transform-origin: 50% 35%;
+    pointer-events: none;
+    animation: storiesZoom calc(var(--stories-duracao) + 3s) linear both;
+}
+
+/* Escurece em cima (barras e botões) e embaixo (texto) */
+.stories-foto::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0) 42%, rgba(20, 2, 2, 0.62) 66%, rgba(20, 2, 2, 0.92) 100%);
+}
+
+.stories-legenda {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    padding: 24px 24px calc(36px + env(safe-area-inset-bottom));
+    /* Toques no texto passam para as áreas de anterior/próximo que estão por baixo */
+    pointer-events: none;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+    transition: opacity 0.25s ease;
+    animation: storiesTexto 0.6s var(--ease-out) 0.1s backwards;
+}
+
+.stories-icone {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 16px;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: var(--brilho-escuro);
+    font-size: 20px;
+}
+
+.stories-icone i {
+    margin: 0;
+}
+
+.stories-legenda h2 {
+    margin-bottom: 10px;
+    font-family: var(--fonte-titulo);
+    font-size: clamp(30px, 8.6vw, 38px);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+}
+
+.stories-passo p {
+    max-width: 34ch;
+    font-size: clamp(16px, 4.4vw, 18px);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.88);
+    text-wrap: pretty;
+}
+
+/* Último cartão: convite para o próximo culto, sobre a foto desfocada da igreja */
+.stories-fundo-convite {
+    background: url(../images/cantata22-wide-desfocada.webp) center / cover no-repeat;
+}
+
+.stories-fundo-convite::after {
+    background: linear-gradient(180deg, rgba(20, 2, 2, 0.6), rgba(40, 3, 2, 0.9));
+}
+
+.stories-convite {
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 88px;
+    text-align: center;
+}
+
+.stories-logo {
+    width: auto;
+    height: 84px;
+    margin-bottom: 18px;
+    filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.3));
+}
+
+.stories-convite h2 {
+    font-size: clamp(38px, 11vw, 46px);
+}
+
+/* O relógio vai junto com o texto (não numa coluna à parte), para as duas linhas
+   ficarem centradas quando o texto quebra */
+.stories-quando {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 8px 16px;
+    border-radius: var(--raio-m);
+    background-color: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: var(--brilho-escuro);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.35;
+    text-shadow: none;
+    text-wrap: balance;
+}
+
+.stories-quando i {
+    margin-right: 6px;
+}
+
+.stories-acoes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 300px;
+    margin-top: 28px;
+    pointer-events: auto;
+    text-shadow: none;
+}
+
+.stories-acoes a {
+    min-height: 50px;
+    font-size: 17px;
+}
+
+/* Áreas de toque: metade esquerda volta, metade direita avança */
+.stories-toque {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 2;
+    width: 50%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.stories-anterior {
+    left: 0;
+}
+
+.stories-proximo {
+    right: 0;
+}
+
+/* A seta de cada área. No celular só aparece com o foco do teclado (o anel fica
+   nela, e não num retângulo de meia tela passando por cima do texto) */
+.stories-toque i {
+    position: absolute;
+    top: calc(50% - 22px);
+    width: 44px;
+    height: 44px;
+    display: none;
+    place-items: center;
+    margin: 0;
+    border-radius: 50%;
+    background-color: rgba(20, 2, 2, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: var(--brilho-escuro);
+    color: white;
+    font-size: 16px;
+    transition: background-color 0.2s ease, opacity 0.25s ease, transform 0.5s var(--mola);
+}
+
+.stories-anterior i {
+    left: 12px;
+}
+
+.stories-proximo i {
+    right: 12px;
+}
+
+.stories-toque:focus-visible {
+    outline: none;
+}
+
+.stories-toque:focus-visible i {
+    display: grid;
+    outline: 3px solid var(--foco);
+    outline-offset: 3px;
+}
+
+/* Segurando o dedo: some tudo para ver só a foto */
+.stories.segurando :is(.stories-barras, .stories-topo, .stories-legenda, .stories-toque i) {
+    opacity: 0;
+}
+
+/* Telas baixas (celular deitado): menos espaço em volta do convite */
+@media (max-height: 560px) {
+    .stories-logo {
+        display: none;
+    }
+
+    .stories-convite {
+        padding-top: 64px;
+    }
+
+    .stories-acoes {
+        margin-top: 18px;
+    }
+}
+
+/* Computador: cartão 9:16 no centro, com as setas do lado de fora */
+@media (min-width: 700px) and (min-height: 600px) {
+    .stories-palco {
+        width: auto;
+        height: min(88vh, 900px);
+        height: min(88dvh, 900px);
+        aspect-ratio: 9 / 16;
+        border-radius: var(--raio-l);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+    }
+
+    .stories-barras {
+        top: 12px;
+        left: 12px;
+        right: 12px;
+    }
+
+    .stories-topo {
+        top: 22px;
+    }
+
+    .stories-legenda h2 {
+        font-size: 34px;
+    }
+
+    .stories-convite h2 {
+        font-size: 42px;
+    }
+
+    .stories-passo p {
+        font-size: 17px;
+    }
+
+    .stories-toque i {
+        display: grid;
+        background-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .stories-anterior i {
+        left: -72px;
+    }
+
+    .stories-proximo i {
+        right: -72px;
+    }
+
+    .stories-toque:hover i,
+    .stories-toque:focus-visible i {
+        background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .stories-toque:active i {
+        transform: scale(0.9);
+        transition-duration: 0.12s;
+    }
+
+    /* No primeiro passo não há para onde voltar (a área ainda recomeça o passo);
+       com o foco do teclado ela aparece, porque é onde o anel está */
+    .stories.no-inicio .stories-anterior:not(:focus-visible) i {
+        opacity: 0;
+    }
+}
+
+@keyframes storiesProgresso {
+    from {
+        transform: scaleX(0);
+    }
+
+    to {
+        transform: scaleX(1);
+    }
+}
+
+@keyframes storiesZoom {
+    from {
+        scale: 1;
+    }
+
+    to {
+        scale: 1.12;
+    }
+}
+
+@keyframes storiesFundo {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes storiesFundoSai {
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes storiesAbre {
+    from {
+        opacity: 0;
+        scale: 0.92;
+    }
+}
+
+@keyframes storiesFecha {
+    to {
+        opacity: 0;
+        scale: 0.94;
+    }
+}
+
+@keyframes storiesDesce {
+    to {
+        opacity: 0;
+        translate: 0 60%;
+    }
+}
+
+@keyframes storiesSurge {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes storiesTexto {
+    from {
+        opacity: 0;
+        translate: 0 18px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stories-foto img {
+        animation: none;
+    }
+
+    /* A barra não é enfeite: mostra quanto falta para o passo trocar (só anda se a
+       pessoa apertar "Continuar"). Sem isto, a regra global de movimento reduzido
+       encurtaria a animação para 0,01ms e os passos pulariam na hora */
+    .stories .stories-barra.atual span {
+        animation-duration: var(--stories-duracao) !important;
+    }
+}
+
+@media (forced-colors: active) {
+    .stories-barras {
+        forced-color-adjust: none;
+    }
+}
+
 
 
 /* @@FEATURE-LOCAL@@ (estilos de fachada, agenda semanal e evento em destaque entram logo abaixo) */
