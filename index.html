@@ -593,6 +593,34 @@
                 </div>
             </section>
 
+            <!-- Convide alguém: para quem já frequenta. O visita.js gera os chips dos cultos,
+                 o link do convite e a imagem para os Stories, e revela a seção -->
+            <section id="convidar" class="convidar" hidden>
+                <h2 class="reveal">CONVIDE ALGUÉM</h2>
+                <h3 class="reveal">Traga alguém para <strong>vir com você</strong></h3>
+                <p class="secao-intro reveal">Já faz parte da IEJB? Escolha o culto e mande o convite pelo WhatsApp, pelas redes ou como imagem para os Stories.</p>
+                <div class="convidar-card cartao-vidro reveal">
+                    <div class="convidar-campo">
+                        <label for="convidar-nome">Seu nome <span>(opcional)</span></label>
+                        <input type="text" id="convidar-nome" maxlength="30" autocomplete="given-name" autocapitalize="words" spellcheck="false" enterkeyhint="done" aria-describedby="convidar-nome-ajuda">
+                        <p class="convidar-ajuda" id="convidar-nome-ajuda">Vai no convite e no link, para a pessoa saber que foi você.</p>
+                    </div>
+                    <fieldset class="convidar-passo">
+                        <legend>Para qual culto?</legend>
+                        <div class="chips" id="convidar-cultos"></div>
+                    </fieldset>
+                    <figure class="convidar-previa">
+                        <figcaption>Prévia do convite</figcaption>
+                        <p class="convidar-balao"><span id="convidar-mensagem"></span><span class="convidar-link" id="convidar-link"></span></p>
+                    </figure>
+                    <div class="convidar-acoes">
+                        <a class="botao-principal" id="convidar-whatsapp" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i>Enviar no WhatsApp</a>
+                        <button type="button" class="botao-secundario" id="convidar-compartilhar"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i>Compartilhar</button>
+                        <button type="button" class="botao-secundario" id="convidar-imagem"><i class="fa-regular fa-image" aria-hidden="true"></i>Imagem para os Stories</button>
+                    </div>
+                </div>
+            </section>
+
             <section id="duvidas" class="duvidas">
                 <h2 class="reveal">DÚVIDAS FREQUENTES</h2>
                 <h3 class="reveal">O que <strong>visitantes</strong> costumam perguntar</h3>

@@ -2621,6 +2621,356 @@ footer .footer-copyright {
 
 /* @@FEATURE-CONVITE@@ (estilos do convite e do plano de visita entram logo abaixo) */
 
+/* ===== Convite recebido e visita marcada (card no hero) =====
+   Vidro escuro sobre a foto, como o chip do próximo culto. O visita.js põe o card
+   logo depois do chip e troca o conteúdo conforme o convite ou o plano de visita. */
+
+/* O card ocupa o lugar do chip do próximo culto (ele já diz o culto e a hora), para os
+   botões do hero continuarem na primeira tela. O chip só some da vista: a barra do
+   celular e o aviso gentil continuam lendo o texto dele. */
+.hero .textos:has(.hero-visita) .proximo-culto {
+    display: none;
+}
+
+.hero-visita {
+    position: relative;
+    max-width: 640px;
+    margin-top: 22px;
+    padding: 16px 18px 18px;
+    border-radius: 24px;
+    background-color: rgba(255, 255, 255, 0.13);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: var(--brilho-escuro), 0 16px 40px rgba(0, 0, 0, 0.25);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    overflow-wrap: anywhere;
+    animation: aparece 0.7s var(--mola) both;
+}
+
+/* Na abertura da página, entra depois do texto do hero */
+.hero-visita.entrada {
+    animation-delay: 0.35s;
+}
+
+/* Contagem regressiva: cápsula com o ponto verde do próximo culto, no fim do texto */
+.hero-visita-selo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 2px;
+    padding: 1px 10px 1px 8px;
+    border-radius: var(--raio-capsula);
+    background-color: rgba(52, 199, 89, 0.24);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    vertical-align: 1px;
+}
+
+.hero-visita-selo::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #34c759;
+}
+
+.hero-visita-titulo {
+    font-family: var(--fonte-titulo);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-wrap: balance;
+}
+
+/* O X fica no canto: o título não passa por baixo dele */
+.hero-visita.com-fechar .hero-visita-titulo {
+    padding-right: 34px;
+}
+
+.hero-visita-texto {
+    margin-top: 4px;
+    font-size: 15px;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.84);
+    text-wrap: pretty;
+}
+
+.hero-visita-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.hero-visita-acoes :is(a, button) {
+    padding: 10px 15px;
+    font-size: 15px;
+}
+
+/* Alvo de toque de 44px com um círculo menor desenhado dentro */
+.hero-visita-fechar {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    color: white;
+    cursor: pointer;
+}
+
+.hero-visita-fechar i {
+    width: 30px;
+    height: 30px;
+    margin: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.14);
+    font-size: 14px;
+    transition: background-color 0.2s ease, transform 0.5s var(--mola);
+}
+
+.hero-visita-fechar:hover i {
+    background-color: rgba(255, 255, 255, 0.26);
+}
+
+.hero-visita-fechar:active i {
+    transform: scale(0.88);
+    transition-duration: 0.12s;
+}
+
+/* "Eu vou!" confirmado: o check entra com a mola */
+.botao-eu-vou[data-confirmado="true"] i {
+    animation: aparece 0.5s var(--mola) both;
+}
+
+/* Tela baixa de notebook: o título encolhe um pouco para o card caber */
+@media (min-width: 701px) and (max-height: 780px) {
+    .hero:has(.hero-visita) h2 {
+        font-size: clamp(42px, 5vw, 64px);
+    }
+}
+
+@media (max-width: 700px) {
+    .hero-visita {
+        margin-top: 18px;
+        padding: 14px 14px 14px 16px;
+        border-radius: 22px;
+    }
+
+    .hero-visita-titulo {
+        font-size: 19px;
+    }
+
+    .hero-visita-texto {
+        font-size: 14px;
+    }
+
+    .hero-visita-acoes {
+        margin-top: 12px;
+    }
+
+    /* Cada linha de botões ocupa a largura toda, como as ações de um alerta do iOS */
+    .hero-visita-acoes :is(a, button) {
+        flex: 1 1 auto;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+}
+
+/* Celular estreito: "Seguir no Instagram" vira "Instagram" e "Marcar outra visita" vira
+   "Marcar visita" (só na tela: o trecho continua no nome lido pelo leitor de tela) */
+@media (max-width: 380px) {
+    .hero-visita-opcional {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+}
+
+/* Sem os ícones, dois botões cabem lado a lado */
+@media (max-width: 360px) {
+    .hero-visita-acoes i {
+        display: none;
+    }
+}
+
+/* Celular baixinho: o subtítulo sai e o título encolhe um pouco para o card caber */
+@media (max-width: 700px) and (max-height: 760px) {
+    .hero .textos:has(.hero-visita) .hero-sub {
+        display: none;
+    }
+
+    .hero:has(.hero-visita) h2 {
+        font-size: 36px;
+    }
+}
+
+/* ===== Convide alguém ===== */
+
+.convidar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--espaco-secao) 20px;
+    background: var(--aurora), var(--fundo-rosado);
+}
+
+/* Mesmo rótulo e título das outras seções */
+.convidar > h2 {
+    margin-bottom: 10px;
+    font-family: var(--fonte-texto);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--principal-brighter);
+    text-align: center;
+}
+
+.convidar > h3 {
+    max-width: 900px;
+    margin-bottom: clamp(32px, 4vw, 52px);
+    font-family: var(--fonte-titulo);
+    font-size: clamp(32px, 4.6vw, 52px);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--principal);
+    text-align: center;
+    text-wrap: balance;
+}
+
+.convidar-card {
+    width: 100%;
+    max-width: min(760px, 100%);
+    min-width: 0;
+    display: grid;
+    gap: 26px;
+    padding: clamp(22px, 3.5vw, 36px);
+    border-radius: 32px;
+}
+
+.convidar-campo label,
+.convidar-passo legend {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--texto);
+}
+
+.convidar-campo label span {
+    font-weight: 400;
+    color: var(--texto-2);
+}
+
+/* Campo no estilo dos campos do iOS. 17px: abaixo de 16px o iPhone dá zoom ao focar */
+.convidar-campo input {
+    width: 100%;
+    max-width: 360px;
+    min-height: 48px;
+    padding: 12px 16px;
+    border: 1px solid rgba(143, 13, 11, 0.16);
+    border-radius: var(--raio-s);
+    background-color: rgba(255, 255, 255, 0.85);
+    box-shadow: inset 0 1px 2px rgba(58, 10, 9, 0.06);
+    font: inherit;
+    font-size: 17px;
+    color: var(--texto);
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.convidar-campo input:hover {
+    border-color: rgba(143, 13, 11, 0.32);
+}
+
+.convidar-campo input:focus {
+    background-color: white;
+}
+
+.convidar-campo input:focus-visible {
+    outline: 3px solid var(--foco);
+    outline-offset: 2px;
+}
+
+.convidar-ajuda {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--texto-2);
+}
+
+.convidar-passo {
+    min-width: 0;
+    border: none;
+}
+
+.convidar-previa figcaption {
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--texto-2);
+}
+
+/* Prévia como um balão de mensagem */
+.convidar-balao {
+    max-width: 480px;
+    padding: 12px 16px 14px;
+    border-radius: 22px 22px 22px 8px;
+    background-color: white;
+    border: 1px solid rgba(143, 13, 11, 0.08);
+    box-shadow: var(--sombra-1);
+    font-size: 16px;
+    line-height: 1.45;
+    color: var(--texto);
+    overflow-wrap: anywhere;
+}
+
+.convidar-link {
+    display: block;
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--principal-brighter);
+    text-decoration: underline;
+    text-decoration-color: rgba(191, 38, 43, 0.35);
+    text-underline-offset: 2px;
+}
+
+.convidar-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.convidar-acoes :is(a, button) {
+    white-space: normal;
+}
+
+.convidar-acoes [aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: progress;
+}
+
+@media (max-width: 560px) {
+    .convidar-acoes :is(a, button) {
+        flex: 1 1 auto;
+        padding: 12px 16px;
+        font-size: 15px;
+    }
+}
+
 
 
 /* @@FEATURE-STORIES@@ (estilos do "Veja como é" entram logo abaixo) */
