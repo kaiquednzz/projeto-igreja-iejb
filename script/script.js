@@ -266,6 +266,18 @@ function proximoInicio(card, agora = agoraEmBrasilia()) {
     return inicio;
 }
 
+// Título (h4) do card de evento que começa exatamente nesse dia e hora, se houver
+function eventoNoHorario(inicio) {
+    for (const el of document.querySelectorAll('.eventos-grid[data-data]')) {
+        const [a, m, d] = el.dataset.data.split('-').map(Number);
+        const hora = (el.querySelector('.horario p')?.textContent || '').match(/(\d{1,2})h(\d{2})?/);
+        if (!hora) continue;
+        const comeco = new Date(a, m - 1, d, Number(hora[1]), Number(hora[2] || 0));
+        if (comeco.getTime() === inicio.getTime()) return el.querySelector('.textos h4')?.textContent.replace(/\s+/g, ' ').trim() || null;
+    }
+    return null;
+}
+
 function atualizarProximoCulto() {
     const faixa = document.getElementById('proximo-culto');
     const cards = [...document.querySelectorAll('.cultos-grid[data-dia]')];
@@ -278,7 +290,9 @@ function atualizarProximoCulto() {
         .sort((a, b) => a.inicio - b.inicio);
 
     const { card, inicio } = proximos[0];
-    const nome = card.dataset.nome;
+    // Evento especial no mesmo dia e horário do culto (ex.: Cantata de Natal no lugar do
+    // Culto da Família): o chip mostra o nome do evento
+    const nome = eventoNoHorario(inicio) || card.dataset.nome;
     const hora = formatarHora(card.dataset.hora);
     const diasAte = Math.round((new Date(inicio).setHours(0, 0, 0, 0) - new Date(agora).setHours(0, 0, 0, 0)) / 86400000);
 
