@@ -231,7 +231,7 @@ summary:focus-visible,
    hover de cada card, e usa translate (e não transform) pelo mesmo motivo.
    Regra de ouro: só "folhas" levam .reveal. Um .reveal dentro de outro soma
    os movimentos e multiplica a opacidade, e o efeito fica arrastado. */
-.js .reveal:not(.visible) {
+.js:not(.sem-observer) .reveal:not(.visible) {
     opacity: 0;
 }
 
@@ -272,13 +272,16 @@ summary:focus-visible,
 /* Sem JavaScript: o .reveal já aparece (a classe .js não existe) e some o que
    depende de script para funcionar */
 @media (scripting: none) {
-    .mobile-menu,
-    .proximo-culto,
-    #versiculo,
-    #btn-distancia,
-    #copiar-endereco {
+    .proximo-culto {
         display: none;
     }
+}
+
+/* Sem o script.js (JS desligado ou o arquivo não carregou, o html.js não existe): somem os
+   botões que só funcionam com ele. No celular, sem o botão de menu, os links do header
+   viram uma linha que rola para o lado (abaixo) em vez de um painel que não abre */
+html:not(.js) :is(header .mobile-menu, #versiculo, #btn-distancia, #copiar-endereco) {
+    display: none !important;
 }
 
 /* ===== Botões =====
@@ -708,6 +711,31 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
         scale: 1;
         translate: 0 0;
         transition-delay: 0s;
+    }
+
+    /* Sem JS o painel nunca abriria: os links ficam numa linha que rola para o lado */
+    html:not(.js) header nav {
+        --cor-ativa: currentColor;
+        color: inherit;
+        position: static;
+        flex: 1;
+        min-width: 0;
+        width: auto;
+        padding: 0;
+        overflow-x: auto;
+        background: none;
+        border: none;
+        box-shadow: none;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        opacity: 1;
+        visibility: visible;
+        scale: none;
+        translate: none;
+    }
+
+    html:not(.js) header nav ul {
+        flex-direction: row;
     }
 
     header nav ul {
@@ -2630,6 +2658,12 @@ footer .footer-copyright {
     display: none;
 }
 
+/* O mesmo para navegadores sem :has() (o visita.js põe a classe). Regra separada: um
+   seletor que o navegador não entende invalidaria a lista inteira */
+.hero .textos.com-visita .proximo-culto {
+    display: none;
+}
+
 .hero-visita {
     position: relative;
     max-width: 640px;
@@ -4519,6 +4553,41 @@ html.lightbox-aberto {
 
     .hero {
         min-height: auto;
+    }
+
+    /* A digitação não acontece no papel: imprime o texto completo do molde */
+    .depoimentos-grid .digitando {
+        display: none;
+    }
+
+    .depoimentos-grid .texto-molde {
+        color: inherit;
+    }
+}
+
+/* Navegadores sem as propriedades soltas translate/scale (Chrome < 104, Samsung Internet
+   antigo): sem isto, o atalho "Pular", a barra do celular e o aviso ficariam fora do lugar */
+@supports not (translate: 0) {
+    .pular {
+        transform: translateY(-150%);
+    }
+
+    .pular:focus-visible {
+        transform: none;
+    }
+
+    .toast {
+        transform: translateX(-50%);
+    }
+
+    .nav-indicador {
+        transform: translate(var(--x, 0), var(--y, 0));
+    }
+
+    @media (max-width: 700px) {
+        .barra-visita:not(.visivel) {
+            transform: translateY(calc(100% + 24px));
+        }
     }
 }
 

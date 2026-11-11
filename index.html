@@ -85,7 +85,7 @@
                 "publicAccess": true,
                 "contactPoint": {
                     "@type": "ContactPoint",
-                    "contactType": "customer service",
+                    "contactType": "informações",
                     "email": "contatoiejb@gmail.com",
                     "availableLanguage": "Portuguese"
                 }
@@ -139,7 +139,7 @@
                 <h1 class="sr-only">IEJB - Igreja Evangélica em Araçariguama</h1>
                 <h2>Uma família que te <strong>recebe</strong> de braços abertos</h2>
                 <p class="hero-sub">No Jardim Brasil, em Araçariguama, SP. Aqui você não é visitante, você é parte.</p>
-                <p class="proximo-culto aguardando" id="proximo-culto">&nbsp;</p>
+                <p class="proximo-culto aguardando" id="proximo-culto" data-nosnippet>&nbsp;</p>
             </div>
             <div class="buttons">
                 <a class="btn-sou-novo" href="#cta">Sou Novo Aqui <span aria-hidden="true">→</span></a>
@@ -437,9 +437,14 @@
             <section id="eventos" class="eventos">
                 <h2 class="reveal">AGENDA</h2>
                 <h3 class="reveal">Próximos <strong>eventos</strong> da IEJB</h3>
-                <p class="eventos-vazio reveal" id="eventos-vazio" hidden>Em breve novos eventos por aqui. Acompanhe as novidades no nosso <a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer">Instagram</a>.</p>
+                <p class="eventos-vazio reveal" id="eventos-vazio">Em breve novos eventos por aqui. Acompanhe as novidades no nosso <a href="https://www.instagram.com/iejbrasil/" target="_blank" rel="noopener noreferrer">Instagram</a>.</p>
                 <div class="eventos-container">
-                    <div class="eventos-grid reveal" data-data="2026-09-19" data-imagem="images/jovens.webp">
+                    <!-- Modelo de evento: copie o bloco abaixo (sem os marcadores de comentário), preencha
+                         e apague-o quando o evento passar. O site esconde sozinho os que já aconteceram e
+                         mostra o aviso "Em breve" quando não sobra nenhum. Opcionais: data-imagem (foto do
+                         evento para o Google), data-local-nome + data-local-cidade (evento fora da igreja),
+                         data-data-fim="AAAA-MM-DD" (evento de vários dias) e o bloco .botao com link de inscrição.
+                    <div class="eventos-grid reveal" data-data="AAAA-MM-DD" data-imagem="images/jovens.webp">
                         <div class="data">
                             <p class="data-dia">19</p>
                             <div class="dia">
@@ -449,83 +454,20 @@
                         </div>
                         <div class="textos">
                             <p class="evento-categoria">Culto de Jovens</p>
-                            <h4><strong>Incendeia</strong></h4>
-                            <p>Prepare o coração e venha viver uma noite de louvor, adoração e muita presença de Deus. Você não vai querer ficar de fora!</p>
+                            <h4><strong>Nome</strong> do evento</h4>
+                            <p>Descrição curta do evento.</p>
                         </div>
                         <div class="horario-localizacao">
                             <div class="horario">
                                 <p><i class="fa-solid fa-clock" aria-hidden="true"></i>19h30</p>
                                 <p><i class="fa-solid fa-location-dot" aria-hidden="true"></i>IEJB - Araçariguama</p>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="eventos-grid reveal" data-data="2026-10-17" data-imagem="images/infantil.webp">
-                        <div class="data">
-                            <p class="data-dia">17</p>
-                            <div class="dia">
-                                <p class="data-mes">Outubro</p>
-                                <p class="data-semana">Sábado</p>
-                            </div>
-                        </div>
-                        <div class="textos">
-                            <p class="evento-categoria">Infantil</p>
-                            <h4>Noite da <strong>Pizza</strong> Kids</h4>
-                            <p>Uma noite deliciosa preparada com muito carinho para as crianças! Venha aproveitar muita pizza, brincadeiras divertidas e aprender mais sobre o amor de Deus conosco.</p>
-                        </div>
-                        <div class="horario-localizacao">
-                            <div class="horario">
-                                <p><i class="fa-solid fa-clock" aria-hidden="true"></i>18h00</p>
-                                <p><i class="fa-solid fa-location-dot" aria-hidden="true"></i>IEJB - Araçariguama</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="eventos-grid reveal" data-data="2026-09-26" data-imagem="images/evangelismo.webp">
-                        <div class="data">
-                            <p class="data-dia">26</p>
-                            <div class="dia">
-                                <p class="data-mes">Setembro</p>
-                                <p class="data-semana">Sábado</p>
-                            </div>
-                        </div>
-                        <div class="textos">
-                            <p class="evento-categoria">Faça o Ide</p>
-                            <h4><strong>Evangelismo</strong></h4>
-                            <p>E se hoje você pudesse ser resposta na vida de alguém? Venha com a gente levar esperança, amor e a mensagem de Cristo para quem precisa ouvir.</p>
-                        </div>
-                        <div class="horario-localizacao">
-                            <div class="horario">
-                                <p><i class="fa-solid fa-clock" aria-hidden="true"></i>17h00</p>
-                                <p><i class="fa-solid fa-location-dot" aria-hidden="true"></i>IEJB - Araçariguama</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="eventos-grid reveal" data-data="2026-10-09" data-local-nome="Espaço Liboredo" data-local-cidade="São Roque" data-imagem="images/jovens.webp">
-                        <div class="data">
-                            <p class="data-dia">09</p>
-                            <div class="dia">
-                                <p class="data-mes">Outubro</p>
-                                <p class="data-semana">Sexta-feira</p>
-                            </div>
-                        </div>
-                        <div class="textos">
-                            <p class="evento-categoria">ACAMPAMENTO CULTURA 24/7</p>
-                            <h4>Acampa de <strong>Jovens</strong></h4>
-                            <p>Um tempo separado pra sair da rotina, fortalecer a fé e criar conexões de verdade. Nosso Acampa de Jovens vai ser um momento único de comunhão, palavra, louvor e muita troca entre a galera.</p>
-                        </div>
-                        <div class="horario-localizacao">
-                            <div class="horario">
-                                <p><i class="fa-solid fa-clock" aria-hidden="true"></i>Horário a conversar</p>
-                                <p><i class="fa-solid fa-location-dot" aria-hidden="true"></i>Espaço Liboredo - São Roque</p>
-                            </div>
                             <div class="botao">
-                                <a href="https://docs.google.com/forms/d/1fFBGBFLmNZAuNLaJ-6H3hddgMu18PPXks_xGiTyydRg/viewform"
-                                    target="_blank" rel="noopener noreferrer">Inscreva-se</a>
+                                <a href="LINK-DA-INSCRICAO" target="_blank" rel="noopener noreferrer">Inscreva-se</a>
                             </div>
                         </div>
                     </div>
+                    -->
                 </div>
             </section>
 
