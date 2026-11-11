@@ -3,7 +3,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
     <url>
         <loc>https://iejb.com.br/</loc>
-        <lastmod>2026-10-19</lastmod>
+        <lastmod>2026-11-11</lastmod>
         <priority>1.0</priority>
         <image:image><image:loc>https://iejb.com.br/images/iejb-principal.webp</image:loc></image:image>
         <image:image><image:loc>https://iejb.com.br/images/iejb-sobre.webp</image:loc></image:image>
@@ -25,7 +25,7 @@
     </url>
     <url>
         <loc>https://iejb.com.br/pages/galeria.html</loc>
-        <lastmod>2026-10-19</lastmod>
+        <lastmod>2026-11-11</lastmod>
         <priority>0.7</priority>
         <image:image><image:loc>https://iejb.com.br/images/pag-galeria/cantata-22/cantata22-01.webp</image:loc></image:image>
         <image:image><image:loc>https://iejb.com.br/images/pag-galeria/cantata-23-pascoa/cantata23pascoa-02.webp</image:loc></image:image>
@@ -66,6 +66,12 @@
         <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao10.webp</image:loc></image:image>
         <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao13.webp</image:loc></image:image>
         <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao16.webp</image:loc></image:image>
+        <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao17.webp</image:loc></image:image>
+        <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao18.webp</image:loc></image:image>
+        <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao19.webp</image:loc></image:image>
+        <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao20.webp</image:loc></image:image>
+        <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao21.webp</image:loc></image:image>
+        <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao22.webp</image:loc></image:image>
         <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao02.webp</image:loc></image:image>
         <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao05.webp</image:loc></image:image>
         <image:image><image:loc>https://iejb.com.br/images/pag-galeria/fundacao/fundacao08.webp</image:loc></image:image>

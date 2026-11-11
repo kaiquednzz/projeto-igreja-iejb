@@ -231,12 +231,15 @@ summary:focus-visible,
    hover de cada card, e usa translate (e não transform) pelo mesmo motivo.
    Regra de ouro: só "folhas" levam .reveal. Um .reveal dentro de outro soma
    os movimentos e multiplica a opacidade, e o efeito fica arrastado. */
-.js .reveal:not(.visible) {
+.js:not(.sem-observer) .reveal:not(.visible) {
     opacity: 0;
 }
 
 .reveal.visible {
-    animation: revelar 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    /* backwards (e não both): durante o atraso fica no estado inicial, e ao terminar a
+       animação "solta" o elemento. Com both, cada bloco já revelado continuava preso numa
+       camada da GPU para sempre (eram ~100 no fim da página) */
+    animation: revelar 0.9s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     animation-delay: var(--atraso, 0s);
 }
 
@@ -272,13 +275,16 @@ summary:focus-visible,
 /* Sem JavaScript: o .reveal já aparece (a classe .js não existe) e some o que
    depende de script para funcionar */
 @media (scripting: none) {
-    .mobile-menu,
-    .proximo-culto,
-    #versiculo,
-    #btn-distancia,
-    #copiar-endereco {
+    .proximo-culto {
         display: none;
     }
+}
+
+/* Sem o script.js (JS desligado ou o arquivo não carregou, o html.js não existe): somem os
+   botões que só funcionam com ele. No celular, sem o botão de menu, os links do header
+   viram uma linha que rola para o lado (abaixo) em vez de um painel que não abre */
+html:not(.js) :is(header .mobile-menu, #versiculo, #btn-distancia, #copiar-endereco) {
+    display: none !important;
 }
 
 /* ===== Botões =====
@@ -708,6 +714,31 @@ header .mobile-menu[aria-expanded="true"] span:nth-child(3) {
         scale: 1;
         translate: 0 0;
         transition-delay: 0s;
+    }
+
+    /* Sem JS o painel nunca abriria: os links ficam numa linha que rola para o lado */
+    html:not(.js) header nav {
+        --cor-ativa: currentColor;
+        color: inherit;
+        position: static;
+        flex: 1;
+        min-width: 0;
+        width: auto;
+        padding: 0;
+        overflow-x: auto;
+        background: none;
+        border: none;
+        box-shadow: none;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        opacity: 1;
+        visibility: visible;
+        scale: none;
+        translate: none;
+    }
+
+    html:not(.js) header nav ul {
+        flex-direction: row;
     }
 
     header nav ul {
@@ -2630,6 +2661,12 @@ footer .footer-copyright {
     display: none;
 }
 
+/* O mesmo para navegadores sem :has() (o visita.js põe a classe). Regra separada: um
+   seletor que o navegador não entende invalidaria a lista inteira */
+.hero .textos.com-visita .proximo-culto {
+    display: none;
+}
+
 .hero-visita {
     position: relative;
     max-width: 640px;
@@ -3741,9 +3778,11 @@ html.stories-aberto {
     top: 0;
     left: 0;
     height: 3px;
-    width: 0;
+    width: 100%;
     z-index: 1200;
-    border-radius: 0 3px 3px 0;
+    /* O script.js estica com scaleX conforme a rolagem */
+    transform: scaleX(0);
+    transform-origin: 0 0;
     background-image: linear-gradient(90deg, var(--principal), var(--principal-brighter), #ff7a59);
     box-shadow: 0 0 10px rgba(191, 38, 43, 0.5);
 }
@@ -4488,6 +4527,68 @@ html.lightbox-aberto {
     }
 }
 
+/* ===== Modo leve =====
+   html.leve vem do script no <head> de cada página: celular com pouca memória (Android de
+   entrada), economia de dados ligada ou o sistema pedindo menos transparência. O desfoque
+   ao vivo de tudo que fica fixo na tela (header, menu, barra, botões) é o que mais pesa
+   numa GPU fraca durante a rolagem, então ali o vidro vira um fundo quase sólido, e a
+   entrada dos blocos sobe sem o desembaçar. Nos celulares bons nada muda. */
+.leve {
+    --desfoque: none;
+}
+
+.leve header::before {
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+.leve header.sobre-escuro::before {
+    background-color: rgba(40, 4, 3, 0.92);
+}
+
+.leve header nav {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+@media (max-width: 900px) {
+    .leve header nav {
+        background-color: rgba(255, 255, 255, 0.98);
+    }
+}
+
+.leve .ministerios .ministerios-container .ministerios-grid .textos {
+    background-color: rgba(255, 255, 255, 0.94);
+}
+
+.leve .botao-topo,
+.leve .convite {
+    background-color: rgba(255, 255, 255, 0.96);
+}
+
+.leve .toast {
+    background-color: rgba(30, 30, 32, 0.95);
+}
+
+.leve .barra-visita {
+    background-color: rgba(40, 4, 3, 0.95);
+}
+
+.leve .reveal.visible {
+    animation-name: revelarLeve;
+    animation-duration: 0.5s;
+}
+
+@keyframes revelarLeve {
+    from {
+        opacity: 0;
+        translate: 0 12px;
+    }
+}
+
+.leve .quem-somos .imagem img {
+    animation: none;
+}
+
 /* ===== Alto contraste e impressão ===== */
 
 @media (forced-colors: active) {
@@ -4519,6 +4620,41 @@ html.lightbox-aberto {
 
     .hero {
         min-height: auto;
+    }
+
+    /* A digitação não acontece no papel: imprime o texto completo do molde */
+    .depoimentos-grid .digitando {
+        display: none;
+    }
+
+    .depoimentos-grid .texto-molde {
+        color: inherit;
+    }
+}
+
+/* Navegadores sem as propriedades soltas translate/scale (Chrome < 104, Samsung Internet
+   antigo): sem isto, o atalho "Pular", a barra do celular e o aviso ficariam fora do lugar */
+@supports not (translate: 0) {
+    .pular {
+        transform: translateY(-150%);
+    }
+
+    .pular:focus-visible {
+        transform: none;
+    }
+
+    .toast {
+        transform: translateX(-50%);
+    }
+
+    .nav-indicador {
+        transform: translate(var(--x, 0), var(--y, 0));
+    }
+
+    @media (max-width: 700px) {
+        .barra-visita:not(.visivel) {
+            transform: translateY(calc(100% + 24px));
+        }
     }
 }
 

@@ -133,7 +133,8 @@ function baixarICSDoCulto(card) {
 const dadosEventos = [];
 
 (function melhorarEventos() {
-    const hoje = new Date();
+    const agora = agoraEmBrasilia();
+    const hoje = new Date(agora);
     hoje.setHours(0, 0, 0, 0);
 
     // Link próprio de cada card (#evento-AAAA-MM-DD-nome). Os que já passaram também
@@ -165,12 +166,16 @@ const dadosEventos = [];
         const local = externo ? `${el.dataset.localNome} - ${el.dataset.localCidade}` : LOCAL_IEJB;
         const hora = horarioTxt.match(/(\d{1,2})h(\d{2})?/);
         const inicio = new Date(a, m - 1, d, hora ? Number(hora[1]) : 0, hora ? Number(hora[2] || 0) : 0);
+        // Evento de vários dias (acampamento): data-data-fim="AAAA-MM-DD"
+        const [af, mf, df] = (el.dataset.dataFim || '').split('-').map(Number);
+        const ultimoDia = df ? new Date(af, mf - 1, df) : null;
+        const jaComecou = hora ? inicio <= agora : dia <= hoje;
 
         // Contagem regressiva
         const dias = Math.round((dia - hoje) / 86400000);
         const contagem = document.createElement('span');
         contagem.className = 'contagem';
-        contagem.textContent = dias === 0 ? 'É hoje!' : dias === 1 ? 'É amanhã!' : `Faltam ${dias} dias`;
+        contagem.textContent = jaComecou ? 'Acontecendo agora' : dias === 0 ? 'É hoje!' : dias === 1 ? 'É amanhã!' : `Faltam ${dias} dias`;
         if (dias <= 1) contagem.classList.add('urgente');
         el.querySelector('.data')?.appendChild(contagem);
 
@@ -181,13 +186,15 @@ const dadosEventos = [];
             '<button type="button" data-acao="compartilhar"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i>Compartilhar</button>';
         // Quatro botões "Lembrar" iguais confundem o leitor de tela: o nome inclui o evento
         acoes.querySelector('[data-acao="calendario"]').setAttribute('aria-label', `Lembrar: ${nomeEvento}`);
+        // Lembrete de algo que já começou não serve para nada
+        if (jaComecou) acoes.querySelector('[data-acao="calendario"]').remove();
         acoes.querySelector('[data-acao="compartilhar"]').setAttribute('aria-label', `Compartilhar: ${nomeEvento}`);
         el.querySelector('.horario-localizacao')?.appendChild(acoes);
 
         const textoData = `${textoDataLonga(dia)}${hora ? ` às ${formatarHora(`${hora[1]}:${hora[2] || '00'}`)}` : ''}`;
         // Endereço público do card: abre a home já rolada até ele (abrirEventoDoLink)
         const link = `https://iejb.com.br/#${el.id}`;
-        acoes.querySelector('[data-acao="calendario"]').addEventListener('click', () => {
+        acoes.querySelector('[data-acao="calendario"]')?.addEventListener('click', () => {
             baixarICS({ titulo: titulo, inicio, diaInteiro: !hora, duracaoMin: 120, descricao, local });
         });
         acoes.querySelector('[data-acao="compartilhar"]').addEventListener('click', async () => {
@@ -203,6 +210,9 @@ const dadosEventos = [];
 
         dadosEventos.push({
             titulo, descricao, inicio, comHora: Boolean(hora), externo, url: link,
+            // Sem horário de término no card: o mesmo padrão de 2h do lembrete (.ics)
+            fim: ultimoDia || (hora ? new Date(inicio.getTime() + 120 * 60000) : dia),
+            fimComHora: Boolean(hora) && !ultimoDia,
             localNome: el.dataset.localNome, localCidade: el.dataset.localCidade,
             imagem: el.dataset.imagem ? new URL(el.dataset.imagem, location.href).href : null
         });
@@ -231,6 +241,7 @@ const dadosEventos = [];
             description: e.descricao,
             url: e.url,
             startDate: iso(e.inicio, e.comHora),
+            endDate: iso(e.fim, e.fimComHora),
             eventStatus: 'https://schema.org/EventScheduled',
             eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
             location: e.externo
@@ -555,10 +566,14 @@ const dadosEventos = [];
         }).observe(localizacao);
     }
 
+    let mostrando = null;
     function atualizarBarra() {
         const proximo = document.getElementById('proximo-culto');
         const passouDoHero = window.scrollY > alturaHero - 100;
         const mostrar = Boolean(celular() && passouDoHero && !naLocalizacao && proximoPronto(proximo));
+        // Roda a cada quadro da rolagem: se nada mudou, não mexe no DOM
+        if (mostrar === mostrando && (!mostrar || textoBarra.textContent === proximo.textContent)) return;
+        mostrando = mostrar;
         if (mostrar) textoBarra.textContent = proximo.textContent;
         barra.classList.toggle('visivel', mostrar);
         // Fora da tela, a barra não pode receber o foco do Tab nem ser lida
@@ -576,22 +591,26 @@ const dadosEventos = [];
         alturaHero = hero.offsetHeight;
         atualizarBarra();
     });
+    // O chip muda sozinho a cada minuto ("Hoje às 18h" vira "Acontecendo agora"): a barra acompanha
+    const chip = document.getElementById('proximo-culto');
+    if (chip) new MutationObserver(atualizarBarra).observe(chip, { childList: true, characterData: true, subtree: true });
     atualizarBarra();
 
     // Aviso gentil (uma vez por sessão): só no computador, depois de ler boa parte da página
     let jaViu = false;
     try { jaViu = sessionStorage.getItem('iejb-convite') === '1'; } catch { /* modo privado */ }
-    if (jaViu) return;
+    // O aviso é só para o computador: no celular a barra fixa já faz esse papel
+    if (jaViu || celular()) return;
 
     const inicio = Date.now();
     const verificar = setInterval(() => {
         const total = document.documentElement.scrollHeight - window.innerHeight;
         const profundidade = total > 0 ? window.scrollY / total : 0;
         const proximo = document.getElementById('proximo-culto');
+        // Quem já tem visita marcada ou chegou por um convite já vê o card no hero: não precisa do aviso
+        if (document.querySelector('.hero-visita')) { clearInterval(verificar); return; }
         if (celular() || naLocalizacao || !proximoPronto(proximo)) return;
         if (Date.now() - inicio < 20000 || profundidade < 0.6) return;
-        // Quem já tem visita marcada ou chegou por um convite já vê o card no hero
-        if (document.querySelector('.hero-visita')) return;
 
         clearInterval(verificar);
         try { sessionStorage.setItem('iejb-convite', '1'); } catch { /* modo privado */ }
@@ -649,7 +668,7 @@ let criarBotaoEuVou = null;
     const quandoLongo = (card, inicio) => `${textoDataLonga(inicio)} às\u00a0${horaDo(card)}`;
     const diasEntre = (de, ate) => Math.round((new Date(ate).setHours(0, 0, 0, 0) - new Date(de).setHours(0, 0, 0, 0)) / DIA_MS);
 
-    function quandoCurto(card, inicio, agora = new Date()) {
+    function quandoCurto(card, inicio, agora = agoraEmBrasilia()) {
         const dias = diasEntre(agora, inicio);
         return `${dias === 0 ? 'hoje' : dias === 1 ? 'amanhã' : NOMES_DIAS[inicio.getDay()]} às ${horaDo(card)}`;
     }
@@ -668,7 +687,7 @@ let criarBotaoEuVou = null;
         const procurado = paraSlug(String(slug ?? ''));
         return (procurado && cardsCultos.find(c => paraSlug(c.dataset.nome) === procurado)) || null;
     };
-    const proximoCulto = (agora = new Date()) => cardsCultos
+    const proximoCulto = (agora = agoraEmBrasilia()) => cardsCultos
         .map(card => ({ card, inicio: proximoInicio(card, agora) }))
         .sort((a, b) => a.inicio - b.inicio)[0].card;
 
@@ -808,7 +827,7 @@ let criarBotaoEuVou = null;
     };
 
     function marcarVisita(card) {
-        const agora = new Date();
+        const agora = agoraEmBrasilia();
         plano = { card, inicio: proximoInicio(card, agora), salvoEm: agora };
         guardar('localStorage', CHAVE_PLANO, { culto: card.dataset.nome, inicio: plano.inicio.toISOString(), salvoEm: agora.toISOString() });
         // Quem marcou a visita já respondeu ao convite
@@ -950,7 +969,7 @@ let criarBotaoEuVou = null;
     function atualizarCartao() {
         const ancora = document.querySelector('.hero .textos #proximo-culto');
         if (!ancora) return;
-        const agora = new Date();
+        const agora = agoraEmBrasilia();
         let conteudo = null;
         if (plano) {
             const estado = estadoDoPlano(agora);
@@ -972,6 +991,8 @@ let criarBotaoEuVou = null;
         else if (novo) ancora.after(novo);
         else if (cartao) cartao.remove();
         cartao = novo;
+        // Navegador sem :has() (Safari < 15.4, Firefox < 121): a classe esconde o chip no lugar dele
+        ancora.parentElement.classList.toggle('com-visita', Boolean(cartao));
 
         if (!tinhaFoco) return;
         if (cartao) cartao.querySelector('.hero-visita-titulo').focus({ preventScroll: true });
@@ -1672,6 +1693,16 @@ let criarBotaoEuVou = null;
     const preCarregar = () => { if (passos[0].foto) prepararFoto(new Image(), passos[0]); };
     botao.addEventListener('pointerenter', preCarregar, { once: true });
     botao.addEventListener('focus', preCarregar, { once: true });
+    // Monta o <dialog> antes do toque, quando o botão chega perto da tela e o navegador está
+    // livre: no celular fraco, montar na hora do clique atrasava a abertura em ~90ms
+    if (temObserver) {
+        const ocioso = window.requestIdleCallback || ((fn) => setTimeout(fn, 200));
+        new IntersectionObserver((entries, obs) => {
+            if (!entries[0].isIntersecting) return;
+            obs.disconnect();
+            ocioso(() => { if (!dialogo) montar(); });
+        }, { rootMargin: '300px 0px' }).observe(botao);
+    }
     botao.hidden = false;
 })();
 

@@ -3,11 +3,19 @@
 // Não precisa mexer aqui quando o site mudar.
 const CACHE = 'iejb-site';
 
-// A primeira visita não passa pelo service worker (ele ainda nem existia),
-// então a home é guardada já na instalação: é a página que aparece offline
+// A primeira visita não passa pelo service worker (ele ainda nem existia), então a home e
+// o que ela precisa para aparecer direito (CSS, JS, ícones, logo) são guardados já na
+// instalação. Os endereços são os mesmos dos <link>/<script> das páginas, com o ?v=2.
+// Cada um é tentado separado: um arquivo que falhe não impede os outros.
+const ESSENCIAIS = [
+    './', 'estilo/style.css?v=2', 'estilo/icones.css', 'script/script.js?v=2', 'script/visita.js?v=2',
+    'script/versiculos.js?v=2', 'images/logo-iejb-pequeno.png', 'estilo/fontes/iejb-icones-solid.woff2',
+    'estilo/fontes/iejb-icones-regular.woff2', 'estilo/fontes/iejb-icones-brands.woff2'
+];
+
 self.addEventListener('install', (e) => {
     self.skipWaiting();
-    e.waitUntil(caches.open(CACHE).then((cache) => cache.add('./')).catch(() => { }));
+    e.waitUntil(caches.open(CACHE).then((cache) => Promise.all(ESSENCIAIS.map((url) => cache.add(url).catch(() => { })))));
 });
 self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
 
@@ -25,7 +33,9 @@ function guardar(evento, chave, resp) {
 // ?fbclid=...) e, se aquela página nunca foi aberta, mostra a home guardada.
 async function semRede(req) {
     const navegacao = req.mode === 'navigate';
-    const guardado = await caches.match(req, { ignoreSearch: navegacao });
+    // CSS e JS também ignoram a query: se um dia o ?v=2 virar ?v=3, a cópia antiga ainda serve offline
+    const ignorar = navegacao || req.destination === 'style' || req.destination === 'script';
+    const guardado = await caches.match(req, { ignoreSearch: ignorar });
     if (guardado) return guardado;
     if (!navegacao) return Response.error();
 

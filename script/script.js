@@ -1,9 +1,11 @@
 const reduzirMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Navegador sem IntersectionObserver (muito antigo): tira o html.js, então nada fica
-// invisível esperando o reveal, e os efeitos que dependem de rolagem são pulados
+// Navegador sem IntersectionObserver (muito antigo): marca html.sem-observer, então nada
+// fica invisível esperando o reveal, e os efeitos que dependem de rolagem são pulados.
+// O html.js continua: ele significa "o script.js carregou" (sem ele, o CSS esconde os
+// botões que só funcionam com JS, como o menu do celular)
 const temObserver = 'IntersectionObserver' in window;
-if (!temObserver) document.documentElement.classList.remove('js');
+if (!temObserver) document.documentElement.classList.add('sem-observer');
 
 // Reveal: os elementos que entram na tela na mesma "leva" aparecem em cascata,
 // um 70ms depois do outro (--atraso no CSS). Quem entra sozinho aparece na hora.
@@ -147,11 +149,32 @@ function atualizarLinkAtivo() {
 
 const SECOES_ESCURAS = '.hero, .brand, .galeria, .depoimentos, .domingo, footer, .pag-galeria-hero, .fundacao-hero';
 
+// Fallback (navegador sem IntersectionObserver): olha o que está atrás do centro do header.
+// É um hit-test com layout forçado, caro demais para rodar a cada quadro da rolagem
 function atualizarTemaHeader() {
     const caixa = header.getBoundingClientRect();
     const atras = document.elementsFromPoint(caixa.left + caixa.width / 2, caixa.top + caixa.height / 2)
         .find(el => !header.contains(el));
     header.classList.toggle('sobre-escuro', Boolean(atras && atras.closest(SECOES_ESCURAS)));
+}
+
+// O normal: um IntersectionObserver vigia uma linha de 1px na altura do meio do header
+// e avisa quando uma seção escura entra ou sai dela, sem custo nenhum durante a rolagem
+let observadorTema = null;
+function montarObservadorTema() {
+    observadorTema?.disconnect();
+    const caixa = header.getBoundingClientRect();
+    const meio = Math.round(caixa.top + caixa.height / 2);
+    const escurasAtras = new Set();
+    observadorTema = new IntersectionObserver((entries) => {
+        entries.forEach(e => (e.isIntersecting ? escurasAtras.add(e.target) : escurasAtras.delete(e.target)));
+        header.classList.toggle('sobre-escuro', escurasAtras.size > 0);
+    }, { rootMargin: `-${meio}px 0px -${Math.max(0, window.innerHeight - meio - 1)}px 0px` });
+    document.querySelectorAll(SECOES_ESCURAS).forEach(secao => observadorTema.observe(secao));
+}
+if (header && temObserver) {
+    montarObservadorTema();
+    window.addEventListener('resize', montarObservadorTema);
 }
 
 // Cabeçalho, barra de progresso e botão "voltar ao topo"
@@ -174,10 +197,11 @@ function aoRolar() {
     rolagemAgendada = false;
     const rolado = window.scrollY;
     const total = document.documentElement.scrollHeight - window.innerHeight;
-    barraProgresso.style.width = total > 0 ? `${(rolado / total) * 100}%` : '0%';
+    // scaleX em vez de width: só a GPU trabalha, sem recalcular o layout a cada quadro
+    barraProgresso.style.transform = `scaleX(${total > 0 ? rolado / total : 0})`;
     if (header) {
         header.classList.toggle('rolou', rolado > 40);
-        atualizarTemaHeader();
+        if (!temObserver) atualizarTemaHeader();
     }
     botaoTopo.classList.toggle('visivel', rolado > 600);
     atualizarLinkAtivo();
@@ -210,7 +234,23 @@ const DURACAO_CULTO_MS = 2 * 60 * 60 * 1000;
 
 // Próxima data de um card de culto (usa data-dia e data-hora). Se o culto está
 // acontecendo agora, devolve o início dele.
-function proximaOcorrencia(card, agora = new Date()) {
+// "Agora" no relógio de Brasília (a igreja fica lá): quem abre o site com o celular em
+// outro fuso continua vendo "hoje", "amanhã" e "acontecendo agora" certos. Devolve uma
+// data cujos campos locais (getDay, getHours...) são os de Brasília, igual aos cards.
+function agoraEmBrasilia() {
+    try {
+        const p = {};
+        new Intl.DateTimeFormat('en-US', {
+            timeZone: 'America/Sao_Paulo', hourCycle: 'h23', year: 'numeric', month: 'numeric',
+            day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric'
+        }).formatToParts(new Date()).forEach(({ type, value }) => { p[type] = Number(value); });
+        return new Date(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+    } catch {
+        return new Date();
+    }
+}
+
+function proximaOcorrencia(card, agora = agoraEmBrasilia()) {
     const [h, m] = card.dataset.hora.split(':').map(Number);
     const inicio = new Date(agora);
     inicio.setHours(h, m, 0, 0);
@@ -220,7 +260,7 @@ function proximaOcorrencia(card, agora = new Date()) {
 }
 
 // Próxima vez que o culto COMEÇA (pula o que já está acontecendo): para planejar e lembrar
-function proximoInicio(card, agora = new Date()) {
+function proximoInicio(card, agora = agoraEmBrasilia()) {
     const inicio = proximaOcorrencia(card, agora);
     if (inicio <= agora) inicio.setDate(inicio.getDate() + 7);
     return inicio;
@@ -232,7 +272,7 @@ function atualizarProximoCulto() {
     if (!faixa || !cards.length) return;
 
     const dias = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
-    const agora = new Date();
+    const agora = agoraEmBrasilia();
 
     const proximos = cards.map(card => ({ card, inicio: proximaOcorrencia(card, agora) }))
         .sort((a, b) => a.inicio - b.inicio);
@@ -263,13 +303,23 @@ setInterval(atualizarProximoCulto, 60000);
     const vazio = document.getElementById('eventos-vazio');
     if (!container) return;
 
-    const agora = new Date();
+    const agora = agoraEmBrasilia();
     const eventos = [...container.querySelectorAll('.eventos-grid[data-data]')].map(el => {
         const [a, m, d] = el.dataset.data.split('-').map(Number);
-        return { el, fim: new Date(a, m - 1, d, 23, 59, 59) };
+        // Com horário ("19h30"), o evento sai da agenda 3h depois de começar; sem horário,
+        // no fim do dia. Evento de vários dias usa data-data-fim="AAAA-MM-DD"
+        const hora = (el.querySelector('.horario p')?.textContent || '').match(/(\d{1,2})h(\d{2})?/);
+        let fim = hora
+            ? new Date(a, m - 1, d, Number(hora[1]) + 3, Number(hora[2] || 0))
+            : new Date(a, m - 1, d, 23, 59, 59);
+        if (el.dataset.dataFim) {
+            const [af, mf, df] = el.dataset.dataFim.split('-').map(Number);
+            fim = new Date(af, mf - 1, df, 23, 59, 59);
+        }
+        return { el, inicio: new Date(a, m - 1, d), fim };
     });
 
-    eventos.sort((x, y) => x.fim - y.fim).forEach(({ el }) => container.appendChild(el));
+    eventos.sort((x, y) => x.inicio - y.inicio).forEach(({ el }) => container.appendChild(el));
 
     let restantes = 0;
     eventos.forEach(({ el, fim }) => {
@@ -278,10 +328,9 @@ setInterval(atualizarProximoCulto, 60000);
         if (!passou) restantes++;
     });
 
-    if (!restantes) {
-        container.hidden = true;
-        if (vazio) vazio.hidden = false;
-    }
+    // O aviso "Em breve" já vem visível no HTML (é o que aparece sem JS quando a agenda está vazia)
+    container.hidden = !restantes;
+    if (vazio) vazio.hidden = restantes > 0;
 })();
 
 // Versículo do dia (muda automaticamente a cada dia)
@@ -343,6 +392,8 @@ setInterval(atualizarProximoCulto, 60000);
     if (jaAberto) abrir(false);
 
     botao.addEventListener('click', () => {
+        // Página aberta desde ontem: recarrega para mostrar (e registrar) o versículo de hoje
+        if (nomeDia(new Date()) !== chaveHoje) { location.reload(); return; }
         abrir(!reduzirMovimento);
         frase.focus();
         try { localStorage.setItem(CHAVE, chaveHoje); } catch { /* modo privado */ }
@@ -581,23 +632,26 @@ document.addEventListener("DOMContentLoaded", () => {
         p.replaceChildren(leitor, visual);
     });
 
-    // Função que faz o efeito de digitar
+    // Efeito de digitar. Conta pelo relógio (22ms por letra), não por quantas vezes rodou:
+    // num celular lento a velocidade é a mesma, só pula letras em vez de atrasar. E só
+    // repinta a cada 3 letras, num único nó de texto, para não ocupar o processador
     function digitarTexto(elemento) {
         const texto = elemento.dataset.textoCompleto;
-        const visual = elemento.querySelector('.digitando');
-        let i = 0;
-        visual.textContent = ''; // Garante que está limpo
+        const no = document.createTextNode('');
+        elemento.querySelector('.digitando').replaceChildren(no);
+        const inicio = performance.now();
+        let escritas = 0;
 
-        function tipo() {
-            if (i < texto.length) {
-                visual.textContent += texto.charAt(i);
-                i++;
-                setTimeout(tipo, 22); // Velocidade da digitação (em milissegundos)
-            } else {
-                elemento.classList.add('digitado'); // Some com o cursor no final
+        function quadro(agora) {
+            const alvo = Math.min(texto.length, Math.floor((agora - inicio) / 22));
+            if (alvo - escritas >= 3 || (alvo === texto.length && alvo !== escritas)) {
+                escritas = alvo;
+                no.nodeValue = texto.slice(0, escritas);
             }
+            if (escritas < texto.length) requestAnimationFrame(quadro);
+            else elemento.classList.add('digitado'); // Some com o cursor no final
         }
-        tipo();
+        requestAnimationFrame(quadro);
     }
 
     // Observer para detectar quando a seção aparece na tela
