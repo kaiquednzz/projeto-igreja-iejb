@@ -212,6 +212,7 @@ const dadosEventos = [];
             titulo, descricao, inicio, comHora: Boolean(hora), externo, url: link,
             // Sem horário de término no card: o mesmo padrão de 2h do lembrete (.ics)
             fim: ultimoDia || (hora ? new Date(inicio.getTime() + 120 * 60000) : dia),
+            fimComHora: Boolean(hora) && !ultimoDia,
             localNome: el.dataset.localNome, localCidade: el.dataset.localCidade,
             imagem: el.dataset.imagem ? new URL(el.dataset.imagem, location.href).href : null
         });
@@ -240,7 +241,7 @@ const dadosEventos = [];
             description: e.descricao,
             url: e.url,
             startDate: iso(e.inicio, e.comHora),
-            endDate: iso(e.fim, e.comHora && e.fim.getHours() + e.fim.getMinutes() > 0),
+            endDate: iso(e.fim, e.fimComHora),
             eventStatus: 'https://schema.org/EventScheduled',
             eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
             location: e.externo
