@@ -149,11 +149,32 @@ function atualizarLinkAtivo() {
 
 const SECOES_ESCURAS = '.hero, .brand, .galeria, .depoimentos, .domingo, footer, .pag-galeria-hero, .fundacao-hero';
 
+// Fallback (navegador sem IntersectionObserver): olha o que está atrás do centro do header.
+// É um hit-test com layout forçado, caro demais para rodar a cada quadro da rolagem
 function atualizarTemaHeader() {
     const caixa = header.getBoundingClientRect();
     const atras = document.elementsFromPoint(caixa.left + caixa.width / 2, caixa.top + caixa.height / 2)
         .find(el => !header.contains(el));
     header.classList.toggle('sobre-escuro', Boolean(atras && atras.closest(SECOES_ESCURAS)));
+}
+
+// O normal: um IntersectionObserver vigia uma linha de 1px na altura do meio do header
+// e avisa quando uma seção escura entra ou sai dela, sem custo nenhum durante a rolagem
+let observadorTema = null;
+function montarObservadorTema() {
+    observadorTema?.disconnect();
+    const caixa = header.getBoundingClientRect();
+    const meio = Math.round(caixa.top + caixa.height / 2);
+    const escurasAtras = new Set();
+    observadorTema = new IntersectionObserver((entries) => {
+        entries.forEach(e => (e.isIntersecting ? escurasAtras.add(e.target) : escurasAtras.delete(e.target)));
+        header.classList.toggle('sobre-escuro', escurasAtras.size > 0);
+    }, { rootMargin: `-${meio}px 0px -${Math.max(0, window.innerHeight - meio - 1)}px 0px` });
+    document.querySelectorAll(SECOES_ESCURAS).forEach(secao => observadorTema.observe(secao));
+}
+if (header && temObserver) {
+    montarObservadorTema();
+    window.addEventListener('resize', montarObservadorTema);
 }
 
 // Cabeçalho, barra de progresso e botão "voltar ao topo"
@@ -176,10 +197,11 @@ function aoRolar() {
     rolagemAgendada = false;
     const rolado = window.scrollY;
     const total = document.documentElement.scrollHeight - window.innerHeight;
-    barraProgresso.style.width = total > 0 ? `${(rolado / total) * 100}%` : '0%';
+    // scaleX em vez de width: só a GPU trabalha, sem recalcular o layout a cada quadro
+    barraProgresso.style.transform = `scaleX(${total > 0 ? rolado / total : 0})`;
     if (header) {
         header.classList.toggle('rolou', rolado > 40);
-        atualizarTemaHeader();
+        if (!temObserver) atualizarTemaHeader();
     }
     botaoTopo.classList.toggle('visivel', rolado > 600);
     atualizarLinkAtivo();
@@ -610,23 +632,26 @@ document.addEventListener("DOMContentLoaded", () => {
         p.replaceChildren(leitor, visual);
     });
 
-    // Função que faz o efeito de digitar
+    // Efeito de digitar. Conta pelo relógio (22ms por letra), não por quantas vezes rodou:
+    // num celular lento a velocidade é a mesma, só pula letras em vez de atrasar. E só
+    // repinta a cada 3 letras, num único nó de texto, para não ocupar o processador
     function digitarTexto(elemento) {
         const texto = elemento.dataset.textoCompleto;
-        const visual = elemento.querySelector('.digitando');
-        let i = 0;
-        visual.textContent = ''; // Garante que está limpo
+        const no = document.createTextNode('');
+        elemento.querySelector('.digitando').replaceChildren(no);
+        const inicio = performance.now();
+        let escritas = 0;
 
-        function tipo() {
-            if (i < texto.length) {
-                visual.textContent += texto.charAt(i);
-                i++;
-                setTimeout(tipo, 22); // Velocidade da digitação (em milissegundos)
-            } else {
-                elemento.classList.add('digitado'); // Some com o cursor no final
+        function quadro(agora) {
+            const alvo = Math.min(texto.length, Math.floor((agora - inicio) / 22));
+            if (alvo - escritas >= 3 || (alvo === texto.length && alvo !== escritas)) {
+                escritas = alvo;
+                no.nodeValue = texto.slice(0, escritas);
             }
+            if (escritas < texto.length) requestAnimationFrame(quadro);
+            else elemento.classList.add('digitado'); // Some com o cursor no final
         }
-        tipo();
+        requestAnimationFrame(quadro);
     }
 
     // Observer para detectar quando a seção aparece na tela

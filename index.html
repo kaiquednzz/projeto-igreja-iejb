@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="view-transition" content="same-origin" />
     <!-- Marca que o JS está ligado (o .reveal só fica invisível com ele); script.js tira se falhar -->
-    <script>document.documentElement.classList.add('js')</script>
+    <script>document.documentElement.classList.add('js');
+        // Modo leve (celular com pouca memória, economia de dados ou sistema pedindo menos transparência): vidro vira fundo sólido
+        try { var n = navigator, c = n.connection || {}; if ((n.deviceMemory && n.deviceMemory <= 2) || c.saveData || matchMedia('(prefers-reduced-transparency: reduce)').matches) document.documentElement.classList.add('leve'); } catch (e) { }</script>
     <title>IEJB - Igreja Evangélica do Jardim Brasil | Araçariguama, SP</title>
     <meta name="description"
         content="Igreja evangélica no Jardim Brasil, Araçariguama-SP. Cultos: domingo às 9h (EBD) e 18h, terça às 19h30. Rua Ceará, 128. Venha como você é!">

@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="view-transition" content="same-origin" />
-    <script>document.documentElement.classList.add('js')</script>
+    <script>document.documentElement.classList.add('js');
+        // Modo leve (celular com pouca memória, economia de dados ou sistema pedindo menos transparência): vidro vira fundo sólido
+        try { var n = navigator, c = n.connection || {}; if ((n.deviceMemory && n.deviceMemory <= 2) || c.saveData || matchMedia('(prefers-reduced-transparency: reduce)').matches) document.documentElement.classList.add('leve'); } catch (e) { }</script>
     <title>Página não encontrada | IEJB - Igreja Evangélica do Jardim Brasil</title>
     <meta name="robots" content="noindex">
     <link rel="preconnect" href="https://fonts.googleapis.com">

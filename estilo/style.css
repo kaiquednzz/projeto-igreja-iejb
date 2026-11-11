@@ -236,7 +236,10 @@ summary:focus-visible,
 }
 
 .reveal.visible {
-    animation: revelar 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    /* backwards (e não both): durante o atraso fica no estado inicial, e ao terminar a
+       animação "solta" o elemento. Com both, cada bloco já revelado continuava preso numa
+       camada da GPU para sempre (eram ~100 no fim da página) */
+    animation: revelar 0.9s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     animation-delay: var(--atraso, 0s);
 }
 
@@ -3775,9 +3778,11 @@ html.stories-aberto {
     top: 0;
     left: 0;
     height: 3px;
-    width: 0;
+    width: 100%;
     z-index: 1200;
-    border-radius: 0 3px 3px 0;
+    /* O script.js estica com scaleX conforme a rolagem */
+    transform: scaleX(0);
+    transform-origin: 0 0;
     background-image: linear-gradient(90deg, var(--principal), var(--principal-brighter), #ff7a59);
     box-shadow: 0 0 10px rgba(191, 38, 43, 0.5);
 }
@@ -4520,6 +4525,68 @@ html.lightbox-aberto {
         transform: translateX(0);
         opacity: 1;
     }
+}
+
+/* ===== Modo leve =====
+   html.leve vem do script no <head> de cada página: celular com pouca memória (Android de
+   entrada), economia de dados ligada ou o sistema pedindo menos transparência. O desfoque
+   ao vivo de tudo que fica fixo na tela (header, menu, barra, botões) é o que mais pesa
+   numa GPU fraca durante a rolagem, então ali o vidro vira um fundo quase sólido, e a
+   entrada dos blocos sobe sem o desembaçar. Nos celulares bons nada muda. */
+.leve {
+    --desfoque: none;
+}
+
+.leve header::before {
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+.leve header.sobre-escuro::before {
+    background-color: rgba(40, 4, 3, 0.92);
+}
+
+.leve header nav {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+@media (max-width: 900px) {
+    .leve header nav {
+        background-color: rgba(255, 255, 255, 0.98);
+    }
+}
+
+.leve .ministerios .ministerios-container .ministerios-grid .textos {
+    background-color: rgba(255, 255, 255, 0.94);
+}
+
+.leve .botao-topo,
+.leve .convite {
+    background-color: rgba(255, 255, 255, 0.96);
+}
+
+.leve .toast {
+    background-color: rgba(30, 30, 32, 0.95);
+}
+
+.leve .barra-visita {
+    background-color: rgba(40, 4, 3, 0.95);
+}
+
+.leve .reveal.visible {
+    animation-name: revelarLeve;
+    animation-duration: 0.5s;
+}
+
+@keyframes revelarLeve {
+    from {
+        opacity: 0;
+        translate: 0 12px;
+    }
+}
+
+.leve .quem-somos .imagem img {
+    animation: none;
 }
 
 /* ===== Alto contraste e impressão ===== */

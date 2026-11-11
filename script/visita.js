@@ -565,10 +565,14 @@ const dadosEventos = [];
         }).observe(localizacao);
     }
 
+    let mostrando = null;
     function atualizarBarra() {
         const proximo = document.getElementById('proximo-culto');
         const passouDoHero = window.scrollY > alturaHero - 100;
         const mostrar = Boolean(celular() && passouDoHero && !naLocalizacao && proximoPronto(proximo));
+        // Roda a cada quadro da rolagem: se nada mudou, não mexe no DOM
+        if (mostrar === mostrando && (!mostrar || textoBarra.textContent === proximo.textContent)) return;
+        mostrando = mostrar;
         if (mostrar) textoBarra.textContent = proximo.textContent;
         barra.classList.toggle('visivel', mostrar);
         // Fora da tela, a barra não pode receber o foco do Tab nem ser lida
@@ -594,7 +598,8 @@ const dadosEventos = [];
     // Aviso gentil (uma vez por sessão): só no computador, depois de ler boa parte da página
     let jaViu = false;
     try { jaViu = sessionStorage.getItem('iejb-convite') === '1'; } catch { /* modo privado */ }
-    if (jaViu) return;
+    // O aviso é só para o computador: no celular a barra fixa já faz esse papel
+    if (jaViu || celular()) return;
 
     const inicio = Date.now();
     const verificar = setInterval(() => {
@@ -1687,6 +1692,16 @@ let criarBotaoEuVou = null;
     const preCarregar = () => { if (passos[0].foto) prepararFoto(new Image(), passos[0]); };
     botao.addEventListener('pointerenter', preCarregar, { once: true });
     botao.addEventListener('focus', preCarregar, { once: true });
+    // Monta o <dialog> antes do toque, quando o botão chega perto da tela e o navegador está
+    // livre: no celular fraco, montar na hora do clique atrasava a abertura em ~90ms
+    if (temObserver) {
+        const ocioso = window.requestIdleCallback || ((fn) => setTimeout(fn, 200));
+        new IntersectionObserver((entries, obs) => {
+            if (!entries[0].isIntersecting) return;
+            obs.disconnect();
+            ocioso(() => { if (!dialogo) montar(); });
+        }, { rootMargin: '300px 0px' }).observe(botao);
+    }
     botao.hidden = false;
 })();
 
