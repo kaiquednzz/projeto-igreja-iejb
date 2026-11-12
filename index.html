@@ -79,7 +79,6 @@
                     "postalCode": "18147-000",
                     "addressCountry": "BR"
                 },
-                "geo": { "@type": "GeoCoordinates", "latitude": -23.42888942, "longitude": -47.07071296 },
                 "hasMap": "https://maps.app.goo.gl/t8zvQi2DQzQXud8M9",
                 "sameAs": ["https://www.instagram.com/iejbrasil/"],
                 "areaServed": { "@type": "City", "name": "Araçariguama" },
@@ -672,7 +671,7 @@
 
                 <div class="localizacao-container reveal">
                     <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3660.8746924174843!2d-47.07071295527709!3d-23.42888942462941!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94cf13f87c149757%3A0x322a0dbdcc2396f!2sR.%20Cear%C3%A1%2C%20128%2C%20Ara%C3%A7ariguama%20-%20SP%2C%2018147-000!5e0!3m2!1spt-BR!2sbr!4v1776214008074!5m2!1spt-BR!2sbr"
+                        src="https://www.google.com/maps?q=Rua%20Cear%C3%A1%2C%20128%20-%20Jardim%20Brasil%2C%20Ara%C3%A7ariguama%20-%20SP%2C%2018147-000&amp;output=embed"
                         title="Localização da IEJB - Igreja Evangélica em Araçariguama, SP" allowfullscreen=""
                         loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                     <!-- Foto da fachada ao lado do endereço (no celular, entre o mapa e os cartões) -->
@@ -695,9 +694,10 @@
                     </div>
                     <a href="https://maps.app.goo.gl/t8zvQi2DQzQXud8M9" target="_blank" rel="noopener noreferrer">Abrir no Google Maps <span aria-hidden="true">→</span></a>
                     <div class="localizacao-acoes">
-                        <a href="https://waze.com/ul?ll=-23.42888942,-47.07071296&navigate=yes" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-waze" aria-hidden="true"></i>Abrir no Waze</a>
-                        <a href="https://m.uber.com/ul/?action=setPickup&amp;pickup=my_location&amp;dropoff[latitude]=-23.42888942&amp;dropoff[longitude]=-47.07071296&amp;dropoff[nickname]=IEJB&amp;dropoff[formatted_address]=Rua%20Cear%C3%A1%2C%20128%20-%20Jardim%20Brasil%2C%20Ara%C3%A7ariguama%20-%20SP%2C%2018147-000" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-uber" aria-hidden="true"></i>Pedir um Uber</a>
-                        <button type="button" id="btn-distancia"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>Qual a distância?</button>
+                        <a href="https://waze.com/ul?q=Rua%20Cear%C3%A1%2C%20128%20-%20Jardim%20Brasil%2C%20Ara%C3%A7ariguama%20-%20SP%2C%2018147-000&amp;navigate=yes" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-waze" aria-hidden="true"></i>Abrir no Waze</a>
+                        <!-- Uber precisa das coordenadas exatas da igreja: fica escondido até elas serem confirmadas (COORDENADAS_IEJB em visita.js) -->
+                        <a hidden href="https://m.uber.com/ul/?action=setPickup&amp;pickup=my_location&amp;dropoff[latitude]=-23.42888942&amp;dropoff[longitude]=-47.07071296&amp;dropoff[nickname]=IEJB&amp;dropoff[formatted_address]=Rua%20Cear%C3%A1%2C%20128%20-%20Jardim%20Brasil%2C%20Ara%C3%A7ariguama%20-%20SP%2C%2018147-000" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-uber" aria-hidden="true"></i>Pedir um Uber</a>
+                        <button type="button" id="btn-distancia" hidden><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>Qual a distância?</button>
                         <button type="button" id="copiar-endereco" data-endereco="Rua Ceará, 128 - Jardim Brasil, Araçariguama - SP, 18147-000"><i class="fa-regular fa-copy" aria-hidden="true"></i>Copiar endereço</button>
                     </div>
                     <p class="localizacao-distancia" id="distancia-resultado" aria-live="polite"></p>
@@ -762,7 +762,7 @@
     <aside class="atalhos" aria-label="Atalhos">
     <div class="barra-visita" id="barra-visita">
         <span id="barra-visita-texto"></span>
-        <a href="https://www.google.com/maps/dir/?api=1&destination=-23.42888942,-47.07071296" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-route" aria-hidden="true"></i>Como chegar</a>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=Rua%20Cear%C3%A1%2C%20128%20-%20Jardim%20Brasil%2C%20Ara%C3%A7ariguama%20-%20SP%2C%2018147-000" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-route" aria-hidden="true"></i>Como chegar</a>
     </div>
 
     <div class="botao-instagram">
