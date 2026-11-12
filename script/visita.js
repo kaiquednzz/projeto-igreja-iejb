@@ -3,7 +3,13 @@
 // reduzirMovimento, temObserver).
 
 const LOCAL_IEJB = 'IEJB - Rua Ceará, 128, Jardim Brasil, Araçariguama - SP';
-const COORDENADAS_IEJB = { lat: -23.42888942, lng: -47.07071296 };
+// As coordenadas antigas apontavam para o lugar errado. Enquanto as certas não forem
+// confirmadas (abrir o Google Maps, tocar e segurar no portão da igreja e copiar os números),
+// as rotas usam o endereço escrito, e o Uber e o "Qual a distância?" ficam escondidos.
+// Com as coordenadas: { lat: -23.xxxxx, lng: -47.xxxxx }, e tirar o hidden dos dois no index.html
+const COORDENADAS_IEJB = null;
+const ENDERECO_ROTA = 'Rua Ceará, 128 - Jardim Brasil, Araçariguama - SP, 18147-000';
+const ROTA_IEJB = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(ENDERECO_ROTA)}`;
 const NOMES_DIAS = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
 
 const ENDERECO_IEJB = {
@@ -319,7 +325,7 @@ const dadosEventos = [];
         cal.innerHTML = '<i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>Adicionar ao calendário';
         cal.addEventListener('click', () => baixarICSDoCulto(card));
         const rota = document.createElement('a');
-        rota.href = `https://www.google.com/maps/dir/?api=1&destination=${COORDENADAS_IEJB.lat},${COORDENADAS_IEJB.lng}`;
+        rota.href = ROTA_IEJB;
         rota.target = '_blank';
         rota.rel = 'noopener noreferrer';
         rota.innerHTML = '<i class="fa-solid fa-route" aria-hidden="true"></i>Como chegar';
@@ -500,7 +506,9 @@ const dadosEventos = [];
     const botao = document.getElementById('btn-distancia');
     const saida = document.getElementById('distancia-resultado');
     if (!botao || !saida) return;
-    if (!('geolocation' in navigator)) { botao.hidden = true; return; }
+    // Sem coordenadas confirmadas da igreja não dá para calcular a distância
+    if (!COORDENADAS_IEJB || !('geolocation' in navigator)) { botao.hidden = true; return; }
+    botao.hidden = false;
 
     const haversine = (a, b) => {
         const rad = (g) => (g * Math.PI) / 180;
@@ -531,7 +539,7 @@ const dadosEventos = [];
             const rota = document.createElement('a');
             // Sem "origin": o Google Maps usa a localização atual sozinho, e as coordenadas
             // da pessoa não precisam ir no link
-            rota.href = `https://www.google.com/maps/dir/?api=1&destination=${COORDENADAS_IEJB.lat},${COORDENADAS_IEJB.lng}`;
+            rota.href = ROTA_IEJB;
             rota.target = '_blank';
             rota.rel = 'noopener noreferrer';
             rota.innerHTML = 'Traçar rota <span aria-hidden="true">→</span>';
@@ -647,7 +655,7 @@ let criarBotaoEuVou = null;
     const CHAVE_CONVITE = 'iejb-convite-recebido';
     const DIAS_PARA_PERGUNTAR = 10;
     const DIA_MS = 86400000;
-    const ROTA = `https://www.google.com/maps/dir/?api=1&destination=${COORDENADAS_IEJB.lat},${COORDENADAS_IEJB.lng}`;
+    const ROTA = ROTA_IEJB;
     const ENDERECO = `${ENDERECO_IEJB.streetAddress}, ${ENDERECO_IEJB.addressLocality} - ${ENDERECO_IEJB.addressRegion}, ${ENDERECO_IEJB.postalCode}`;
     const LOGO = new URL('../images/logo-iejb-pequeno.png', document.currentScript?.src || location.href).href;
 
