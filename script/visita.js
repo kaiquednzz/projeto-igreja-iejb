@@ -3,11 +3,9 @@
 // reduzirMovimento, temObserver).
 
 const LOCAL_IEJB = 'IEJB - Rua Ceará, 128, Jardim Brasil, Araçariguama - SP';
-// As coordenadas antigas apontavam para o lugar errado. Enquanto as certas não forem
-// confirmadas (abrir o Google Maps, tocar e segurar no portão da igreja e copiar os números),
-// as rotas usam o endereço escrito, e o Uber e o "Qual a distância?" ficam escondidos.
-// Com as coordenadas: { lat: -23.xxxxx, lng: -47.xxxxx }, e tirar o hidden dos dois no index.html
-const COORDENADAS_IEJB = null;
+// Pino da igreja no Google Maps (confirmado). As coordenadas antigas (-23.4288, -47.0707)
+// caíam uns 500 m a oeste, na Rua Leopoldo da Silva
+const COORDENADAS_IEJB = { lat: -23.4288865, lng: -47.0658478 };
 const ENDERECO_ROTA = 'Rua Ceará, 128 - Jardim Brasil, Araçariguama - SP, 18147-000';
 const ROTA_IEJB = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(ENDERECO_ROTA)}`;
 const NOMES_DIAS = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];

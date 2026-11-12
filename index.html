@@ -79,6 +79,7 @@
                     "postalCode": "18147-000",
                     "addressCountry": "BR"
                 },
+                "geo": { "@type": "GeoCoordinates", "latitude": -23.4288865, "longitude": -47.0658478 },
                 "hasMap": "https://maps.app.goo.gl/t8zvQi2DQzQXud8M9",
                 "sameAs": ["https://www.instagram.com/iejbrasil/"],
                 "areaServed": { "@type": "City", "name": "Araçariguama" },
@@ -694,9 +695,8 @@
                     </div>
                     <a href="https://maps.app.goo.gl/t8zvQi2DQzQXud8M9" target="_blank" rel="noopener noreferrer">Abrir no Google Maps <span aria-hidden="true">→</span></a>
                     <div class="localizacao-acoes">
-                        <a href="https://waze.com/ul?q=Rua%20Cear%C3%A1%2C%20128%20-%20Jardim%20Brasil%2C%20Ara%C3%A7ariguama%20-%20SP%2C%2018147-000&amp;navigate=yes" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-waze" aria-hidden="true"></i>Abrir no Waze</a>
-                        <!-- Uber precisa das coordenadas exatas da igreja: fica escondido até elas serem confirmadas (COORDENADAS_IEJB em visita.js) -->
-                        <a hidden href="https://m.uber.com/ul/?action=setPickup&amp;pickup=my_location&amp;dropoff[latitude]=-23.42888942&amp;dropoff[longitude]=-47.07071296&amp;dropoff[nickname]=IEJB&amp;dropoff[formatted_address]=Rua%20Cear%C3%A1%2C%20128%20-%20Jardim%20Brasil%2C%20Ara%C3%A7ariguama%20-%20SP%2C%2018147-000" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-uber" aria-hidden="true"></i>Pedir um Uber</a>
+                        <a href="https://waze.com/ul?ll=-23.4288865,-47.0658478&amp;navigate=yes" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-waze" aria-hidden="true"></i>Abrir no Waze</a>
+                        <a href="https://m.uber.com/ul/?action=setPickup&amp;pickup=my_location&amp;dropoff[latitude]=-23.4288865&amp;dropoff[longitude]=-47.0658478&amp;dropoff[nickname]=IEJB&amp;dropoff[formatted_address]=Rua%20Cear%C3%A1%2C%20128%20-%20Jardim%20Brasil%2C%20Ara%C3%A7ariguama%20-%20SP%2C%2018147-000" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-uber" aria-hidden="true"></i>Pedir um Uber</a>
                         <button type="button" id="btn-distancia" hidden><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>Qual a distância?</button>
                         <button type="button" id="copiar-endereco" data-endereco="Rua Ceará, 128 - Jardim Brasil, Araçariguama - SP, 18147-000"><i class="fa-regular fa-copy" aria-hidden="true"></i>Copiar endereço</button>
                     </div>
