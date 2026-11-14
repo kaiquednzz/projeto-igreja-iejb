@@ -1,0 +1,61 @@
+# Traz os eventos publicados no IEJB Hub (app.iejb.com.br > Eventos) para o
+# index.html. Roda a cada 15 minutos (o GitHub às vezes atrasa alguns minutos)
+# e também na mão: Actions > Eventos do Hub > Run workflow.
+#
+# Só LÊ do Hub, pela função pública eventos_do_site (eventos publicados que
+# não passaram). A chave abaixo é a "publishable" do Supabase: ela é pública
+# de propósito (vai no app de qualquer jeito) e sozinha não lê nada além do
+# que o banco libera para visitantes. Não é segredo e não dá para escrever
+# no Hub com ela.
+#
+# Se o Hub não responder, o passo falha e o site fica como estava.
+name: Eventos do Hub
+
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write   # commitar o index.html
+  pages: write      # pedir a publicação do GitHub Pages
+
+concurrency:
+  group: eventos-do-hub
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Buscar eventos no Hub e gerar o HTML
+        env:
+          SUPABASE_URL: https://hqalztygktkabwybmdyl.supabase.co
+          SUPABASE_CHAVE: sb_publishable_Kmg39L8l9I6RhBwNb1BnTw_wIEjTirv
+        run: python3 ferramentas/eventos-do-hub.py
+
+      - name: Publicar se mudou
+        id: publicar
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "Nenhum evento mudou."
+            exit 0
+          fi
+          git config user.name "IEJB Hub"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "chore: eventos atualizados pelo IEJB Hub"
+          git push
+          echo "mudou=sim" >> "$GITHUB_OUTPUT"
+
+      # Commit feito pelo próprio Action nem sempre dispara o build do Pages:
+      # pede explicitamente. Se o Pages já tiver começado sozinho, tudo bem.
+      - name: Pedir publicação do site
+        if: steps.publicar.outputs.mudou == 'sim'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds"
